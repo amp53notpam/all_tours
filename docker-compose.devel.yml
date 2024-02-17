@@ -1,0 +1,28 @@
+version: "3.8"
+
+services: 
+    web:
+        build:
+            context: ./services/web
+            dockerfile: Dockerfile.devel
+        command: python  wsgi.py
+        volumes:
+            - ./services/web:/opt/app
+        ports:
+            - 8080:5000
+        env_file:
+            - ./.env.dev
+        depends_on:
+            - db
+
+    db:
+        image: postgres:15-alpine
+        volumes:
+            - postgres_data:/var/lib/postgresql/data/
+        environment:
+            - POSTGRES_USER=amp53notpam
+            - POSTGRES_PASSWORD=Install$$10
+            - POSTGRES_DB=berlin_tour
+
+volumes:
+    postgres_data:

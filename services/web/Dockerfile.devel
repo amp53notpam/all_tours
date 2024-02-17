@@ -1,0 +1,26 @@
+# pull official base image for python
+FROM python:3.11.7-slim-bookworm
+
+# set the work directory
+WORKDIR /opt/app
+
+# set the environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# 
+
+# install system dependencies
+RUN apt-get update && apt-get install -y netcat-openbsd locales && rm -r /var/lib/apt/lists/*
+RUN echo "it_IT.UTF-8 UTF-8" >> /etc/locale.gen && dpkg-reconfigure --frontend=noninteractive locales
+
+# install dependencies
+RUN pip install --upgrade pip && pip install wheel
+COPY ./requirements.txt /opt/app/requirements.txt
+RUN pip install -r requirements.txt
+
+# copy project
+COPY . /opt/app
+
+# run entrypoint.sh
+ENTRYPOINT ["/opt/app/entrypoint.sh"]

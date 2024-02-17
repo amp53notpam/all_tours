@@ -1,0 +1,146 @@
+{% extends 'layout.jinja2' %}
+
+{% block styles %}
+<style>
+	h1 {
+		color: #cddc39
+		letter-spacing: 5px;
+		font-size: 2rem;
+        margin-top: 50px;
+	}
+    h2 {
+        margin-top: 50px;
+        margin-bottom: 60px;
+    }
+  p, a {
+    font-size: 1.2rem;
+  }
+</style>
+{% endblock %}
+
+{% block header %}
+	<div class="w3-display-container" style="display: none">
+		<h1 class="w3-display-middle">{% block title %}Tappe{% endblock %}</h1>
+	</div>
+{% endblock %}
+
+{% block content %}
+<div class="w3-sidebar w3-bar-block w3-sand w3-card" style="width: 25%">
+  <h4 class="w3-bar-item  w3-orange">Tappe</h4>
+  {% for result in results %}
+  	<button class="w3-bar-item w3-button w3-hover-amber tablink" onclick='openLap(event, "{{ result.Lap.start }}")'>{{ result.Lap.start }} - {{ result.Lap.destination }}</button>
+  {% endfor %}
+</div>
+
+<div style="margin-left: 25%;">
+{% for result in results %}
+	<div id="{{ result.Lap.start }}" class="w3-container tappa" style="display: none">
+  	<div class="w3-display-container" style="height: 200px;">
+		  <h2 class="w3-display-middle">{{ result.Lap.start }} - {{ result.Lap.destination }}</h2>
+	  </div>
+
+    <div style="margin-top: 100px">
+      <div class="w3-row w3-container">
+        <div class="w3-col l3 m3 s5 w3-khaki">
+          <p class="w3-left-align">Data:</p>
+        </div>
+        <div class="w3-col l4 m3 s5 w3-khaki">
+          <p class="w3-left-align">{{ result.Lap.date.strftime("%a %d %b") }}</p>
+        </div>
+      </div>
+
+      <div class="w3-row w3-container">
+        <div class="w3-col l3 m3 s5 w3-pale-yellow">
+          <p class="w3-left-align">Distanza:</p>
+        </div>
+        <div class="w3-col l4 m3 s5 w3-pale-yellow">
+          <p class="w3-left-align">{{ result.Lap.distance }}</p>
+        </div>
+      </div>
+
+      <div class="w3-row w3-container">
+        <div class="w3-col l3 m3 s5 w3-khaki">
+          <p class="w3-left-align">Dislivello salita:</p>
+        </div>
+        <div class="w3-col l4 m3 s5 w3-khaki">
+          <p class="w3-left-align">{{ result.Lap.ascent }}</p>
+        </div>
+      </div>
+
+      <div class="w3-row w3-container">
+        <div class="w3-col l3 m3 s5 w3-pale-yellow">
+          <p class="w3-left-align">Dislivello discesa:</p>
+        </div>
+        <div class="w3-col l4 m3 s5 w3-pale-yellow">
+          <p class="w3-left-align">{{ result.Lap.descent }}</p>
+        </div>
+      </div>
+
+      <div class="w3-row w3-container">
+        <div class="w3-col l3 m3 s5 w3-khaki">
+          <p class="w3-left-align">Tempo previsto:</p>
+        </div>
+        <div class="w3-col l4 m3 s5 w3-khaki">
+          <p class="w3-left-align">{{ result.Lap.duration.strftime("%H:%M") }}</p>
+        </div>
+      </div>
+
+      {% set media = result.Lap.distance * 1000 / ( result.Lap.duration.hour * 3600 + result.Lap.duration.minute *60) * 3.6 %}
+
+      <div class="w3-row w3-container">
+        <div class="w3-col l3 m3 s5 w3-pale-yellow">
+          <p class="w3-left-align">Media prevista:</p>
+        </div>
+        <div class="w3-col l4 m3 s5 w3-pale-yellow">
+        <p class="w3-left-align">{{ media|round(2) }}</p>
+        </div>
+      </div>
+
+
+      <div class="w3-row w3-container">
+        <div class="w3-col l3 m3 s5 w3-khaki">
+          <p class="w3-left-align">Traccia gpx:</p>
+        </div>
+        <div class="w3-col l4 m3 s5 w3-khaki">
+          {% set gpx = result.Lap.gpx %}
+          <p class="w3-left-align"><a href='{{ url_for("static", filename=result.Lap.gpx) }}' alt="gpx">{{ result.Lap.start }}-{{ result.Lap.destination }}</a></p>
+        </div>
+      </div>
+
+      <div class="w3-row w3-container">
+        <div class="w3-col l3 m3 s5 w3-pale-yellow">
+          <p class="w3-left-align">Albergo:</p>
+        </div>
+        <div class="w3-col l4 m3 s5 w3-pale-yellow">
+          <p class="w3-left-align"><a href='{{ url_for("lap_bp.albergo", id=result.Lap.hotel_id) }}' alt='albergo'>{{ result.name }}</a></p>
+        </div>
+      </div>
+
+    </div>
+    
+  
+
+  </div>
+{% endfor %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function openLap(evt, start) {
+  var i, x, tablinks;
+  x = document.getElementsByClassName("tappa");
+  for (i = 0; i < x.length; i++) {
+    x[i].style.display = "none";
+  }
+  tablinks = document.getElementsByClassName("tablink");
+  for (i = 0; i < x.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" w3-amber", ""); 
+  }
+  document.getElementById(start).style.display = "block";
+  evt.currentTarget.className += " w3-amber";
+}
+</script>
+{% endblock %}
+
+
