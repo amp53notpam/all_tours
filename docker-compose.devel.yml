@@ -11,18 +11,6 @@ services:
         ports:
             - 8080:5000
         env_file:
-            - ./.env.dev
-        depends_on:
-            - db
-
-    db:
-        image: postgres:15-alpine
-        volumes:
-            - postgres_data:/var/lib/postgresql/data/
+            - ./.env.sqlite
         environment:
-            - POSTGRES_USER=amp53notpam
-            - POSTGRES_PASSWORD=Install$$10
-            - POSTGRES_DB=berlin_tour
-
-volumes:
-    postgres_data:
+            - FLASK_ENV=development

@@ -19,6 +19,7 @@ build/
 *.orig
 
 *.gpx
+*.db
 cmd.py
 flask_app/
 static/
