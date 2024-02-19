@@ -12,23 +12,12 @@ services:
                      --error-logfile /home/flasker/web/logs/gunicorn-error.log
         volumes:
             - static_vol_1:/home/flasker/web/berlin_tour/static
-        expose:
-            - 5000
+        ports:
+            - 8080:5000
         env_file:
             - ./.env.sqlite
         environment:
-            FLASK_ENV=production
-
-    nginx:
-        build:
-            context: ./services/nginx
-            dockerfile: Dockerfile
-        volumes:
-            - static_vol_1:/home/flasker/web/Berlin_tour/static
-        ports:
-            - 1337:80
-        depends_on:
-            - web
+            - FLASK_ENV=production
 
 volumes:
     static_vol_1:

@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 
 load_dotenv('../../.env.sqlite')
 
+
 class Config:
     FLASK_ENV = environ.get('FLASK_ENV')
     DEBUG = True if FLASK_ENV == 'development' else False
