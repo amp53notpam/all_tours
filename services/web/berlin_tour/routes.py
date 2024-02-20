@@ -1,11 +1,12 @@
 from flask import current_app as app
 from flask import make_response, redirect, render_template, request, url_for, send_from_directory, flash
-from subprocess import *
+from subprocess import Popen, STDOUT, PIPE
 
 
 @app.route('/')
 def start():
     return redirect(url_for("lap_bp.index"))
+
 
 @app.route('/start')
 def set_up_database():
@@ -17,7 +18,7 @@ def set_up_database():
     if res != 0:
         flash("Creazione database fallita", category='error')
         return redirect(url_for("lap_bp.index"))
-    
+
     flash("Database started...", category='info')
     return redirect(url_for("lap_bp.index"))
 
