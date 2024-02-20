@@ -13,10 +13,14 @@
 }
 h1 {
 	color: #2bf82b;	
-	text-align:center;
+	text-align: center;
 	font-family: 'Permanent Marker', cursive;
 }
-
+.flash { 
+	margin: 1em 0;
+	padding: 1em;
+	border: 1px solid #377ba8;
+}
 </style>
 {% block styles %}{% endblock %}
 
@@ -24,17 +28,21 @@ h1 {
 
 <body class="w3-sand">
 	<nav class="w3-bar w3-khaki">
+		{% block nav %}{% endblock %}
 		<a href="{{ url_for('lap_bp.index') }}" class="w3-bar-item w3-button w3-hover-amber">Home</a>
 		<a href="{{ url_for('lap_bp.hotel_dashboard') }}" class="w3-bar-item w3-button w3-hover-amber w3-right">Alberghi</a>
-		<a href="{{ url_for('lap_bp.lap_dashboard') }}" class="w3-bar-item w3-button w3-hover-amber w3-right" >Tappe</a>
+		<a href="{{ url_for('lap_bp.lap_dashboard') }}" class="w3-bar-item w3-button w3-hover-amber w3-right">Tappe</a>
 	</nav>
 
 <section class="content">
   <header class="w3-container">
     {% block header %}{% endblock %}
   </header>
-  {% for message in get_flashed_messages() %}
-    <div class="flash">{{ message }}</div>
+  {% for message in get_flashed_messages(category_filter='error') %}
+    <div class="flash w3-pale-red w3-center">{{ message }}</div>
+  {% endfor %}
+  {% for message in get_flashed_messages(category_filter='info') %}
+    <div class="flash w3-pale-green w3-center">{{ message }}</div>
   {% endfor %}
   {% block content %}{% endblock %}
 </section>

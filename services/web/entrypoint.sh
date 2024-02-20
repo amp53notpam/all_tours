@@ -13,7 +13,7 @@ then
 fi
 
 
-if [ "$FLASK_ENV" = "development" -o "$FLASK_DEBUG"="1" ]
+if [ "$FLASK_ENV" = "development" ]
 then
     echo "Creating the database tables..."
     python manage.py create_db

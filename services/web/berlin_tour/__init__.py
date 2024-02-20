@@ -36,23 +36,10 @@ def create_app(test_config=None):
     configure_logging(app)
     register_cli_commands(app)
 
-    engine = sa.create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
-    inspector = sa.inspect(engine)
-    if not inspector.has_table("lap"):
-        with app.app_context():
-            db.drop_all()
-            db.create_all()
-            # populate_db()
-        app.logger.info('Database initialized')
-    else:
-        app.logger.info('Database already created')
-
     return app
 
-#-----------------
-# Helper functions
-#-----------------
 
+# Helper functions
 def initialize_extensions(app):
     # Since the application instance is now created, pass it to each Flask
     # extension instance to bind it to the Flask application instance (app)
@@ -102,24 +89,25 @@ def populate_db():
 
     for lap in laps:
         new_hotel = Hotel(name=lap['Alloggio'],
-                      address=lap['Indirizzo'],
-                      town=lap['End'],
-                      check_in=datetime.strptime(lap['Check-in'], "%a %d %b %Y").date(),
-                      check_out=datetime.strptime(lap['Check-out'], "%a %d %b %Y").date(),
-                      price=lap['Costo'],
-                      photo=lap['Photo'],
-                      link=lap['Booking']
-                      )
-        new_hotel.laps = [Lap(date=datetime.strptime(lap['Data'], "%a %d %b %Y").date(),
-                      start=lap['Start'],
-                      destination=lap['End'],
-                      distance=lap['Distanza'],
-                      ascent=lap['Ascesa'],
-                      descent=lap['Discesa'],
-                      duration=time.fromisoformat(lap['Tempo']),
-                      gpx=lap['gpx']
+                          address=lap['Indirizzo'],
+                          town=lap['End'],
+                          check_in=datetime.strptime(lap['Check-in'], "%a %d %b %Y").date(),
+                          check_out=datetime.strptime(lap['Check-out'], "%a %d %b %Y").date(),
+                          price=lap['Costo'],
+                          photo=lap['Photo'],
+                          link=lap['Booking']
                           )
-                      ]
+        new_hotel.laps = [Lap(date=datetime.strptime(lap['Data'], "%a %d %b %Y").date(),
+                              start=lap['Start'],
+                              destination=lap['End'],
+                              distance=lap['Distanza'],
+                              ascent=lap['Ascesa'],
+                              descent=lap['Discesa'],
+                              duration=time.fromisoformat(lap['Tempo']),
+                              gpx=lap['gpx']
+                              )
+                          ]
+
         db.session.add(new_hotel)
         db.session.commit()
 
@@ -146,25 +134,24 @@ def register_cli_commands(app):
         with app.app_context():
             for lap in laps:
                 new_hotel = Hotel(name=lap['Alloggio'],
-                              address=lap['Indirizzo'],
-                              town=lap['End'],
-                              check_in=datetime.strptime(lap['Check-in'], "%a %d %b %Y").date(),
-                              check_out=datetime.strptime(lap['Check-out'], "%a %d %b %Y").date(),
-                              price=lap['Costo'],
-                              photo=lap['Photo'],
-                              link=lap['Booking']
-                              )
-                new_hotel.laps = [Lap(date=datetime.strptime(lap['Data'], "%a %d %b %Y").date(),
-                              start=lap['Start'],
-                              destination=lap['End'],
-                              distance=lap['Distanza'],
-                              ascent=lap['Ascesa'],
-                              descent=lap['Discesa'],
-                              duration=time.fromisoformat(lap['Tempo']),
-                              gpx=lap['gpx']
+                                  address=lap['Indirizzo'],
+                                  town=lap['End'],
+                                  check_in=datetime.strptime(lap['Check-in'], "%a %d %b %Y").date(),
+                                  check_out=datetime.strptime(lap['Check-out'], "%a %d %b %Y").date(),
+                                  price=lap['Costo'],
+                                  photo=lap['Photo'],
+                                  link=lap['Booking']
                                   )
-                              ]
+                new_hotel.laps = [Lap(date=datetime.strptime(lap['Data'], "%a %d %b %Y").date(),
+                                      start=lap['Start'],
+                                      destination=lap['End'],
+                                      distance=lap['Distanza'],
+                                      ascent=lap['Ascesa'],
+                                      descent=lap['Discesa'],
+                                      duration=time.fromisoformat(lap['Tempo']),
+                                      gpx=lap['gpx']
+                                      )
+                                  ]
                 db.session.add(new_hotel)
                 db.session.commit()
         echo('The database has been populated')
-

@@ -6,7 +6,7 @@ greenlet
 gunicorn
 MarkupSafe
 packaging
-psycopg2-binar
+psycopg2-binary
 python-dotenv
 SQLAlchemy
 typing_extensions

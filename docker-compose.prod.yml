@@ -5,11 +5,7 @@ services:
         build:
             context: ./services/web
             dockerfile: Dockerfile.prod
-        command: >-
-            gunicorn --worker-class gthread --workers 4 
-                     --bind 0.0.0.0:5000 wsgi:app
-                     --access-logfile /home/flasker/web/logs/gunicorn-access.log
-                     --error-logfile /home/flasker/web/logs/gunicorn-error.log
+        command: python wsgi.py
         volumes:
             - static_vol_1:/home/flasker/web/berlin_tour/static
         ports:
