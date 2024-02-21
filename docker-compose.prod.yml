@@ -13,8 +13,8 @@ services:
 
         volumes:
             - static_vol_1:/home/flasker/web/berlin_tour/static
-        expose:
-          - 10000
+        ports:
+          - 10000:10000
         env_file:
             - ./.env.sqlite
         environment:
