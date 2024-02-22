@@ -22,8 +22,6 @@ h1 {
 	border: 1px solid #377ba8;
 	max-width: 450px;
 	border-radius: 10px;
-
-
 }
 </style>
 {% block styles %}{% endblock %}
@@ -32,7 +30,6 @@ h1 {
 
 <body class="w3-sand">
 	<nav class="w3-bar w3-khaki">
-		{% block nav %}{% endblock %}
 		<a href="{{ url_for('lap_bp.index') }}" class="w3-bar-item w3-button w3-hover-amber">Home</a>
 		<a href="{{ url_for('lap_bp.hotel_dashboard') }}" class="w3-bar-item w3-button w3-hover-amber w3-right">Alberghi</a>
 		<a href="{{ url_for('lap_bp.lap_dashboard') }}" class="w3-bar-item w3-button w3-hover-amber w3-right">Tappe</a>

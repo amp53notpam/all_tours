@@ -34,7 +34,7 @@ RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requir
 FROM python:3.11.7-slim-bookworm
 
 # install system dependencies
-RUN apt-get update && apt-get install -y locales && rm -r /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y locales bind9-dnsutils && rm -r /var/lib/apt/lists/*
 RUN echo "it_IT.UTF-8 UTF-8" >> /etc/locale.gen && dpkg-reconfigure --frontend=noninteractive locales
 
 

@@ -18,8 +18,6 @@ lap_bp = Blueprint('lap_bp', __name__,
 
 @lap_bp.route('/')
 def index():
-    messages = get_flashed_messages()
-    print(messages)
     return render_template('index.jinja2')
 
 

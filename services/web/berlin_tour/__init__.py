@@ -80,6 +80,7 @@ def configure_logging(app):
 
 
 def populate_db():
+    """ Populate the database """
     from berlin_tour.models import Lap, Hotel
 
     setlocale(LC_ALL, 'it_IT.UTF-8')
@@ -124,6 +125,7 @@ def register_cli_commands(app):
 
     @app.cli.command('populate_db')
     def populate_db():
+        """ Populate the database """
         from berlin_tour.models import Lap, Hotel
 
         setlocale(LC_ALL, 'it_IT.UTF-8')

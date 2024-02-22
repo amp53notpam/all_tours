@@ -10,10 +10,6 @@
 </style>
 {% endblock %}
 
-{% block nav %}
-	<a id="init_db" href="{{ url_for('set_up_database') }}" class="w3-bar-item w3-button w3-hover-amber w3-right" style="display: none;" onclick='hide(event, "init_db")'>Init</a>
-{% endblock %}
-
 {% block header %}
 	<div class="w3-display-container" style="height: 20rem;">
 		<h1 class="w3-display-middle">{% block title %}Berlin Tour{% endblock %}</h1>
@@ -35,11 +31,4 @@
 	</div>
 </div>
 
-{% endblock %}
-{% block scripts %}
-<script>
-function hide(evt, id) {
-  document.getElementById(id).style.display = "none";
-  }
-</script>
 {% endblock %}
