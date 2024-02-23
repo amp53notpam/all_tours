@@ -5,16 +5,18 @@ services:
         build:
             context: ./services/web
             dockerfile: Dockerfile.prod
+        container_name: new_berlin_tour
         command: >-
                   gunicorn --worker-class gthread --workers 4
-                  --bind 0.0.0.0:10000 wsgi:app
+                  --bind 0.0.0.0:5000 wsgi:app
                   --access-logfile /home/flasker/web/logs/gunicorn-access.log
                   --error-logfile /home/flasker/web/logs/gunicorn-error.log
 
         volumes:
             - static_vol_1:/home/flasker/web/berlin_tour/static
+        network_mode: "host"
         ports:
-          - 10000:10000
+          - 5000:5000
         env_file:
             - ./.env.sqlite
         environment:
