@@ -13,7 +13,9 @@ htmlcov/
 dist/
 build/
 *.egg-info/
-.*env*
+.env*
+!.env.postgres
+!.env.sqlite
 .idea
 
 *.orig
