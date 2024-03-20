@@ -1,83 +1,119 @@
 {% extends 'layout.jinja2' %}
 
 {% block styles %}
-<style>
 	h1 {
-    color: #cddc39
-		letter-spacing: 4px;
-		font-size: 2.5rem;
-        margin-top: 50px;
+		letter-spacing: 5px;
+		font-size: 2rem;
 	}
   p, a {
     font-size: 1.2rem;
   }
-
-</style>
+  .row:nth-of-type(even) {
+      background-color: #ffffcc;
+  }
+  .row:nth-of-type(odd) {
+      background-color: #f0e68c;
+  }
 {% endblock %}
 
 {% block header %}
-	<div class="w3-display-container" style="height: 200px">
-		<h2 class="w3-display-middle">{% block title %}{{ result.Hotel.name }}{% endblock %}</h2>
-    <img src='{{ url_for("static", filename=result.Hotel.photo) }}' class="w3-display-left w3-margin-left w3-margin-top">
-	</div>
+<div class="w3-display-container" style="height: 200px">
+	<h2 class="w3-display-middle">{% block title %}{{ hotel.name }}{% endblock %}</h2>
+  {% if hotel.photo %}
+    <img src='{{ url_for("static", filename=hotel.photo) }}' class="w3-display-left w3-margin-left w3-margin-top">
+  {% else %}
+    <img src='{{ url_for("static", filename="images/default.webp") }}' class="w3-display-left w3-margin-left w3-margin-top"> 
+  {% endif %}
+</div>
 {% endblock %}
 
 {% block content %}
-<div style="margin-top: 100px">
-    <div class="w3-row w3-container">
-      <div class="w3-col l3 m3 s5 w3-khaki">
-        <p class="w3-left-align">Indirizzo:</p>
+<div style="margin: 100px 20% 0 10%">
+  <div class="row w3-row w3-container">
+    <div class=" w3-col l4 m5 s5">
+      <p class="w3-left-align">Indirizzo:</p>
+    </div>
+    <div class="w3-col l5 m5 s5">
+      <p class="w3-left-align">{{ hotel.address }}</p>
+    </div>
+  </div>
+
+  <div class="row w3-row w3-container">
+    <div class="w3-col l4 m5 s5">
+      <p class="w3-left-align">Città:</p>
+    </div>
+    <div class="w3-col l5 m5 s5">
+      <p class="w3-left-align">{{ hotel.town }}</p>
+    </div>
+  </div>
+
+  <div class="row w3-row w3-container">
+    <div class="w3-col l4 m5 s5">
+      <p class="w3-left-align">Prenotazione:</p>
+    </div>
+    <div class="w3-col l5 m5 s5">
+      {% if hotel.reserved %}
+      <p class="w3-left-align"><span  class="material-symbols-outlined done">done</span></p>
+      {% else %}
+      <p></p>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="row w3-row w3-container">
+    <div class="w3-col l4 m5 s5">
+      <p class="w3-left-align">Check-in:</p>
+    </div>
+    <div class="w3-col l5 m5 s5">
+      <p class="w3-left-align">{{ hotel.check_in.strftime("%A %d %b") }}</p>
+    </div>
+  </div>
+
+  {% if hotel.check_out %}         
+  <div class="row w3-row w3-container">
+    <div class="w3-col l4 m5 s5">
+      <p class="w3-left-align">Check-out:</p>
+    </div>
+    <div class="w3-col l5 m5 s5">
+      <p class="w3-left-align">{{ hotel.check_out.strftime("%A %d %b") }}</p>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if hotel.price %}         
+  <div class="row w3-row w3-container">
+    <div class="w3-col l4 m5 s5">
+      <p class="w3-left-align">Costo:</p>
+    </div>
+    <div class="w3-col l5 m5 s5">
+      <p class="w3-left-align">&euro;{{ hotel.price }}</p>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if hotel.lap %}
+  <div class="row w3-row w3-container">
+    <div class="w3-col l4 m5 s5">
+      <p class="w3-left-align">Tappa:</p>
+    </div>
+    <div class="w3-col l5 m5 s5">
+      <p class="w3-left-align"><a href='{{ url_for("lap_bp.tappa", id=hotel.lap.id) }}' target="_blank">{{ hotel.lap.start }} - {{ hotel.lap.destination }}</p>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if hotel.link %}
+  <div class="row w3-row w3-container">
+      <div class="w3-col l4 m5 s5">
+        <p class="w3-left-align">Vedilo su Booking.com</p>
       </div>
-      <div class="w3-col l4 m3 s5 w3-khaki">
-        <p class="w3-left-align">{{ result.Hotel.address }}</p>
+      <div class="w3-col l5 m5 s5">
+        <p class="w3-left-align"><a href="{{ hotel.link }}" target="_blank" alt="pagine hotel su Booking.com">{{ hotel.name }}</a></p>
       </div>
     </div>
+    {% endif %}
+  </div>
 
-    <div class="w3-row w3-container">
-      <div class="w3-col l3 m3 s5 w3-pale-yellow">
-        <p class="w3-left-align">Città:</p>
-      </div>
-      <div class="w3-col l4 m3 s5 w3-pale-yellow">
-        <p class="w3-left-align">{{ result.Hotel.town }}</p>
-      </div>
-    </div>
-
-            <div class="w3-row w3-container">
-                <div class="w3-col l3 m3 s5 w3-khaki">
-                    <p class="w3-left-align">Check-in:</p>
-                </div>
-                <div class="w3-col l4 m3 s5 w3-khaki">
-                    <p class="w3-left-align">{{ result.Hotel.check_in.strftime("%a %d %b") }}</p>
-                </div>
-            </div>
-
-            <div class="w3-row w3-container">
-                <div class="w3-col l3 m3 s5 w3-pale-yellow">
-                    <p class="w3-left-align">Check-out:</p>
-                </div>
-                <div class="w3-col l4 m3 s5 w3-pale-yellow">
-                    <p class="w3-left-align">{{ result.Hotel.check_out.strftime("%a %d %b") }}</p>
-                </div>
-            </div>
-
-            <div class="w3-row w3-container">
-                <div class="w3-col l3 m3 s5 w3-khaki">
-                    <p class="w3-left-align">Tappa:</p>
-                </div>
-                <div class="w3-col l4 m3 s5 w3-khaki">
-                    <p class="w3-left-align">{{ result.start }} - {{ result.destination }}</p>
-                </div>
-            </div>
-
-            <div class="w3-row w3-container">
-                <div class="w3-col l3 m3 s5 w3-pale-yellow">
-                    <p class="w3-left-align">Vedilo su Booking.com</p>
-                </div>
-                <div class="w3-col l4 m3 s5 w3-pale-yellow">
-                    <p class="w3-left-align"><a href="{{ result.Hotel.link }}" alt="pagine hotel su Booking.com">{{ result.Hotel.name }}</a></p>
-                </div>
-            </div>
-    </div>
 </div>
 
 {% endblock %}

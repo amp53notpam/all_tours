@@ -1,0 +1,32 @@
+{% extends 'layout.jinja2' %}
+
+{% block header %}
+	<div class="w3-display-container" style="display: none">
+    <h1>{% block title %}Login{% endblock %}</h1>
+  </div>
+{% endblock %}
+
+{% block content %}
+  <div class="w3-card-4" style="max-width: 400px; margin: auto; margin-top: 60px">
+  <div class="w3-card-4" style="max-width: 400px; margin: 80px auto auto">
+    <div class="w3-container">
+      <h2 class="w3-amber w3-center">Login</h2>
+    </div>
+
+  <form method="POST">
+    {{ form.csrf_token }}
+    <p>
+    {{ form.email(class="w3-input", placeholder="E-mail", style="width: 90%; margin-left: 5%") }}
+    </p>
+    <p>
+    {{ form.password(class="w3-input", placeholder="Password", style="width: 90%; margin-left: 5%") }}
+    </p>
+    <p>
+    {{ form.remember(class="w3-center", style="margin-left: 40%") }} {{ form.remember.label }}
+    </p>
+    <p>
+    {{ form.submit(class="w3-button w3-block w3-amber w3-hover-orange w3-center") }}
+    </p>
+  </form>
+  </div>
+{% endblock %}

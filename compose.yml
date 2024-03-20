@@ -4,8 +4,11 @@ services:
     web:
         build:
             context: ./services/web
-            dockerfile: Dockerfile.prod
-        container_name: new_berlin_tour
+            dockerfile: Dockerfile
+            tags: 
+                - wheelsofhope:latest
+                - angelo53/wheelsofhope:latest
+        container_name: wheelsofhope
         command: >-
                   gunicorn --worker-class gthread --workers 4
                   --bind 0.0.0.0:5000 wsgi:app
@@ -14,9 +17,6 @@ services:
 
         volumes:
             - static_vol_1:/home/flasker/web/berlin_tour/static
-        network_mode: "host"
-        ports:
-          - 5000:5000
         env_file:
             - ./.env.postgres
         environment:

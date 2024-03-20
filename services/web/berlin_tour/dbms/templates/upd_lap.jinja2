@@ -1,0 +1,55 @@
+{% extends 'layout.jinja2' %}
+
+{% block styles %}
+.form_item {
+  width: 90%;
+  margin-left: 5%
+}
+{% endblock %}
+
+{% block header %}
+	<div class="w3-display-container" style="display: none">
+    <h1>{% block title %}Tappa{% endblock %}</h1>
+  </div>
+{% endblock %}
+
+{% block content %}
+  <div class="w3-card-4" style="max-width: 600px; margin:auto; margin-top: 60px">
+    <div class="w3-container w3-amber">
+      <h2 class="w3-center">Aggiorna Tappa</h2>
+      <h3 class="w3-center">{{ lap.start }} - {{ lap.destination }}</h3>
+    </div>
+
+  <form method="POST" enctype="multipart/form-data">
+    {{ form.csrf_token }}
+    <p class="form_item">
+      {{ form.date.label(class="w3-sand") }}
+      {% set lap_date = lap.date.strftime('%A %d %b') %}
+      {{ form.date(class="w3-input w3-sand", value=lap_date) }}
+    </p>
+    <p class="form_item">
+      {{ form.distance.label(class="w3-sand") }}
+      {{ form.distance(class="w3-input w3-sand") }}
+    </p>
+    <p class="form_item">
+      {{ form.ascent.label(class="w3-sand") }}
+      {{ form.ascent(class="w3-input w3-sand") }}
+    </p>
+    <p class="form_item">
+      {{ form.descent.label(class="w3-sand") }}
+      {{ form.descent(class="w3-input w3-sand") }}
+    </p>
+    <p class="form_item">
+      {{ form.duration.label(class="w3-sand") }}
+      {{ form.duration(class="w3-input w3-sand", placeholder="HH:MM", pattern="^(2[0-4]|[1][0-9]|0?[0-9]):([1-5][0-9]|0?[0-9])$") }}
+    </p>
+    <p class="form_item">
+      {{ form.gpx.label(class="w3-sand") }}
+      {{ form.gpx(class="w3-input w3-sand") }}
+    </p>
+    <p>
+      {{ form.submit(class="w3-button w3-block w3-amber w3-hover-orange w3-center") }}
+    </p>
+  </form>
+  </div>
+{% endblock %}

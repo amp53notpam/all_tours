@@ -1,0 +1,64 @@
+{% extends 'layout.jinja2' %}
+
+{% block styles %}
+.form_item {
+  width: 90%;
+  margin-left: 5%
+}
+{% endblock %}
+
+{% block header %}
+	<div class="w3-display-container" style="display: none">
+    <h1>{% block title %}Nuovo albergo{% endblock %}</h1>
+  </div>
+{% endblock %}
+
+{% block content %}
+  <div class="w3-card-4" style="max-width: 600px; margin: auto; margin-top: 60px">
+    <div class="w3-container">
+      <h2 class="w3-amber w3-center">Nuovo Albergo</h2>
+    </div>
+
+  <form method="POST" enctype="multipart/form-data">
+    {{ form.csrf_token }}
+    <p class="form_item">
+      {{ form.name.label(class="w3-sand required") }}
+      {{ form.name(class="w3-input w3-sand") }}
+    </p>
+    <p class="form_item">
+      {{ form.address.label(class="w3-sand required") }}
+      {{ form.address(class="w3-input w3-sand") }}
+    </p>
+    <p class="form_item">
+      {{ form.town.label(class="w3-sand required") }}
+      {{ form.town(class="w3-input w3-sand") }}
+    </p>
+    <p class="form_item">
+      {{ form.check_in.label(class="w3-sand required") }}
+      {{ form.check_in(class="w3-input w3-sand", placeholder="dd/mm/yyyy", pattern="^(3[01]|[12][0-9]|0?[1-9])(-|\/|\.)(1[0-2]|0?[1-9])\\2([0-9]{2})?[0-9]{2}$") }}
+    </p>
+    <p class="form_item">
+      {{ form.check_out.label(class="w3-sand") }}
+      {{ form.check_out(class="w3-input w3-sand") }}
+    </p>
+    <p class="form_item">
+      {{ form.price.label(class="w3-sand") }}
+      {{ form.price(class="w3-input w3-sand") }}
+    </p>
+    <p class="form_item">
+      {{ form.website.label(class="w3-sand") }}
+      {{ form.website(class="w3-input w3-sand") }}
+    </p>
+    <p class="form_item">
+      {{ form.photo.label(class="w3-sand") }}
+      {{ form.photo(class="w3-input w3-sand") }}
+    </p>
+    <p>
+      {{ form.reserved(class="w3-sand w3-center", style="margin-left: 40%") }} {{ form.reserved.label }}
+    </p>
+    <p>
+      {{ form.submit(class="w3-button w3-block w3-amber w3-hover-orange w3-center") }}
+    </p>
+  </form>
+  </div>
+{% endblock %}

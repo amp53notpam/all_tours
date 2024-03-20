@@ -3,7 +3,7 @@
 ###########
 
 # pull the official base image
-FROM python:3.11.7-slim-bookworm as BUILDER
+FROM python:3.12.2-slim-bookworm as BUILDER
 
 # set the work directory
 WORKDIR /usr/src/app
@@ -31,7 +31,7 @@ RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requir
 #########
 
 # pull official base image for python
-FROM python:3.11.7-slim-bookworm
+FROM python:3.12.2-slim-bookworm
 
 # install system dependencies
 RUN apt-get update && apt-get install -y locales bind9-dnsutils && rm -r /var/lib/apt/lists/*
@@ -70,6 +70,8 @@ RUN chown -R flasker:flasker ${APP_HOME}
 
 # change to the app user
 USER flasker
+
+CMD  gunicorn --workers 2 --bind 0.0.0.0:10000 wsgi:app --access-logfile /home/flasker/web/logs/gunicorn-access.log --error-logfile /home/flasker/web/logs/gunicorn-error.log
 
 # run entrypoint.sh
 ENTRYPOINT ["/home/flasker/web/entrypoint.sh"]
