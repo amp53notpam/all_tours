@@ -1,6 +1,6 @@
 from datetime import datetime
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for, send_from_directory, get_flashed_messages
+    Blueprint, flash, render_template, current_app
 )
 from werkzeug.exceptions import abort
 from sqlalchemy.exc import OperationalError
@@ -14,6 +14,11 @@ lap_bp = Blueprint('lap_bp', __name__,
                     static_folder='static',
                     template_folder='templates'
                    )
+
+
+@lap_bp.context_processor
+def add_upload_path():
+    return dict(upload_path=current_app.config['UPLOAD_FOLDER'])
 
 
 @lap_bp.route('/')

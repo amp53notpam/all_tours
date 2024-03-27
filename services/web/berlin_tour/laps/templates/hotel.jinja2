@@ -20,9 +20,9 @@
 <div class="w3-display-container" style="height: 200px">
 	<h2 class="w3-display-middle">{% block title %}{{ hotel.name }}{% endblock %}</h2>
   {% if hotel.photo %}
-    <img src='{{ url_for("static", filename=hotel.photo) }}' class="w3-display-left w3-margin-left w3-margin-top">
+    <img src='{{ url_for("download_files", filename="images/"+hotel.photo) }}' class="w3-display-left w3-margin-left w3-margin-top">
   {% else %}
-    <img src='{{ url_for("static", filename="images/default.webp") }}' class="w3-display-left w3-margin-left w3-margin-top"> 
+    <img src='{{ url_for("download_files", filename="images/default.webp") }}' class="w3-display-left w3-margin-left w3-margin-top">
   {% endif %}
 </div>
 {% endblock %}

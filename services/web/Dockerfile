@@ -53,7 +53,7 @@ RUN mkdir -p ${APP_HOME} && mkdir ${APP_HOME}/logs
 WORKDIR $APP_HOME
 
 # install dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends netcat-openbsd
+RUN apt-get update && apt-get install -y --no-install-recommends netcat-openbsd && apt-get purge expat
 COPY --from=BUILDER /usr/src/app/wheels /wheels
 COPY --from=BUILDER /usr/src/app/requirements.txt .
 RUN pip install --upgrade pip
@@ -70,6 +70,8 @@ RUN chown -R flasker:flasker ${APP_HOME}
 
 # change to the app user
 USER flasker
+
+EXPOSE 10000
 
 CMD  gunicorn --workers 2 --bind 0.0.0.0:10000 wsgi:app --access-logfile /home/flasker/web/logs/gunicorn-access.log --error-logfile /home/flasker/web/logs/gunicorn-error.log
 

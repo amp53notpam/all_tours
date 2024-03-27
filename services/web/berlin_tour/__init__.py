@@ -34,6 +34,8 @@ def create_app(test_config=None):
     else:
         app.config.from_mapping(test_config)
 
+    app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(app.instance_path), 'uploaded')
+
     initialize_extensions(app)
     register_blueprints(app)
     configure_logging(app)
@@ -150,7 +152,8 @@ def register_cli_commands(app):
         with app.app_context():
             admins = [{'email': 'angelo@berlintour.org', 'password': generate_password_hash('Admin$1')},
                       {'email': 'carlo@berlintour.org', 'password': generate_password_hash('Admin$2')},
-                      {'email': 'gfranco@berlintour.org', 'password': generate_password_hash('Admin$3')}
+                      {'email': 'gfranco@berlintour.org', 'password': generate_password_hash('Admin$3')},
+                      {'email': 'cammino@adelaide.org', 'password': generate_password_hash('Santiago2022!')}
                       ]
             db.session.bulk_insert_mappings(Admin, admins)
             db.session.commit()
@@ -175,7 +178,7 @@ def register_cli_commands(app):
                               ascent=lap['Ascesa'],
                               descent=lap['Discesa'],
                               duration=time.fromisoformat(lap['Tempo']),
-                              gpx=lap['gpx']
+                              gpx=os.path.basename(lap['gpx'])
                               )
                 new_lap.hotels = [Hotel(name=lap['Alloggio'],
                                         address=lap['Indirizzo'],
@@ -183,7 +186,7 @@ def register_cli_commands(app):
                                         check_in=datetime.strptime(lap['Check-in'], "%a %d %b %Y").date(),
                                         check_out=datetime.strptime(lap['Check-out'], "%a %d %b %Y").date(),
                                         price=lap['Costo'],
-                                        photo=lap['Photo'],
+                                        photo=os.path.basename(lap['Photo']),
                                         link=lap['Booking']
                                         )
                                   ]

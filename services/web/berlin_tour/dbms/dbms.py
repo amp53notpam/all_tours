@@ -66,7 +66,7 @@ class AddLap(View):
                 file = request.files['gpx']
                 if file.filename != '' and allowed_file(file.filename):
                     gpx = secure_filename(file.filename)
-                    file.save(f"{current_app.root_path}/static/tracks/{gpx}")
+                    file.save(join(current_app.config['UPLOAD_FOLDER'], 'tracks', gpx))
 
             # save to database
             new_lap = Lap(
@@ -84,7 +84,7 @@ class AddLap(View):
             if tempo:
                 new_lap.duration = tempo
             if gpx:
-                new_lap.gpx = f"tracks/{gpx}"
+                new_lap.gpx = gpx
             db.session.commit()
             flash(f"Aggiunta tappa {partenza} - {arrivo}.", category="info")
             return redirect(url_for("lap_bp.lap_dashboard"))
@@ -110,7 +110,7 @@ class UpdLap(View):
                 file = request.files['gpx']
                 if file.filename != '' and allowed_file(file.filename):
                     gpx = secure_filename(file.filename)
-                    file.save(f"{current_app.root_path}/static/tracks/{gpx}")
+                    file.save(join(current_app.config['UPLOAD_FOLDER'], 'tracks', gpx))
 
             lap = db.session.get(Lap, id)
             if distanza:
@@ -122,7 +122,7 @@ class UpdLap(View):
             if tempo:
                 lap.duration = tempo
             if gpx:
-                lap.gpx = f"tracks/{gpx}"
+                lap.gpx = gpx
 
             db.session.commit()
             flash(f"Aggiornata tappa {lap.start} - {lap.destination}.", category='info')
@@ -139,7 +139,7 @@ class DeleteLap(View):
         lap = db.session.get(Lap, id)
         # delete the relevant track file
         if lap.gpx:
-            remove(f"{current_app.root_path}/static/{lap.gpx}")
+            remove(join(current_app.config['UPLOAD_FOLDER'], 'tracks', lap.gpx))
         db.session.delete(lap)
         db.session.commit()
         flash(f"Cancellata tappa {lap.start} - {lap.destination}", category='info')
@@ -173,7 +173,7 @@ class AddHotel(View):
                 file = request.files['photo']
                 if file.filename != '' and allowed_file(file.filename):
                     photo = secure_filename(file.filename)
-                    file.save(f"{current_app.root_path}/static/images/{photo}")
+                    file.save(join(current_app.config['UPLOAD_FOLDER'], 'images', photo))
 
             # save to database
             new_hotel = Hotel(
@@ -192,7 +192,7 @@ class AddHotel(View):
                 new_hotel.link = website
             new_hotel.reserved = reserved
             if photo:
-                new_hotel.photo = f"images/{photo}"
+                new_hotel.photo = photo
 
             db.session.commit()
             flash(f"Aggiunto albergo {name} a {town}.", category="info")
@@ -218,7 +218,7 @@ class UpdHotel(View):
                 file = request.files['photo']
                 if file.filename != '' and allowed_file(file.filename):
                     photo = secure_filename(file.filename)
-                    file.save(f"{current_app.root_path}/static/images/{photo}")
+                    file.save(join(current_app.config['UPLOAD_FOLDER'], 'images', photo))
 
             hotel = db.session.get(Hotel, id)
             if check_out:
@@ -229,7 +229,7 @@ class UpdHotel(View):
                 hotel.link = website
             hotel.reserved = reserved
             if photo:
-                hotel.photo = f"images/{photo}"
+                hotel.photo = photo
 
             db.session.commit()
             flash(f"Hotel {hotel.name} aggiornato.", category="info")
@@ -246,7 +246,7 @@ class DeleteHotel(View):
         hotel = db.session.get(Hotel, id)
         # delete the hotel's photo
         if hotel.photo:
-            remove(f"{current_app.root_path}/static/{hotel.photo}")
+            remove(join(current_app.config['UPLOAD_FOLDER'], 'images', hotel.photo))
         db.session.delete(hotel)
         db.session.commit()
         flash(f"Cancellato albergo {hotel.name}", category='info')

@@ -13,15 +13,15 @@ class InitDb(View):
     def dispatch_request(self):
         res = Popen(['flask', 'create_db'], stdout=PIPE, stderr=STDOUT).wait()
         if res != 0:
-            flash("Creazione database fallita", category='error')
+            flash("Creazione database: 'create_db' KO   ", category='error')
             return redirect(url_for("lap_bp.index"))
         res = Popen(['flask', 'register_admins'], stdout=PIPE, stderr=STDOUT).wait()
         if res != 0:
-            flash("Creazione database fallita", category='error')
+            flash("Creazione database: 'register_admin' KO", category='error')
             return redirect(url_for("lap_bp.index"))
         res = Popen(['flask', 'populate_db'], stdout=PIPE, stderr=STDOUT).wait()
         if res != 0:
-            flash("Creazione database fallita", category='error')
+            flash("Creazione database: 'populate_db' KO", category='error')
             return redirect(url_for("lap_bp.index"))
 
         flash("Database started...", category='info')
@@ -33,6 +33,12 @@ class StaticFiles(View):
         return send_from_directory(app.config['STATIC_FOLDER'], filename)
 
 
+class DownloadFiles(View):
+    def dispatch_request(self, filename):
+        return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+
 app.add_url_rule('/', view_func=Start.as_view('start'))
 app.add_url_rule("/init_db", view_func=InitDb.as_view("init_db"))
 app.add_url_rule("/static/<path:filename>", view_func=StaticFiles.as_view("static_files"))
+app.add_url_rule("/download/<path:filename>", view_func=DownloadFiles.as_view("download_files"))

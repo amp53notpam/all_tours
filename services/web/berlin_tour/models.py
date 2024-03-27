@@ -41,6 +41,7 @@ class Hotel(db.Model):
 
 
 class Admin(UserMixin, db.Model):
+    __bind_key__ = 'db_sec'
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(String(64), unique=True)
     password: Mapped[str]

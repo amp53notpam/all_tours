@@ -24,5 +24,6 @@ build/
 cmd.py
 flask_app/
 
-progetto.csv
+progetto.*
 utils/
+uploaded/

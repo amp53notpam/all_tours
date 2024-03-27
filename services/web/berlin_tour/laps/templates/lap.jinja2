@@ -104,7 +104,7 @@
       <p class="w3-left-align">Traccia gpx:</p>
     </div>
     <div class="w3-col l4 m3 s5">
-       <p class="w3-left-align"><a href='{{ url_for("static", filename=lap.gpx) }}'>{{ lap.start }}-{{ lap.destination }}</a></p>
+      <p class="w3-left-align"><a href='{{ url_for("download_files", filename="tracks/"+lap.gpx) }}'>{{ lap.start }}-{{ lap.destination }}</a></p>
     </div>
   </div>
   {% endif %}

@@ -11,12 +11,15 @@ services:
         container_name: wheelsofhope
         command: >-
                   gunicorn --worker-class gthread --workers 4
-                  --bind 0.0.0.0:5000 wsgi:app
+                  --bind 0.0.0.0:10000 wsgi:app
                   --access-logfile /home/flasker/web/logs/gunicorn-access.log
                   --error-logfile /home/flasker/web/logs/gunicorn-error.log
-
+        ports:
+            - 5000:10000
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
         volumes:
-            - static_vol_1:/home/flasker/web/berlin_tour/static
+            - static_vol_1:/home/flasker/web/uploaded
         env_file:
             - ./.env.postgres
         environment:
