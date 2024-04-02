@@ -19,11 +19,11 @@ services:
         extra_hosts:
             - "host.docker.internal:host-gateway"
         volumes:
-            - static_vol_1:/home/flasker/web/uploaded
+            - upld_vol:/home/flasker/web/uploaded
         env_file:
-            - ./.env.postgres
+            - ./.env.pg
         environment:
             - FLASK_ENV=production
 
 volumes:
-    static_vol_1:
+    upld_vol:

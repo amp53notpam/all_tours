@@ -10,6 +10,8 @@ function openHotel(evt, id) {
   }
   document.getElementById(id).style.display = "block";
   evt.currentTarget.className += " w3-amber";
+
+  closeMenu()
 }
 
 function openLap(evt, start) {
@@ -24,4 +26,24 @@ function openLap(evt, start) {
   }
   document.getElementById(start).style.display = "block";
   evt.currentTarget.className += " w3-amber";
+
+  closeMenu()
+}
+
+function toggleMenu() {
+  if (document.getElementById("sidebar").style.display === "block") {
+    closeMenu()
+  } else {
+    openMenu()
+  }
+}
+
+function openMenu() {
+  document.getElementById("sidebar").style.width = "50%";
+  document.getElementById("sidebar").style.display = "block";
+}
+
+function closeMenu() {
+  document.getElementById("sidebar").style.width = "25%";
+  document.getElementById("sidebar").style.display = "none";
 }

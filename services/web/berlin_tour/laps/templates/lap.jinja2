@@ -32,66 +32,66 @@
 {% endblock %}
 
 {% block content %}
-<div style="margin: 100px 20% 0 10%">
-  <div class="row w3-row w3-container">
-    <div class="w3-col l3 m3 s5">
-      <p class="w3-left-align">Data:</p>
+<div style="margin: 100px 10% 0 10%">
+  <div class="row w3-row">
+    <div class="w3-container w3-third w3-mobile">
+      <p class="w3-left-align wbold">Data:</p>
     </div>
-    <div class="w3-col l4 m3 s5">
+    <div class="w3-container w3-twothird w3-mobile">
       <p class="w3-left-align">{{ lap.date.strftime("%A %d %b") }}</p>
     </div>
   </div>
 
   {% if lap.distance %}
-  <div class="row w3-row w3-container">
-    <div class="w3-col l3 m3 s5">
-      <p class="w3-left-align">Distanza:</p>
+  <div class="row w3-row">
+    <div class="w3-container w3-third w3-mobile">
+      <p class="w3-left-align wbold">Distanza:</p>
     </div>
-    <div class="w3-col l4 m3 s5">
+    <div class="w3-container w3-twothird w3-mobile">
       <p class="w3-left-align">{{ lap.distance }} Km</p>
     </div>
   </div>
   {% endif %}
 
   {% if lap.ascent %}
-  <div class="row w3-row w3-container">
-    <div class="w3-col l3 m3 s5">
-      <p class="w3-left-align">Dislivello salita:</p>
+  <div class="row w3-row">
+    <div class="w3-container w3-third w3-mobile">
+      <p class="w3-left-align wbold">Dislivello salita:</p>
     </div>
-    <div class="w3-col l4 m3 s5">
+    <div class="w3-container w3-twothird w3-mobile">
       <p class="w3-left-align">{{ lap.ascent }} m</p>
     </div>
   </div>
   {% endif %}
 
   {% if lap.descent %}
-  <div class="row w3-row w3-container">
-    <div class="w3-col l3 m3 s5">
-      <p class="w3-left-align">Dislivello discesa:</p>
+  <div class="row w3-row">
+    <div class="w3-container w3-third w3-mobile">
+      <p class="w3-left-align wbold">Dislivello discesa:</p>
     </div>
-    <div class="w3-col l4 m3 s5 w3">
+    <div class="w3-container w3-twothird w3-mobile">
       <p class="w3-left-align">{{ lap.descent }} m</p>
     </div>
   </div>
   {% endif %}
 
   {% if lap.duration %}
-  <div class="row w3-row w3-container">
-    <div class="w3-col l3 m3 s5">
-      <p class="w3-left-align">Tempo previsto:</p>
+  <div class="row w3-row">
+    <div class="w3-container w3-third w3-mobile">
+      <p class="w3-left-align wbold">Tempo previsto:</p>
     </div>
-    <div class="w3-col l4 m3 s5">
+    <div class="w3-container w3-twothird w3-mobile">
       <p class="w3-left-align">{{ lap.duration.strftime("%H:%M") }}</p>
     </div>
   </div>
   {% endif %}
 
   {% if lap.distance and lap.duration %}
-  <div class="row w3-row w3-container">
-    <div class="w3-col l3 m3 s5">
-      <p class="w3-left-align">Media prevista:</p>
+  <div class="row w3-row">
+    <div class="w3-container w3-third w3-mobile">
+      <p class="w3-left-align wbold">Media prevista:</p>
     </div>
-    <div class="w3-col l4 m3 s5">
+    <div class="w3-container w3-twothird w3-mobile">
       {% set media = lap.distance * 1000 / ( lap.duration.hour * 3600 + lap.duration.minute *60) * 3.6 %}
       <p class="w3-left-align">{{ media|round(2) }} Km/h</p>
     </div>
@@ -99,22 +99,22 @@
   {% endif %}
 
   {% if lap.gpx %}
-  <div class="row w3-row w3-container">
-    <div class="w3-col l3 m3 s5">
-      <p class="w3-left-align">Traccia gpx:</p>
+  <div class="row w3-row">
+    <div class="w3-container w3-third w3-mobile">
+      <p class="w3-left-align wbold">Traccia gpx:</p>
     </div>
-    <div class="w3-col l4 m3 s5">
+    <div class="w3-container w3-twothird w3-mobile">
       <p class="w3-left-align"><a href='{{ url_for("download_files", filename="tracks/"+lap.gpx) }}'>{{ lap.start }}-{{ lap.destination }}</a></p>
     </div>
   </div>
   {% endif %}
       
   {% if lap.hotels %}
-  <div class="row w3-row w3-container">
-    <div class="w3-col l3 m3 s5">
-      <p class="w3-left-align">Alberghi:</p>
+  <div class="row w3-row">
+    <div class="w3-container w3-third w3-mobile">
+      <p class="w3-left-align wbold">Alberghi:</p>
     </div>
-    <div class="w3-col l4 m3 s5">
+    <div class="w3-container w3-twothird w3-mobile">
       {% for hotel in lap.hotels %}
         <p class="w3-left-align"><a href='{{ url_for("lap_bp.albergo", id=hotel.id) }}' target="_blank">{{ hotel.name }}</a></p>
       {% endfor %}

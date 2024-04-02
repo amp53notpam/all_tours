@@ -39,6 +39,7 @@ def create_app(test_config=None):
     initialize_extensions(app)
     register_blueprints(app)
     configure_logging(app)
+    configure_upload_area(app)
     register_cli_commands(app)
 
     return app
@@ -98,6 +99,20 @@ def configure_logging(app):
     app.logger.removeHandler(default_handler)
 
     app.logger.info('Starting the Flask Berlin Tour App...')
+
+
+def configure_upload_area(app):
+    try:
+        os.mkdir(f"{app.config['UPLOAD_FOLDER']}/tracks")
+        app.logger.info("Creato sub-folder 'tracks' in 'uploaded")
+    except FileExistsError:
+        pass
+
+    try:
+        os.mkdir(f"{app.config['UPLOAD_FOLDER']}/images")
+        app.logger.info("Creato sub-folder 'images' in 'uploaded")
+    except FileExistsError:
+        pass
 
 
 # def populate_db():

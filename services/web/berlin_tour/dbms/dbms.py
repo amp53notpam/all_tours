@@ -87,6 +87,7 @@ class AddLap(View):
                 new_lap.gpx = gpx
             db.session.commit()
             flash(f"Aggiunta tappa {partenza} - {arrivo}.", category="info")
+            current_app.logger.info(f"Aggiunta tappa {partenza} - {arrivo}.")
             return redirect(url_for("lap_bp.lap_dashboard"))
 
         return render_template("add_lap.jinja2", form=form)
@@ -125,7 +126,8 @@ class UpdLap(View):
                 lap.gpx = gpx
 
             db.session.commit()
-            flash(f"Aggiornata tappa {lap.start} - {lap.destination}.", category='info')
+            flash(f"Tappa {lap.start} - {lap.destination} aggiornata .", category='info')
+            current_app.logger.info(f"Aggiornata tappa {lap.start} - {lap.destination}.")
             return redirect(url_for("lap_bp.lap_dashboard"))
 
         lap = db.session.get(Lap, id)
@@ -143,6 +145,7 @@ class DeleteLap(View):
         db.session.delete(lap)
         db.session.commit()
         flash(f"Cancellata tappa {lap.start} - {lap.destination}", category='info')
+        current_app.logger.info(f"Cancellata tappa {lap.start} - {lap.destination}")
         return redirect(url_for("lap_bp.lap_dashboard"))
 
 
@@ -196,6 +199,7 @@ class AddHotel(View):
 
             db.session.commit()
             flash(f"Aggiunto albergo {name} a {town}.", category="info")
+            current_app.logger.info(f"Aggiunto albergo {name} a {town}.")
             return redirect(url_for("lap_bp.hotel_dashboard"))
 
         return render_template("add_hotel.jinja2", form=form)
@@ -233,6 +237,7 @@ class UpdHotel(View):
 
             db.session.commit()
             flash(f"Hotel {hotel.name} aggiornato.", category="info")
+            current_app.logger.info(f"Aggiornato hotel {hotel.name}.")
             return redirect(url_for("lap_bp.hotel_dashboard"))
 
         hotel = db.session.get(Hotel, id)
@@ -250,6 +255,7 @@ class DeleteHotel(View):
         db.session.delete(hotel)
         db.session.commit()
         flash(f"Cancellato albergo {hotel.name}", category='info')
+        current_app.logger.info(f"Cancellato albergo {hotel.name}.")
         return redirect(url_for("lap_bp.hotel_dashboard"))
 
 

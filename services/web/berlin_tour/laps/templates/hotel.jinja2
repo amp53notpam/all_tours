@@ -14,44 +14,53 @@
   .row:nth-of-type(odd) {
       background-color: #f0e68c;
   }
+  img {
+    width: 170px;
+    height: 170px;
+  }
+  .clearfix::after {
+    content: "";
+    clear: both;
+    display: table;
+  }
 {% endblock %}
 
 {% block header %}
-<div class="w3-display-container" style="height: 200px">
-	<h2 class="w3-display-middle">{% block title %}{{ hotel.name }}{% endblock %}</h2>
+<div class="clearfix" style="height: 200px">
   {% if hotel.photo %}
-    <img src='{{ url_for("download_files", filename="images/"+hotel.photo) }}' class="w3-display-left w3-margin-left w3-margin-top">
+    <img src='{{ url_for("download_files", filename="images/"+hotel.photo) }}' class="w3-left w3-margin-left w3-margin-top">
   {% else %}
-    <img src='{{ url_for("download_files", filename="images/default.webp") }}' class="w3-display-left w3-margin-left w3-margin-top">
+    <img src='{{ url_for("download_files", filename="images/default.webp") }}' class="w3-left w3-margin-left w3-margin-top">
   {% endif %}
+  <h2 class="w3-center w3-padding-48">{% block title %}{{ hotel.name }}{% endblock %}</h2>
 </div>
 {% endblock %}
 
 {% block content %}
-<div style="margin: 100px 20% 0 10%">
-  <div class="row w3-row w3-container">
-    <div class=" w3-col l4 m5 s5">
-      <p class="w3-left-align">Indirizzo:</p>
+<div style="margin: 100px 10% 0 10%">
+  <div class="row w3-row">
+    <div class="w3-container w3-third w3-mobile">
+      <p class="w3-left-align wbold">Indirizzo:</p>
     </div>
-    <div class="w3-col l5 m5 s5">
+    <div class="w3-container w3-twothird w3-mobile">
       <p class="w3-left-align">{{ hotel.address }}</p>
     </div>
   </div>
 
-  <div class="row w3-row w3-container">
-    <div class="w3-col l4 m5 s5">
-      <p class="w3-left-align">Città:</p>
+  <div class="row w3-row">
+    <div class="w3-container w3-third w3-mobile">
+      <p class="w3-left-align wbold">Città:</p>
     </div>
-    <div class="w3-col l5 m5 s5">
+    <div class="w3-container w3-twothird w3-mobile">
       <p class="w3-left-align">{{ hotel.town }}</p>
     </div>
   </div>
 
-  <div class="row w3-row w3-container">
-    <div class="w3-col l4 m5 s5">
-      <p class="w3-left-align">Prenotazione:</p>
+  <div class="row w3-row">
+    <div class="w3-container w3-third w3-mobile">
+      <p class="w3-left-align wbold">Prenotazione:</p>
     </div>
-    <div class="w3-col l5 m5 s5">
+    <div class="w3-container w3-twothird w3-mobile">
       {% if hotel.reserved %}
       <p class="w3-left-align"><span  class="material-symbols-outlined done">done</span></p>
       {% else %}
@@ -60,54 +69,54 @@
     </div>
   </div>
 
-  <div class="row w3-row w3-container">
-    <div class="w3-col l4 m5 s5">
-      <p class="w3-left-align">Check-in:</p>
+  <div class="row w3-row">
+    <div class="w3-container w3-third w3-mobile">
+      <p class="w3-left-align wbold">Check-in:</p>
     </div>
-    <div class="w3-col l5 m5 s5">
+    <div class="w3-container w3-twothird w3-mobile">
       <p class="w3-left-align">{{ hotel.check_in.strftime("%A %d %b") }}</p>
     </div>
   </div>
 
   {% if hotel.check_out %}         
-  <div class="row w3-row w3-container">
-    <div class="w3-col l4 m5 s5">
-      <p class="w3-left-align">Check-out:</p>
+  <div class="row w3-row">
+    <div class="w3-container w3-third w3-mobile">
+      <p class="w3-left-align wbold">Check-out:</p>
     </div>
-    <div class="w3-col l5 m5 s5">
+    <div class="w3-container w3-twothird w3-mobile">
       <p class="w3-left-align">{{ hotel.check_out.strftime("%A %d %b") }}</p>
     </div>
   </div>
   {% endif %}
 
   {% if hotel.price %}         
-  <div class="row w3-row w3-container">
-    <div class="w3-col l4 m5 s5">
-      <p class="w3-left-align">Costo:</p>
+  <div class="row w3-row">
+    <div class="w3-container w3-third w3-mobile">
+      <p class="w3-left-align wbold">Costo:</p>
     </div>
-    <div class="w3-col l5 m5 s5">
+    <div class="w3-container w3-twothird w3-mobile">
       <p class="w3-left-align">&euro;{{ hotel.price }}</p>
     </div>
   </div>
   {% endif %}
 
   {% if hotel.lap %}
-  <div class="row w3-row w3-container">
-    <div class="w3-col l4 m5 s5">
-      <p class="w3-left-align">Tappa:</p>
+  <div class="row w3-row">
+    <div class="w3-container w3-third w3-mobile">
+      <p class="w3-left-align wbold">Tappa:</p>
     </div>
-    <div class="w3-col l5 m5 s5">
+    <div class="w3-container w3-twothird w3-mobile">
       <p class="w3-left-align"><a href='{{ url_for("lap_bp.tappa", id=hotel.lap.id) }}' target="_blank">{{ hotel.lap.start }} - {{ hotel.lap.destination }}</p>
     </div>
   </div>
   {% endif %}
 
   {% if hotel.link %}
-  <div class="row w3-row w3-container">
-      <div class="w3-col l4 m5 s5">
-        <p class="w3-left-align">Vedilo su Booking.com</p>
+  <div class="row w3-row">
+      <div class="w3-container w3-third w3-mobile">
+        <p class="w3-left-align wbold">Vedilo su Booking.com</p>
       </div>
-      <div class="w3-col l5 m5 s5">
+      <div class="w3-container w3-twothird w3-mobile">
         <p class="w3-left-align"><a href="{{ hotel.link }}" target="_blank" alt="pagine hotel su Booking.com">{{ hotel.name }}</a></p>
       </div>
     </div>

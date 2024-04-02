@@ -4,13 +4,13 @@
 	h1 {
 		letter-spacing: 15px;
 		text-shadow: 3px 3px;	
-		font-size: 7rem;
+		font-size: 5rem;
 	}
 {% endblock %}
 
 {% block header %}
 	<div class="w3-display-container" style="height: 20rem;">
-		<h1 class="w3-display-middle">{% block title %}Berlin Tour{% endblock %}</h1>
+		<h1 class="w3-display-middle">{% block title %}Wheels of Hope{% endblock %}</h1>
 	</div>
 {% endblock %}
 
@@ -18,13 +18,19 @@
 <div style="margin-top: 100px">
 	<div class="w3-row-padding">
   		<div class="w3-third">
-    		<img src="{{ url_for('static', filename='images/caldogno.jpg') }}" alt="panorama Caldogno" style="width: 100%"> 
+			<figure>
+    			<img src="{{ url_for('static', filename='images/caldogno.jpg') }}" alt="panorama Caldogno" style="width: 100%"> 
+				<figcaption class="w3-center w3-xlarge w3-padding-top-24">Caldogno</figcaption>
+			</figure>
   		</div>
   		<div class="w3-third">
 			<img class="w3-opacity-min" src="{{ url_for('static', filename='images/bike_tour.jpg') }}" alt="ciclisti"  style="width: 100%"> 
   			</div>
   		<div class="w3-third">
-			<img src="{{ url_for('static', filename='images/berlin.jpg') }}" alt="Berlino"  style="width: 100%"> 
+			<figure>
+				<img src="{{ url_for('static', filename='images/berlin.jpg') }}" alt="Berlino"  style="width: 100%">
+				<figcaption class="w3-center w3-xlarge w3-padding-top-24">Berlino</figcaption>
+			</figure>
 		</div>
 	</div>
 </div>
