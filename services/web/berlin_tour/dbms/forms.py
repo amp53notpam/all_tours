@@ -27,6 +27,7 @@ class UpdLapForm(FlaskForm):
     descent = IntegerField("Dislivello discesa")
     duration = StringField("Tempo previsto")
     gpx = FileField("Track file (.gpx)", validators=[FileAllowed(['gpx'])])
+    done = BooleanField('OK è fatta!')
     submit = SubmitField('OK')
 
 

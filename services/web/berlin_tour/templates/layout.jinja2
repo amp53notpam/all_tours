@@ -4,82 +4,30 @@
 <title>{% block title %}{% endblock %} - Plannig</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/w3-styles.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/my-styles.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/my-theme.css') }}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
 <style>
-body {
-	font-size: 16px;
-}
-.content {
-	padding: 0 1rem 1rem;
-}
-aside {
-	width: 25%;
-	padding-left: 15px;
-	float: left;
-	overflow: scroll;
-}
-h1 {
-	color: #2bf82b;	
-	text-align: center;
-	font-family: 'Permanent Marker', cursive;
-}
-.flash { 
-	margin: auto;
-	padding: 1em;
-	border: 1px solid #377ba8;
-	max-width: 450px;
-	border-radius: 10px;
-}
-span.icon28 {
-	font-size: 28px;
-	background: #fdf5e6;
-	color: chocolate;
-	font-variation-settings: 'OPSZ' 28;
-	font-variation-settings: 'GRAD' 50;
-}
-span.icon28:hover {
-	color: red;
-	background: #ffc107
-}
-span.done {
-	font-size: 36px;
-	color: lime;
-	font-variation-settings: 'OPSZ' 36;
-	font-variation-settings: 'GRAD' 180;
-}
-nav a {
-	font-size: 1.2rem;
-}
-.required:after {
-	content:" *";
-    color: red;
-}
-.wbold {
-	font-weight: bold;
-}
 {% block styles %}{% endblock %}
 </style>
 
 <script src="{{ url_for('static', filename='scripts/scripts.js') }}" defer></script>
 </head>
 
-<body class="w3-sand" {% block event %}{% endblock %}>
-	<nav class="w3-bar w3-khaki">
+<body class="w3-theme-l4" {% block event %}{% endblock %}>
+	<nav class="w3-bar w3-theme-l2">
 		{% block hamburger %}{% endblock %}
-		<a href="{{ url_for('lap_bp.index') }}" class="w3-bar-item w3-ripple w3-button w3-hover-amber">Home</a>	
-		<a href="{{ url_for('lap_bp.lap_dashboard') }}" class="w3-bar-item w3-button w3-ripple w3-hover-amber">Tappe</a>
-		<a href="{{ url_for('lap_bp.hotel_dashboard') }}" class="w3-bar-item w3-button w3-ripple w3-hover-amber">Alberghi</a>
+		<a href="{{ url_for('lap_bp.index') }}" class="w3-bar-item w3-ripple w3-button w3-hover-theme">Home</a>
+		<a href="{{ url_for('lap_bp.lap_dashboard') }}" class="w3-bar-item w3-button w3-ripple w3-hover-theme">Tappe</a>
+		<a href="{{ url_for('lap_bp.hotel_dashboard') }}" class="w3-bar-item w3-button w3-ripple w3-hover-theme">Alberghi</a>
 		{% if '_user_id' in session.keys() %}
-			<a href="{{ url_for('auth_bp.logout') }}" class="w3-bar-item w3-ripple w3-button w3-hover-amber w3-right" title="logout"><span class="material-symbols-outlined size28">logout</span></a>
+			<a href="{{ url_for('auth_bp.logout') }}" class="w3-bar-item w3-ripple w3-button w3-hover-theme w3-right" title="logout"><span class="material-symbols-outlined size28">logout</span></a>
 		{% else %}
-			<a href="{{ url_for('auth_bp.login') }}" class="w3-bar-item w3-ripple w3-button w3-hover-amber w3-right" title="login"><span class="material-symbols-outlined size28">login</span></a>
+			<a href="{{ url_for('auth_bp.login') }}" class="w3-bar-item w3-ripple w3-button w3-hover-theme w3-right" title="login"><span class="material-symbols-outlined size28">login</span></a>
 		{% endif %}
-		{#
-		<button class="w3-bar-item w3-hover-khaki w3-button w3-right" style="width: 20px;"> | </button>
-		#}
 	</nav>
 
 <aside>
@@ -90,10 +38,16 @@ nav a {
     {% block header %}{% endblock %}
   </header>
   {% for message in get_flashed_messages(category_filter='error') %}
-    <div class="flash w3-pale-red w3-center">{{ message }}</div>
+    <div class="flash w3-panel w3-pale-red w3-display-container w3-border-red w3-round-large">
+		<span onclick="this.parentElement.style.display='none'" class="w3-button w3-large w3-display-topright w3-hover-pale-red">&times;</span>
+		<p>{{ message }}</p>	
+	</div>
   {% endfor %}
   {% for message in get_flashed_messages(category_filter='info') %}
-    <div class="flash w3-pale-green w3-center">{{ message }}</div>
+	<div class="flash w3-panel w3-pale-green w3-display-container w3-border-green w3-round-large">
+		<span onclick="this.parentElement.style.display='none'" class="w3-button w3-large w3-display-topright w3-hover-pale-green">&times;</span>
+		<p>{{ message }}</p>	
+	</div>
   {% endfor %}
   {% block content %}{% endblock %}
 </section>

@@ -15,6 +15,7 @@ class Lap(db.Model):
     ascent: Mapped[Optional[int]]
     descent: Mapped[Optional[int]]
     duration: Mapped[Optional[time]]
+    done: Mapped[Optional[bool]] = mapped_column(BOOLEAN, default=False)
     gpx: Mapped[Optional[str]] = mapped_column(String(48))
     hotels: Mapped[List["Hotel"]] = relationship(cascade="all, delete-orphan", back_populates="lap")
 

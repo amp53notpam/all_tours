@@ -12,7 +12,6 @@ from ..models import Lap, Hotel
 from .forms import AddLapForm, UpdLapForm, AddHotelForm, UpdHotelForm
 from .. import db
 
-
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'webp', 'gpx'}
 
 dbms_bp = Blueprint('dbms_bp', __name__,
@@ -106,6 +105,8 @@ class UpdLap(View):
             discesa = request.form.get('descent')
             tempo = request.form.get('duration')
             tempo = to_datetime_time(tempo) if tempo else tempo
+            fatta = True if request.form.get('done') else False
+
             if 'gpx' in request.files:
                 gpx = None
                 file = request.files['gpx']
@@ -122,6 +123,7 @@ class UpdLap(View):
                 lap.descent = discesa
             if tempo:
                 lap.duration = tempo
+            lap.done = fatta
             if gpx:
                 lap.gpx = gpx
 

@@ -1,9 +1,10 @@
-from datetime import datetime
+from datetime import datetime, date
 from flask import (
     Blueprint, flash, render_template, current_app
 )
+from flask.views import View
 from werkzeug.exceptions import abort
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import OperationalError, ProgrammingError
 from .. import db
 from ..models import Lap, Hotel
 from locale import setlocale, LC_ALL
@@ -21,41 +22,66 @@ def add_upload_path():
     return dict(upload_path=current_app.config['UPLOAD_FOLDER'])
 
 
-@lap_bp.route('/')
-def index():
-    return render_template('index.jinja2')
+def get_stats(laps):
+    km_tot = 0
+    km_done = 0
+    tappe_fatte = 0
+    tappe_tot = 0
+    for lap in laps:
+        km_tot += lap.Lap.distance
+        tappe_tot += 1
+        try:
+            if lap.Lap.date < date.today() or lap.Lap.done:
+                km_done += lap.Lap.distance
+                tappe_fatte += 1
+        except AttributeError:
+            pass
+
+    return dict([('total_km', km_tot), ('done_km', km_done), ('left_km', km_tot - km_done), ('num_tappe', tappe_tot), ('tappe_fatte', tappe_fatte), ('tappe_da_fare', tappe_tot - tappe_fatte)])
 
 
-@lap_bp.route('/tappe')
-def lap_dashboard():
-    setlocale(LC_ALL, "it_IT.UTF-8")
-    try:
-        laps = db.session.execute(db.select(Lap).order_by(Lap.date)).all()
-    except OperationalError:
-        flash("Database assente! Prova più tardi", category="error")
+class Index(View):
+    def dispatch_request(self):
         return render_template('index.jinja2')
 
-    return render_template("laps.jinja2", laps=laps)
+
+class Laps(View):
+    def dispatch_request(self):
+        setlocale(LC_ALL, "it_IT.UTF-8")
+        try:
+            laps = db.session.execute(db.select(Lap).order_by(Lap.date)).all()
+        except (OperationalError, ProgrammingError):
+            flash("Database assente! Prova più tardi", category="error")
+            return render_template('index.jinja2')
+
+        return render_template("laps.jinja2", laps=laps, stats=get_stats(laps))
 
 
-@lap_bp.route('/alberghi')
-def hotel_dashboard():
-    try:
-        hotels = db.session.execute(db.select(Hotel).order_by(Hotel.check_in)).all()
-    except OperationalError:
-        flash("Database assente! Prova più tardi", category="error")
-        return render_template('index.jinja2')
+class Hotels(View):
+    def dispatch_request(self):
+        try:
+            hotels = db.session.execute(db.select(Hotel).order_by(Hotel.check_in)).all()
+        except (OperationalError, ProgrammingError):
+            flash("Database assente! Prova più tardi", category="error")
+            return render_template('index.jinja2')
 
-    return render_template("hotels.jinja2", hotels=hotels)
-
-
-@lap_bp.route('/tappe/<int:id>')
-def tappa(id):
-    lap = db.session.get(Lap, id)
-    return render_template("lap.jinja2", lap=lap)
+        return render_template("hotels.jinja2", hotels=hotels)
 
 
-@lap_bp.route('/alberghi/<int:id>')
-def albergo(id):
-    hotel = db.session.get(Hotel, id)
-    return render_template("hotel.jinja2", hotel=hotel)
+class SingleLap(View):
+    def dispatch_request(self, id):
+        lap = db.session.get(Lap, id)
+        return render_template("lap.jinja2", lap=lap)
+
+
+class SingleHotel(View):
+    def dispatch_request(self, id):
+        hotel = db.session.get(Hotel, id)
+        return render_template("hotel.jinja2", hotel=hotel)
+
+
+lap_bp.add_url_rule('/', view_func=Index.as_view('index'))
+lap_bp.add_url_rule('/tappe', view_func=Laps.as_view('lap_dashboard'))
+lap_bp.add_url_rule('/tappe/<int:id>', view_func=SingleLap.as_view('tappa'))
+lap_bp.add_url_rule('/alberghi', view_func=Hotels.as_view('hotel_dashboard'))
+lap_bp.add_url_rule('/alberghi/<int:id>', view_func=SingleHotel.as_view('albergo'))

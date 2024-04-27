@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, redirect, request, url_for, flash, session
+from flask import Blueprint, render_template, redirect, request, url_for, flash, current_app, session
 from flask.views import View
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash
 from wtforms.validators import ValidationError
 from ..models import Admin
@@ -33,6 +33,7 @@ class Login(View):
                 flash('Wrong e-mail or password. Try again...', category='error')
                 return redirect(url_for('auth_bp.login'))
             login_user(user.Admin, remember=remember)
+            current_app.logger.info(f"Login utente {email}")
             return redirect(url_for('lap_bp.index'))
 
         return render_template('login.jinja2', form=form)
@@ -42,6 +43,7 @@ class Logout(View):
     decorators = [login_required]
 
     def dispatch_request(self):
+        current_app.logger.info(f"Logout utente {current_user.email}")
         logout_user()
         return redirect(url_for('lap_bp.index'))
 

@@ -12,6 +12,7 @@ from click import echo
 from flask import Flask, session
 from flask.logging import default_handler
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from flask_login import LoginManager
 from sqlalchemy.orm import DeclarativeBase
 from werkzeug.security import generate_password_hash
@@ -22,6 +23,7 @@ class Base(DeclarativeBase):
 
 
 db = SQLAlchemy(model_class=Base)
+migrate = Migrate()
 login_manager = LoginManager()
 
 
@@ -50,6 +52,7 @@ def initialize_extensions(app):
     # Since the application instance is now created, pass it to each Flask
     # extension instance to bind it to the Flask application instance (app)
     db.init_app(app)
+    migrate.init_app(app, db)
 
     login_manager.login_view = 'auth.login'
     login_manager.init_app(app)

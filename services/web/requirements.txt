@@ -3,6 +3,7 @@ click
 Flask
 Flask-Login
 Flask-SQLAlchemy
+Flask-Migrate
 Flask-WTF
 greenlet
 gunicorn
