@@ -1,6 +1,6 @@
 from datetime import date, time
 from . import db
-from sqlalchemy import Integer, String, DATE, BOOLEAN, TIME, ForeignKey
+from sqlalchemy import Integer, String, BOOLEAN, FLOAT, DATE, TIME, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from flask_login import UserMixin
 from typing import Optional, List
@@ -11,7 +11,7 @@ class Lap(db.Model):
     date: Mapped[date] = mapped_column(DATE, unique=True)
     start: Mapped[str] = mapped_column(String(32))
     destination: Mapped[str] = mapped_column(String(32))
-    distance: Mapped[Optional[float]]
+    distance: Mapped[Optional[float]] = mapped_column(FLOAT, default=0)
     ascent: Mapped[Optional[int]]
     descent: Mapped[Optional[int]]
     duration: Mapped[Optional[time]]

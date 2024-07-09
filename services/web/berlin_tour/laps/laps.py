@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from flask import (
     Blueprint, flash, render_template, current_app
 )
@@ -28,16 +28,18 @@ def get_stats(laps):
     tappe_fatte = 0
     tappe_tot = 0
     for lap in laps:
-        km_tot += lap.Lap.distance
+        if lap.Lap.distance:
+            km_tot += lap.Lap.distance
         tappe_tot += 1
         try:
             if lap.Lap.date < date.today() or lap.Lap.done:
-                km_done += lap.Lap.distance
+                if lap.Lap.distance:
+                    km_done += lap.Lap.distance
                 tappe_fatte += 1
         except AttributeError:
             pass
 
-    return dict([('total_km', km_tot), ('done_km', km_done), ('left_km', km_tot - km_done), ('num_tappe', tappe_tot), ('tappe_fatte', tappe_fatte), ('tappe_da_fare', tappe_tot - tappe_fatte)])
+    return dict([('total_km', round(km_tot, 2)), ('done_km', round(km_done, 2)), ('left_km', km_tot - km_done), ('num_tappe', tappe_tot), ('tappe_fatte', tappe_fatte), ('tappe_da_fare', tappe_tot - tappe_fatte)])
 
 
 class Index(View):
