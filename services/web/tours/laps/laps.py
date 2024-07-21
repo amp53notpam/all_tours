@@ -1,6 +1,6 @@
 from datetime import datetime, date, timedelta
 from flask import (
-    Blueprint, flash, render_template, current_app
+    Blueprint, flash, render_template, current_app, session
 )
 from flask.views import View
 from werkzeug.exceptions import abort
@@ -51,7 +51,7 @@ class Laps(View):
     def dispatch_request(self):
         setlocale(LC_ALL, "it_IT.UTF-8")
         try:
-            laps = db.session.execute(db.select(Lap).order_by(Lap.date)).all()
+            laps = db.session.execute(db.select(Lap).where(Lap.tour_id==session['trip_id']).order_by(Lap.date)).all()
         except (OperationalError, ProgrammingError):
             flash("Database assente! Prova più tardi", category="error")
             return render_template('index.jinja2')
@@ -61,8 +61,11 @@ class Laps(View):
 
 class Hotels(View):
     def dispatch_request(self):
+
         try:
-            hotels = db.session.execute(db.select(Hotel).order_by(Hotel.check_in)).all()
+            hotels = db.session.execute(
+                db.select(Hotel).join(Lap, Hotel.lap_id == Lap.id).where(Lap.tour_id == session['trip_id']).order_by(
+                    Hotel.check_in)).all()
         except (OperationalError, ProgrammingError):
             flash("Database assente! Prova più tardi", category="error")
             return render_template('index.jinja2')

@@ -6,6 +6,16 @@ from flask_login import UserMixin
 from typing import Optional, List
 
 
+class Tour(db.Model):
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(64), unique=True)
+    bind: Mapped[str] = mapped_column(String(32), unique=True)
+    is_active: Mapped[bool] = mapped_column(BOOLEAN, default=False)
+
+    def __repr__(self) -> str:
+        return self.name
+
+
 class Lap(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     date: Mapped[date] = mapped_column(DATE, unique=True)
@@ -17,6 +27,7 @@ class Lap(db.Model):
     duration: Mapped[Optional[time]]
     done: Mapped[Optional[bool]] = mapped_column(BOOLEAN, default=False)
     gpx: Mapped[Optional[str]] = mapped_column(String(48))
+    tour_id: Mapped[int] = mapped_column(ForeignKey("tour.id"))
     hotels: Mapped[List["Hotel"]] = relationship(cascade="all, delete-orphan", back_populates="lap")
 
     def __repr__(self) -> str:

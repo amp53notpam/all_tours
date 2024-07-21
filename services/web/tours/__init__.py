@@ -54,7 +54,7 @@ def initialize_extensions(app):
     db.init_app(app)
     migrate.init_app(app, db)
 
-    login_manager.login_view = 'auth.login'
+    login_manager.login_view = 'auth_bp.login'
     login_manager.init_app(app)
 
     from .models import Admin
@@ -74,13 +74,13 @@ def register_blueprints(app):
         from . import routes
 
         # Register Blueprints
-        from berlin_tour.laps import laps
+        from tours.laps import laps
         app.register_blueprint(laps.lap_bp)
 
-        from berlin_tour.auth import auth
+        from tours.auth import auth
         app.register_blueprint(auth.auth_bp)
 
-        from berlin_tour.dbms import dbms
+        from tours.dbms import dbms
         app.register_blueprint(dbms.dbms_bp)
 
 
@@ -120,11 +120,11 @@ def configure_upload_area(app):
 
 # def populate_db():
 #     """ Populate the database """
-#     from berlin_tour.models import Lap, Hotel, Admin
+#     from tours.models import Lap, Hotel, Admin
 
 #     setlocale(LC_ALL, 'it_IT.UTF-8')
 
-#     with open("berlin_tour/progetto.json") as IN:
+#     with open("tours/progetto.json") as IN:
 #         laps = load(IN)
 
 #     for lap in laps:
@@ -168,12 +168,22 @@ def register_cli_commands(app):
         from .models import Admin
 
         with app.app_context():
-            admins = [{'email': 'angelo@berlintour.org', 'password': generate_password_hash('Admin$1')},
-                      {'email': 'carlo@berlintour.org', 'password': generate_password_hash('Admin$2')},
-                      {'email': 'gfranco@berlintour.org', 'password': generate_password_hash('Admin$3')},
-                      {'email': 'cammino@adelaide.org', 'password': generate_password_hash('Santiago2022!')}
+            admins = [{'email': 'angelo@tours.org', 'password': generate_password_hash('aC%2yak*36Z?Jq')},
+                      {'email': 'cammini@tours.org', 'password': generate_password_hash('Santiago2024!')}
                       ]
             db.session.bulk_insert_mappings(Admin, admins)
+            db.session.commit()
+
+    @app.cli.command('register_tours')
+    def register_tours():
+        """ Create the database admins"""
+        from .models import Tour
+
+        with app.app_context():
+            tours = [{'name': 'Berlin', 'bind': 'db_berlin', 'is_active': False},
+                     {'name': 'Santiago', 'bind': 'db_santiago', 'is_active': False}
+                     ]
+            db.session.bulk_insert_mappings(Tour, tours)
             db.session.commit()
 
     @app.cli.command('populate_db')
@@ -183,7 +193,7 @@ def register_cli_commands(app):
 
         setlocale(LC_ALL, 'it_IT.UTF-8')
 
-        with open("berlin_tour/progetto.json") as IN:
+        with open("tours/progetto.json") as IN:
             laps = load(IN)
 
         with app.app_context():

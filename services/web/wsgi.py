@@ -1,5 +1,5 @@
 """App entry point."""
-from berlin_tour import create_app
+from tours import create_app
 
 app = create_app()
 

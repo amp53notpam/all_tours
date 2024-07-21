@@ -21,7 +21,8 @@ class AddLapForm(FlaskForm):
 
 
 class UpdLapForm(FlaskForm):
-    date = StringField("Data della tappa", render_kw={'readonly': 'readonly'}, validators=[DataRequired()])
+    # date = StringField("Data della tappa", render_kw={'readonly': 'readonly'}, validators=[DataRequired()])
+    date = StringField("Data della tappa", validators=[DataRequired()])
     distance = FloatField("Distanza")
     ascent = IntegerField("Dislivello salita")
     descent = IntegerField("Dislivello discesa")

@@ -1,12 +1,34 @@
 from flask import current_app as app
-from flask import make_response, redirect, render_template, request, url_for, send_from_directory, flash
+from flask import session, make_response, redirect, render_template, request, url_for, send_from_directory, flash
+from . import db
+from .models import Tour
+from .forms import SelectTripForm
 from flask.views import View
 from subprocess import Popen, STDOUT, PIPE
 
 
 class Start(View):
+    methods = ['GET', 'POST']
+
     def dispatch_request(self):
-        return redirect(url_for("lap_bp.index"))
+        form = SelectTripForm()
+
+        if request.method == 'POST':
+            trip = request.form.get('trip')
+            active_trip = db.session.execute(db.select(Tour).where(Tour.is_active==True)).fetchone()
+            if active_trip:
+                active_trip.Tour.is_active = False
+                db.session.commit()
+            next_active = db.session.execute(db.select(Tour).where(Tour.name==trip)).fetchone()
+            next_active.Tour.is_active = True;
+            db.session.commit()
+            session['trip'] = trip
+            session['trip_id'] = next_active.Tour.id
+
+        tours = db.session.execute(db.select(Tour).order_by(Tour.id)).all()
+        form.trip.choices = [tour.Tour.name for tour in tours]
+
+        return render_template("index.jinja2", form=form)
 
 
 class InitDb(View):

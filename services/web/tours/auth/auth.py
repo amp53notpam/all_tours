@@ -34,7 +34,7 @@ class Login(View):
                 return redirect(url_for('auth_bp.login'))
             login_user(user.Admin, remember=remember)
             current_app.logger.info(f"Login utente {email}")
-            return redirect(url_for('lap_bp.index'))
+            return redirect(url_for('start'))
 
         return render_template('login.jinja2', form=form)
 
@@ -45,7 +45,7 @@ class Logout(View):
     def dispatch_request(self):
         current_app.logger.info(f"Logout utente {current_user.email}")
         logout_user()
-        return redirect(url_for('lap_bp.index'))
+        return redirect(url_for('start'))
 
 
 auth_bp.add_url_rule("login", view_func=Login.as_view("login"))
