@@ -15,18 +15,18 @@ class Start(View):
 
         if request.method == 'POST':
             trip = request.form.get('trip')
-            active_trip = db.session.execute(db.select(Tour).where(Tour.is_active==True)).fetchone()
-            if active_trip:
-                active_trip.Tour.is_active = False
+            if trip:
+                active_trip = db.session.execute(db.select(Tour).where(Tour.is_active==True)).fetchone()
+                if active_trip:
+                    active_trip.Tour.is_active = False
+                    db.session.commit()
+                next_active = db.session.execute(db.select(Tour).where(Tour.name==trip)).fetchone()
+                next_active.Tour.is_active = True;
                 db.session.commit()
-            next_active = db.session.execute(db.select(Tour).where(Tour.name==trip)).fetchone()
-            next_active.Tour.is_active = True;
-            db.session.commit()
-            session['trip'] = trip
-            session['trip_id'] = next_active.Tour.id
+                session['trip'] = trip
 
         tours = db.session.execute(db.select(Tour).order_by(Tour.id)).all()
-        form.trip.choices = [tour.Tour.name for tour in tours]
+        form.trip.choices = [''] + [tour.Tour.name for tour in tours]
 
         return render_template("index.jinja2", form=form)
 

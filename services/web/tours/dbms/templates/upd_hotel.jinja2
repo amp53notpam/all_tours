@@ -17,13 +17,24 @@
     {{ form.csrf_token }}
     <p class="form_item">
       {{ form.check_in.label(class="w3-theme-l4") }}
-      {% set checkin_date = hotel.check_in.strftime('%A %d %b') %}
-      {{ form.check_in(class="w3-input w3-theme-l4", value=checkin_date) }}
+      {% if hotel.check_in %}
+        {% set checkin_date = hotel.check_in.strftime('%d/%m/%Y') %}
+        {{ form.check_in(class="w3-input w3-theme-l4", value=checkin_date) }}
+      {% else %}
+        {{ form.check_in(class="w3-input w3-theme-l4", placeholder="dd/mm/yyyy", pattern="^(3[01]|[12][0-9]|0?[1-9])(-|\/|\.)(1[0-2]|0?[1-9])\\2([0-9]{2})?[0-9]{2}$") }}
+      {% endif %}
     </p>
     <p class="form_item">
       {{ form.check_out.label(class="w3-theme-l4") }}
-      {% set checkout_date = hotel.check_out.strftime('%d/%m/%Y') %}
-      {{ form.check_out(class="w3-input w3-theme-l4", value=checkout_date) }}
+      {% if hotel.check_out %}
+        {% set checkout_date = hotel.check_out.strftime('%d/%m/%Y') %}
+        {{ form.check_out(class="w3-input w3-theme-l4", value=checkout_date) }}
+      {% elif hotel.check_in %}
+        {% set checkout_date = (hotel.check_in + timedelta(days=1)).strftime('%d/%m/%Y') %}
+        {{ form.check_out(class="w3-input w3-theme-l4", value=checkout_date) }}
+      {% else %}
+        {{ form.check_out(class="w3-input w3-theme-l4", placeholder="dd/mm/yyyy", pattern="^(3[01]|[12][0-9]|0?[1-9])(-|\/|\.)(1[0-2]|0?[1-9])\\2([0-9]{2})?[0-9]{2}$") }}
+      {% endif %}
     </p>
     <p class="form_item">
       {{ form.price.label(class="w3-theme-l4") }}

@@ -17,7 +17,7 @@
     {{ form.csrf_token }}
     <p class="form_item">
       {{ form.date.label(class="w3-theme-l4") }}
-      {% set lap_date = lap.date.strftime('%A %d %b') %}
+      {% set lap_date = lap.date.strftime('%d/%m/%Y') %}
       {{ form.date(class="w3-input w3-theme-l4", value=lap_date) }}
     </p>
     <p class="form_item">

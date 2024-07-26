@@ -9,7 +9,6 @@ from typing import Optional, List
 class Tour(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(64), unique=True)
-    bind: Mapped[str] = mapped_column(String(32), unique=True)
     is_active: Mapped[bool] = mapped_column(BOOLEAN, default=False)
 
     def __repr__(self) -> str:
@@ -39,13 +38,13 @@ class Hotel(db.Model):
     name: Mapped[str] = mapped_column(String(48))
     address: Mapped[str] = mapped_column(String(48))
     town: Mapped[str] = mapped_column(String(32))
-    check_in: Mapped[date] = mapped_column(DATE)
+    check_in: Mapped[Optional[date]] = mapped_column(DATE)
     check_out: Mapped[Optional[date]] = mapped_column(DATE)
     reserved: Mapped[Optional[bool]] = mapped_column(BOOLEAN, default=False)
     price: Mapped[Optional[int]]
     photo: Mapped[Optional[str]] = mapped_column(String(48))
     link: Mapped[Optional[str]]
-    lap_id: Mapped[int] = mapped_column(ForeignKey("lap.id"))
+    lap_id: Mapped[int] = mapped_column(ForeignKey("lap.id", ondelete="set null"), nullable=True)
     lap: Mapped["Lap"] = relationship(back_populates="hotels")
 
     def __repr__(self) -> str:

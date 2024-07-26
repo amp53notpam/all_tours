@@ -6,14 +6,14 @@ from flask.views import View
 from werkzeug.exceptions import abort
 from sqlalchemy.exc import OperationalError, ProgrammingError
 from .. import db
-from ..models import Lap, Hotel
+from ..models import Lap, Hotel, Tour
 from locale import setlocale, LC_ALL
 
 
 lap_bp = Blueprint('lap_bp', __name__,
-                    url_prefix="/laps",
-                    static_folder='static',
-                    template_folder='templates'
+                   url_prefix="/laps",
+                   static_folder='static',
+                   template_folder='templates'
                    )
 
 
@@ -41,6 +41,9 @@ def get_stats(laps):
 
     return dict([('total_km', round(km_tot, 2)), ('done_km', round(km_done, 2)), ('left_km', km_tot - km_done), ('num_tappe', tappe_tot), ('tappe_fatte', tappe_fatte), ('tappe_da_fare', tappe_tot - tappe_fatte)])
 
+def get_trip():
+    active_trip = db.session.execute(db.select(Tour).where(Tour.is_active == True)).fetchone()
+    return active_trip.Tour.id
 
 class Index(View):
     def dispatch_request(self):
@@ -51,7 +54,8 @@ class Laps(View):
     def dispatch_request(self):
         setlocale(LC_ALL, "it_IT.UTF-8")
         try:
-            laps = db.session.execute(db.select(Lap).where(Lap.tour_id==session['trip_id']).order_by(Lap.date)).all()
+            trip_id = get_trip()
+            laps = db.session.execute(db.select(Lap).where(Lap.tour_id == trip_id).order_by(Lap.date)).all()
         except (OperationalError, ProgrammingError):
             flash("Database assente! Prova più tardi", category="error")
             return render_template('index.jinja2')
@@ -63,14 +67,16 @@ class Hotels(View):
     def dispatch_request(self):
 
         try:
+            trip_id = get_trip()
             hotels = db.session.execute(
-                db.select(Hotel).join(Lap, Hotel.lap_id == Lap.id).where(Lap.tour_id == session['trip_id']).order_by(
+                db.select(Hotel).join(Lap, Hotel.lap_id == Lap.id).where(Lap.tour_id == trip_id).order_by(
                     Hotel.check_in)).all()
+            hotels_unbound = db.session.execute(db.select(Hotel).where(Hotel.lap_id == None)).all()
         except (OperationalError, ProgrammingError):
             flash("Database assente! Prova più tardi", category="error")
             return render_template('index.jinja2')
 
-        return render_template("hotels.jinja2", hotels=hotels)
+        return render_template("hotels.jinja2", hotels=hotels, hotels_nb=hotels_unbound, timedelta=timedelta)
 
 
 class SingleLap(View):
@@ -82,7 +88,7 @@ class SingleLap(View):
 class SingleHotel(View):
     def dispatch_request(self, id):
         hotel = db.session.get(Hotel, id)
-        return render_template("hotel.jinja2", hotel=hotel)
+        return render_template("hotel.jinja2", hotel=hotel, timedelta=timedelta)
 
 
 lap_bp.add_url_rule('/', view_func=Index.as_view('index'))

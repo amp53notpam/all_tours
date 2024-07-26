@@ -2,13 +2,11 @@ from os import remove
 from os.path import join
 from datetime import date, time, timedelta
 from re import compile
-
-from flask import Blueprint, render_template, redirect, request, url_for, flash, current_app, session
+from flask import Blueprint, render_template, redirect, request, url_for, flash, current_app
 from flask.views import View
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_required
 from werkzeug.utils import secure_filename
-from wtforms.validators import ValidationError
-from ..models import Lap, Hotel
+from ..models import Lap, Hotel, Tour
 from .forms import AddLapForm, UpdLapForm, AddHotelForm, UpdHotelForm
 from .. import db
 
@@ -29,6 +27,8 @@ def allowed_file(filename):
 
 
 def to_datetime_date(date_str):
+    if not date_str:
+        return None
     a = date_pattern.split(date_str)
     # normalize the year to 4 digits
     a[2] = f"20{a[2]}" if len(a[2]) == 2 else a[2]
@@ -39,9 +39,16 @@ def to_datetime_date(date_str):
 
 
 def to_datetime_time(time_str):
+    if not time_str:
+        return None
     a = time_str.split(":")
     a = [f"0{x}" if len(x) == 1 else x for x in a]
     return time.fromisoformat(''.join(a))
+
+
+def get_trip():
+    active_trip = db.session.execute(db.select(Tour).where(Tour.is_active == True)).fetchone()
+    return active_trip.Tour.id
 
 
 class AddLap(View):
@@ -60,22 +67,22 @@ class AddLap(View):
             discesa = request.form.get('descent')
             tempo = request.form.get('duration')
             tempo = to_datetime_time(tempo) if tempo else tempo
+            gpx = None
             if 'gpx' in request.files:
-                gpx = None
                 file = request.files['gpx']
                 if file.filename != '' and allowed_file(file.filename):
                     gpx = secure_filename(file.filename)
                     file.save(join(current_app.config['UPLOAD_FOLDER'], 'tracks', gpx))
-
+            trip_id = get_trip()
             # save to database
             new_lap = Lap(
                 date=data,
                 start=partenza,
-                destination=arrivo
+                destination=arrivo,
+                tour_id=trip_id,
             )
             db.session.add(new_lap)
-            if distanza:
-                new_lap.distance = distanza
+            new_lap.distance = distanza if distanza else 0
             if salita:
                 new_lap.ascent = salita
             if discesa:
@@ -100,21 +107,23 @@ class UpdLap(View):
         form = UpdLapForm()
 
         if request.method == 'POST':
+            data = to_datetime_date(request.form.get('date'))
             distanza = request.form.get('distance')
             salita = request.form.get('ascent')
             discesa = request.form.get('descent')
             tempo = request.form.get('duration')
             tempo = to_datetime_time(tempo) if tempo else tempo
             fatta = True if request.form.get('done') else False
-
+            gpx = None
             if 'gpx' in request.files:
-                gpx = None
                 file = request.files['gpx']
                 if file.filename != '' and allowed_file(file.filename):
                     gpx = secure_filename(file.filename)
                     file.save(join(current_app.config['UPLOAD_FOLDER'], 'tracks', gpx))
 
             lap = db.session.get(Lap, id)
+            if data != lap.date:
+                lap.date = data
             if distanza:
                 lap.distance = distanza
             if salita:
@@ -159,22 +168,27 @@ class AddHotel(View):
         form = AddHotelForm()
 
         if request.method == 'POST':
+            lap_id = None
             name = request.form.get('name')
             address = request.form.get('address')
             town = request.form.get('town')
             check_in = to_datetime_date(request.form.get('check_in'))
-            lap_id = db.session.scalars(db.select(Lap.id).where(Lap.date == check_in)).first()
-            if lap_id is None:
-                flash(f"Nessuna tappa in data {request.form.get('check_in')}", category='error')
-                return redirect(url_for("lap_bp.hotel_dashboard"))
+            check_out = to_datetime_date(request.form.get('check_out'))
+            if check_in:
+                lap_id = db.session.scalars(db.select(Lap.id).where(Lap.date == check_in)).first()
+                if lap_id is None:
+                    flash("Albergo non associabile ad alcuna tappa. ", category='warning')
 
-            check_out = request.form.get('check_out')
-            check_out = to_datetime_date(check_out) if check_out else check_in + timedelta(1)
+                if check_out and check_out <= check_in:
+                    # data di check-out anteriore o uguale a quella di check-in???
+                    flash("Date di check-in e check-out incongrenti.", category='error')
+                    return redirect(url_for("lap_bp.hotel_dashboard"))
+
             price = request.form.get('price')
             website = request.form.get('website')
             reserved = True if request.form.get('reserved') else False
+            photo = None
             if 'photo' in request.files:
-                photo = None
                 file = request.files['photo']
                 if file.filename != '' and allowed_file(file.filename):
                     photo = secure_filename(file.filename)
@@ -185,10 +199,12 @@ class AddHotel(View):
                 name=name,
                 address=address,
                 town=town,
-                check_in=check_in,
-                lap_id=lap_id
             )
             db.session.add(new_hotel)
+            if lap_id:
+                new_hotel.lap_id = lap_id
+            if check_in:
+                new_hotel.check_in = check_in
             if check_out:
                 new_hotel.check_out = check_out
             if price:
@@ -213,22 +229,37 @@ class UpdHotel(View):
 
     def dispatch_request(self, id):
         form = UpdHotelForm()
+
         if request.method == 'POST':
-            check_out = request.form.get('check_out')
-            check_out = to_datetime_date(check_out) if check_out else check_out
+            check_in = to_datetime_date(request.form.get('check_in'))
+            check_out = to_datetime_date(request.form.get('check_out'))
+            if check_in:
+                lap_id = db.session.scalars(db.select(Lap.id).where(Lap.date == check_in)).first()
+                if lap_id is None:
+                    flash("Albergo non associabile ad alcuna tappa. ", category='warning')
+
+                if check_out and check_out <= check_in:
+                    # data di check-out anteriore o uguale a quella di check-in???
+                    flash("Date di check-in e check-out incongrenti.", category='error')
+                    return redirect(url_for("lap_bp.hotel_dashboard"))
+
             price = request.form.get('price')
             website = request.form.get('website')
             reserved = True if request.form.get('reserved') else False
+            photo = None
             if 'photo' in request.files:
-                photo = None
                 file = request.files['photo']
                 if file.filename != '' and allowed_file(file.filename):
                     photo = secure_filename(file.filename)
                     file.save(join(current_app.config['UPLOAD_FOLDER'], 'images', photo))
 
             hotel = db.session.get(Hotel, id)
+            if check_in:
+                hotel.check_in = check_in
             if check_out:
                 hotel.check_out = check_out
+            if lap_id:
+                hotel.lap_id = lap_id
             if price:
                 hotel.price = price
             if website:
@@ -243,7 +274,7 @@ class UpdHotel(View):
             return redirect(url_for("lap_bp.hotel_dashboard"))
 
         hotel = db.session.get(Hotel, id)
-        return render_template("upd_hotel.jinja2", form=form, hotel=hotel)
+        return render_template("upd_hotel.jinja2", form=form, hotel=hotel, timedelta=timedelta)
 
 
 class DeleteHotel(View):

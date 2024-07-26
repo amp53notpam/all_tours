@@ -180,8 +180,8 @@ def register_cli_commands(app):
         from .models import Tour
 
         with app.app_context():
-            tours = [{'name': 'Berlin', 'bind': 'db_berlin', 'is_active': False},
-                     {'name': 'Santiago', 'bind': 'db_santiago', 'is_active': False}
+            tours = [{'name': 'Berlin', 'is_active': False},
+                     {'name': 'Santiago', 'is_active': False}
                      ]
             db.session.bulk_insert_mappings(Tour, tours)
             db.session.commit()

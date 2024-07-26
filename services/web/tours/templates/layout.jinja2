@@ -44,9 +44,17 @@
   {% for message in get_flashed_messages(category_filter='error') %}
     <div class="flash w3-panel w3-pale-red w3-display-container w3-border-red w3-round-large">
 		<span onclick="this.parentElement.style.display='none'" class="w3-button w3-large w3-display-topright w3-hover-pale-red">&times;</span>
-		<p>{{ message }}</p>	
+		<p>{{ message }}</p>
 	</div>
   {% endfor %}
+
+  {% for message in get_flashed_messages(category_filter='warning') %}
+    <div class="flash w3-panel w3-pale-yellow w3-display-container w3-border-yellow w3-round-large">
+		<span onclick="this.parentElement.style.display='none'" class="w3-button w3-large w3-display-topright w3-hover-pale-yellow">&times;</span>
+		<p>{{ message }}</p>
+	</div>
+  {% endfor %}
+
   {% for message in get_flashed_messages(category_filter='info') %}
 	<div class="flash w3-panel w3-pale-green w3-display-container w3-border-green w3-round-large">
 		<span onclick="this.parentElement.style.display='none'" class="w3-button w3-large w3-display-topright w3-hover-pale-green">&times;</span>

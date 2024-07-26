@@ -21,7 +21,6 @@ class AddLapForm(FlaskForm):
 
 
 class UpdLapForm(FlaskForm):
-    # date = StringField("Data della tappa", render_kw={'readonly': 'readonly'}, validators=[DataRequired()])
     date = StringField("Data della tappa", validators=[DataRequired()])
     distance = FloatField("Distanza")
     ascent = IntegerField("Dislivello salita")
@@ -36,7 +35,7 @@ class AddHotelForm(FlaskForm):
     name = StringField("Albergo", validators=[DataRequired()])
     address = StringField("Indirizzo", validators=[DataRequired()])
     town = StringField("Città", validators=[DataRequired()])
-    check_in = StringField("Data check-in", validators=[DataRequired()])
+    check_in = StringField("Data check-in")
     check_out = StringField("Data check-out")
     price = FloatField("Costo")
     photo = FileField("Immagine dell'albergo", validators=[FileAllowed(['webp', 'jpg', 'jpeg'])])
@@ -46,7 +45,7 @@ class AddHotelForm(FlaskForm):
 
 
 class UpdHotelForm(FlaskForm):
-    check_in = StringField("Data check-in", render_kw={'readonly': 'readonly'}, validators=[DataRequired()])
+    check_in = StringField("Data check-in")
     check_out = StringField("Data check-out")
     price = FloatField("Costo")
     photo = FileField("Immagine dell'albergo", validators=[FileAllowed(['webp', 'jpg', 'jpeg'])])

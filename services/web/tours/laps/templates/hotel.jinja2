@@ -53,16 +53,19 @@
     </div>
   </div>
 
-  {% if hotel.check_out %}         
   <div class="row w3-row">
     <div class="w3-container w3-third w3-mobile">
       <p class="w3-left-align wbold">Check-out:</p>
     </div>
     <div class="w3-container w3-twothird w3-mobile">
-      <p class="w3-left-align">{{ hotel.check_out.strftime("%A %d %b") }}</p>
+        {% if hotel.check_out %}
+          <p class="w3-left-align">{{ hotel.check_out.strftime("%A %d %b") }}</p>
+        {% else %}
+          {% set check_out = (hotel.check_in + timedelta(days=1)).strftime("%A %d %b") %}
+          <p class="w3-left-align">{{ check_out }}</p> 
+        {% endif %}
     </div>
   </div>
-  {% endif %}
 
   {% if hotel.price %}         
   <div class="row w3-row">
@@ -81,7 +84,7 @@
       <p class="w3-left-align wbold">Tappa:</p>
     </div>
     <div class="w3-container w3-twothird w3-mobile">
-      <p class="w3-left-align"><a href='{{ url_for("lap_bp.tappa", id=hotel.lap.id) }}' target="_blank">{{ hotel.lap.start }} - {{ hotel.lap.destination }}</p>
+      <p class="w3-left-align"><a href='{{ url_for("lap_bp.tappa", id=hotel.lap.id) }}' target="_blank">{{ hotel.lap.start }} - {{ hotel.lap.destination }}</a></p>
     </div>
   </div>
   {% endif %}
@@ -94,9 +97,8 @@
       <div class="w3-container w3-twothird w3-mobile">
         <p class="w3-left-align"><a href="{{ hotel.link }}" target="_blank" alt="pagine hotel su Booking.com">{{ hotel.name }}</a></p>
       </div>
-    </div>
-    {% endif %}
   </div>
+  {% endif %}
 
 </article>
 
