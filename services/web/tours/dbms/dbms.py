@@ -51,6 +51,14 @@ def get_trip():
     return active_trip.Tour.id
 
 
+def update_all_date(laps, delta_t):
+    for lap in laps:
+        lap.Lap.date += delta_t
+        for hotel in lap.Lap.hotels:
+            hotel.check_in += delta_t
+            hotel.check_out += delta_t
+
+
 class AddLap(View):
     methods = ['GET', 'POST']
     decorators = [login_required]
@@ -123,7 +131,13 @@ class UpdLap(View):
 
             lap = db.session.get(Lap, id)
             if data != lap.date:
+                delta_t = data - lap.date
+                next_laps = db.session.execute(db.select(Lap).where(Lap.date > lap.date))
                 lap.date = data
+                for hotel in lap.hotels:
+                    hotel.check_in += delta_t
+                    hotel.check_out += delta_t
+                update_all_date(next_laps, delta_t)
             if distanza:
                 lap.distance = distanza
             if salita:

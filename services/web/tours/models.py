@@ -17,7 +17,7 @@ class Tour(db.Model):
 
 class Lap(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
-    date: Mapped[date] = mapped_column(DATE, unique=True)
+    date: Mapped[date] = mapped_column(DATE)
     start: Mapped[str] = mapped_column(String(32))
     destination: Mapped[str] = mapped_column(String(32))
     distance: Mapped[Optional[float]] = mapped_column(FLOAT, default=0)
