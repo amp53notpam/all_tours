@@ -27,7 +27,7 @@ class Lap(db.Model):
     done: Mapped[Optional[bool]] = mapped_column(BOOLEAN, default=False)
     gpx: Mapped[Optional[str]] = mapped_column(String(48))
     tour_id: Mapped[int] = mapped_column(ForeignKey("tour.id"))
-    hotels: Mapped[List["Hotel"]] = relationship(cascade="all, delete-orphan", back_populates="lap")
+    hotels: Mapped[List["Hotel"]] = relationship(back_populates="lap")
 
     def __repr__(self) -> str:
         return f"Tappa: {self.start}-{self.destination}  Giorno: {self.date}"

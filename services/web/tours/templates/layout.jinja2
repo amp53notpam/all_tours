@@ -38,9 +38,11 @@
 	{% block aside %}{% endblock %}
 </aside>
 <section class="content">
+  {#
   <header class="w3-container">
     {% block header %}{% endblock %}
   </header>
+  #}
   {% for message in get_flashed_messages(category_filter='error') %}
     <div class="flash w3-panel w3-pale-red w3-display-container w3-border-red w3-round-large">
 		<span onclick="this.parentElement.style.display='none'" class="w3-button w3-large w3-display-topright w3-hover-pale-red">&times;</span>
