@@ -186,6 +186,10 @@ class AddHotel(View):
             name = request.form.get('name')
             address = request.form.get('address')
             town = request.form.get('town')
+            phone = request.form.get('phone')
+            email = request.form.get('email')
+            latitude = request.form.get('geo_lat')
+            longitude = request.form.get('geo_long')
             check_in = to_datetime_date(request.form.get('check_in'))
             check_out = to_datetime_date(request.form.get('check_out'))
             if check_in:
@@ -217,6 +221,14 @@ class AddHotel(View):
             db.session.add(new_hotel)
             if lap_id:
                 new_hotel.lap_id = lap_id
+            if phone:
+                new_hotel.phone = phone
+                new_hotel.href_phone = ''.join(phone.split())
+            if email:
+                new_hotel.email = email
+            if latitude and longitude:
+                new_hotel.lat = latitude
+                new_hotel.long = longitude
             if check_in:
                 new_hotel.check_in = check_in
             if check_out:
@@ -245,6 +257,10 @@ class UpdHotel(View):
         form = UpdHotelForm()
 
         if request.method == 'POST':
+            phone = request.form.get('phone')
+            email = request.form.get('email')
+            latitude = request.form.get('geo_lat')
+            longitude = request.form.get('geo_long')
             check_in = to_datetime_date(request.form.get('check_in'))
             check_out = to_datetime_date(request.form.get('check_out'))
             if check_in:
@@ -268,6 +284,14 @@ class UpdHotel(View):
                     file.save(join(current_app.config['UPLOAD_FOLDER'], 'images', photo))
 
             hotel = db.session.get(Hotel, id)
+            if phone:
+                hotel.phone = phone
+                hotel.href_phone = ''.join(phone.split())
+            if email:
+                hotel.email = email
+            if latitude and longitude:
+                hotel.lat = latitude
+                hotel.long = longitude
             if check_in:
                 hotel.check_in = check_in
             if check_out:

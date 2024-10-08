@@ -420,18 +420,23 @@ async function openHotel(evt) {
 
 function populateHeaderHotel(hotel, outerDiv) {
     const header = document.createElement("header");
-    const innerDiv = document.createElement("div");
 
-    innerDiv.setAttribute("class", "w3-display-container");
-    innerDiv.style.height = "200px";
+    const div1 = document.createElement("div");
+    div1.setAttribute("class", "w3-row");
+    const divImg = document.createElement("div");
+    divImg.setAttribute("class", "w3-container w3-quarter 3w-mobile");
     const hotelImg = document.createElement("img");
-    setAttributes(hotelImg, {src: hotel.this_hotel.photo, class: "w3-display-left w3-margin-left w3-margin-top webp"});
+    setAttributes(hotelImg, {src: hotel.this_hotel.photo, class: "w3-margin-left w3-margin-top webp"});
+    divImg.appendChild(hotelImg)
+    const divTitle = document.createElement("div");
+    divTitle.setAttribute("class", "w3-container w3-threequarter 3w-mobile");
     const h2 = document.createElement("h2");
     h2.textContent = hotel.this_hotel.name;
-    h2.setAttribute("class", "w3-display-middle");
-    innerDiv.appendChild(hotelImg)
-    innerDiv.appendChild(h2);
-    header.appendChild(innerDiv);
+    h2.setAttribute("class", "w3-center w3-padding-64");
+    divTitle.appendChild(h2);
+    div1.appendChild(divImg);
+    div1.appendChild(divTitle);
+    header.appendChild(div1);
     outerDiv.appendChild(header);
 }
 
@@ -442,12 +447,12 @@ function populateHotel(hotel, outerDiv) {
     const div1 = document.createElement("div");
     div1.setAttribute("class", "row w3-row");
     const divLabel1 =document.createElement("div");
-    divLabel1.setAttribute("class", "w3-container w3-third 3w-mobile");
+    divLabel1.setAttribute("class", "w3-container w3-col m4 3w-mobile");
     const paraLabel1 = document.createElement("p");
     paraLabel1.setAttribute("class", "w3-left-align wbold");
     paraLabel1.textContent = "Indirizzo:";
     const divData1 = document.createElement("div");
-    divData1.setAttribute("class", "w3-container w3-twothird w3-mobile");
+    divData1.setAttribute("class", "w3-container w3-col m7 w3-mobile");
     const paraInfo1 = document.createElement("p");
     paraInfo1.setAttribute("class", "w3-left-align");
     paraInfo1.textContent = hotel.this_hotel.address;
@@ -455,6 +460,18 @@ function populateHotel(hotel, outerDiv) {
     divLabel1.appendChild(paraLabel1);
     div1.appendChild(divLabel1);
     div1.appendChild(divData1);
+    if (hotel.this_hotel.coord) {
+        const divData1_1 = document.createElement("div")
+        divData1_1.setAttribute("class", "w3-container w3-col m1 w3-mobile");
+        const paraInfo1_1 = document.createElement("p");
+        paraInfo1_1.setAttribute("class", "w3-left-align");
+        const a1 = document.createElement("a");
+        setAttributes(a1, {href: `geo:0.0?q=${hotel.this_hotel.coord.latitude},${hotel.this_hotel.coord.longitude}`, class: "w3-hover-theme-d3 w3-right"});
+        a1.textContent = "Mappa";
+        paraInfo1_1.appendChild(a1);
+        divData1_1.appendChild(paraInfo1_1);
+        div1.appendChild(divData1_1)
+    };
     myArticle.appendChild(div1);
     
     const div2 = document.createElement("div");
@@ -474,6 +491,71 @@ function populateHotel(hotel, outerDiv) {
     div2.appendChild(divLabel2);
     div2.appendChild(divData2);
     myArticle.appendChild(div2);
+
+    if (hotel.this_hotel.phone) {
+        const div14 = document.createElement("div");
+        div14.setAttribute("class", "row w3-row");
+        const divLabel14 =document.createElement("div");
+        divLabel14.setAttribute("class", "w3-container w3-third 3w-mobile");
+        const paraLabel14 = document.createElement("p");
+        paraLabel14.setAttribute("class", "w3-left-align wbold");
+        paraLabel14.textContent = "Telefono:";
+        const divData14 = document.createElement("div");
+        divData14.setAttribute("class", "w3-container w3-twothird w3-mobile");
+        const paraInfo14 = document.createElement("p");
+        paraInfo14.setAttribute("class", "w3-left-align");
+        const a14 = document.createElement("a");
+        a14.setAttribute("href", `tel:hotel.this_hotelhref_phone`);
+        a14.textContent = hotel.this_hotel.phone;
+        paraInfo14.appendChild(a14);
+        divData14.appendChild(paraInfo14)
+        divLabel14.appendChild(paraLabel14);
+        div14.appendChild(divLabel14);
+        div14.appendChild(divData14);
+        myArticle.appendChild(div14);
+    };
+
+    if (hotel.this_hotel.email) {
+        const div15 = document.createElement("div");
+        div15.setAttribute("class", "row w3-row");
+        const divLabel15 =document.createElement("div");
+        divLabel15.setAttribute("class", "w3-container w3-third 3w-mobile");
+        const paraLabel15 = document.createElement("p");
+        paraLabel15.setAttribute("class", "w3-left-align wbold");
+        paraLabel15.textContent = "E-mail:";
+        const divData15 = document.createElement("div");
+        divData15.setAttribute("class", "w3-container w3-twothird w3-mobile");
+        const paraInfo15 = document.createElement("p");
+        paraInfo15.setAttribute("class", "w3-left-align");
+        paraInfo15.textContent = hotel.this_hotel.email;
+        divData15.appendChild(paraInfo15)
+        divLabel15.appendChild(paraLabel15);
+        div15.appendChild(divLabel15);
+        div15.appendChild(divData15);
+        myArticle.appendChild(div15);
+    };
+
+    if (hotel.this_hotel.check_in) {
+        const div4 = document.createElement("div");
+        div4.setAttribute("class", "row w3-row");
+        const divLabel4 =document.createElement("div");
+        divLabel4.setAttribute("class", "w3-container w3-third 3w-mobile");
+        const paraLabel4 = document.createElement("p");
+        paraLabel4.setAttribute("class", "w3-left-align wbold");
+        paraLabel4.textContent = "Check-in:";
+        const divData4 = document.createElement("div");
+        divData4.setAttribute("class", "w3-container w3-twothird w3-mobile");
+        const paraInfo4 = document.createElement("p");
+        paraInfo4.setAttribute("class", "w3-left-align");
+        paraInfo4.textContent = hotel.this_hotel.check_in;
+        divData4.appendChild(paraInfo4);
+        divLabel4.appendChild(paraLabel4);
+        div4.appendChild(divLabel4);
+        div4.appendChild(divData4);
+        myArticle.appendChild(div4);
+    };
+
+
 
     const div3 = document.createElement("div");
     div3.setAttribute("class", "row w3-row");

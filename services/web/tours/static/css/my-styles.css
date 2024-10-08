@@ -81,3 +81,7 @@ img.webp {
 	width: 90%;
 	margin-left: 5%
 }
+
+.form_label {
+    padding-top: 7px;
+}

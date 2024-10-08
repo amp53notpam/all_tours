@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
-from wtforms import StringField, IntegerField, FloatField, SubmitField, URLField, BooleanField
+from wtforms import StringField, IntegerField, FloatField, SubmitField, URLField, BooleanField, EmailField, TelField
 from wtforms.widgets import CheckboxInput, ListWidget
 from wtforms.validators import DataRequired
 from locale import LC_ALL, setlocale
@@ -35,20 +35,28 @@ class AddHotelForm(FlaskForm):
     name = StringField("Albergo", validators=[DataRequired()])
     address = StringField("Indirizzo", validators=[DataRequired()])
     town = StringField("Città", validators=[DataRequired()])
+    geo_lat = FloatField("Lat. & Long.")
+    geo_long = FloatField()
+    email = EmailField("E-mail")
+    phone = TelField("Telefono")
     check_in = StringField("Data check-in")
     check_out = StringField("Data check-out")
     price = FloatField("Costo")
-    photo = FileField("Immagine dell'albergo", validators=[FileAllowed(['webp', 'jpg', 'jpeg'])])
+    photo = FileField("Foto dell'albergo", validators=[FileAllowed(['webp', 'jpg', 'jpeg'])])
     website = URLField("Web site")
     reserved = BooleanField('È prenotato')
     submit = SubmitField('OK')
 
 
 class UpdHotelForm(FlaskForm):
+    email = EmailField("E-mail")
+    phone = TelField("Telefono")
+    geo_lat = FloatField("Lat. & Long.")
+    geo_long = FloatField()
     check_in = StringField("Data check-in")
     check_out = StringField("Data check-out")
     price = FloatField("Costo")
-    photo = FileField("Immagine dell'albergo", validators=[FileAllowed(['webp', 'jpg', 'jpeg'])])
+    photo = FileField("Foto dell'albergo", validators=[FileAllowed(['webp', 'jpg', 'jpeg'])])
     website = URLField("Web site")
     reserved = BooleanField('È prenotato')
     submit = SubmitField('OK')

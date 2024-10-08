@@ -26,8 +26,10 @@ class Start(View):
                 session['trip'] = trip
 
         tours = db.session.execute(db.select(Tour).order_by(Tour.id)).all()
-        form.trip.choices = [''] + [tour.Tour.name for tour in tours]
-
+        form.trip.choices = [("", "Scegli il viaggio", {"disabled": "disabled"})]
+        form.trip.choices.extend([(tour.Tour.name, tour.Tour.name, dict()) for tour in tours])
+        form.trip.default = ""
+        form.process([])
         return render_template("index.jinja2", form=form)
 
 

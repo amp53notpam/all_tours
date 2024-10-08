@@ -168,9 +168,12 @@ class SingleHotelJSON(View):
                               "address": this_hotel.address,
                               "town": this_hotel.town,
                               "reserved": this_hotel.reserved,
+                              "phone": this_hotel.phone,
+                              "href_phone": this_hotel.href_phone,
+                              "email": this_hotel.email,
+                              "coord": None,
                               "check_in": this_hotel.check_in.strftime("%A %d %b %Y") if this_hotel.check_in else None,
                               "check_out": check_out(),
-                              # "check-out": this_hotel.check_out.strftime("%A %d %b %Y") if this_hotel.check_out else (this_hotel.check_in + timedelta(days=1)).strftime("%A %d %b %Y"),
                               "price": this_hotel.price,
                               "tappa": {"URL": url_for("lap_bp.tappa", id=this_hotel.lap.id),
                                         "start": this_hotel.lap.start,
@@ -180,6 +183,12 @@ class SingleHotelJSON(View):
                               "update": url_for("dbms_bp.update_hotel", id=this_hotel.id),
                               "delete": url_for("dbms_bp.delete_hotel", id=this_hotel.id),
                               }
+
+        if this_hotel.lat and this_hotel.long:
+            data["this_hotel"]["coord"] = {
+                "latitude": this_hotel.lat,
+                "longitude": this_hotel.long
+            }
 
         response = jsonify(data)
 
