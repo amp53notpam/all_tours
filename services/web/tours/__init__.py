@@ -118,40 +118,6 @@ def configure_upload_area(app):
         pass
 
 
-# def populate_db():
-#     """ Populate the database """
-#     from tours.models import Lap, Hotel, Admin
-
-#     setlocale(LC_ALL, 'it_IT.UTF-8')
-
-#     with open("tours/progetto.json") as IN:
-#         laps = load(IN)
-
-#     for lap in laps:
-#         new_lap = Lap(date=datetime.strptime(lap['Data'], "%a %d %b %Y").date(),
-#                       start=lap['Start'],
-#                       destination=lap['End'],
-#                       distance=lap['Distanza'],
-#                       ascent=lap['Ascesa'],
-#                       descent=lap['Discesa'],
-#                       duration=time.fromisoformat(lap['Tempo']),
-#                       gpx=lap['gpx']
-#                       )
-#         new_lap.hotels = [Hotel(name=lap['Alloggio'],
-#                                 address=lap['Indirizzo'],
-#                                 town=lap['End'],
-#                                 check_in=datetime.strptime(lap['Check-in'], "%a %d %b %Y").date(),
-#                                 check_out=datetime.strptime(lap['Check-out'], "%a %d %b %Y").date(),
-#                                 price=lap['Costo'],
-#                                 photo=lap['Photo'],
-#                                 link=lap['Booking']
-#                                 )
-#                           ]
-
-#         db.session.add(new_lap)
-#         db.session.commit()
-
-
 def register_cli_commands(app):
 
     @app.cli.command('create_db')
@@ -176,12 +142,12 @@ def register_cli_commands(app):
 
     @app.cli.command('register_tours')
     def register_tours():
-        """ Create the database admins"""
+        """ Create the database tour"""
         from .models import Tour
 
         with app.app_context():
-            tours = [{'name': 'Berlin', 'is_active': False},
-                     {'name': 'Santiago', 'is_active': False}
+            tours = [{'name': 'Berlin', 'is_active': False, 'trip_mode': "bicycling"},
+                     {'name': 'Santiago', 'is_active': False, 'trip_mode': 'walking'}
                      ]
             db.session.bulk_insert_mappings(Tour, tours)
             db.session.commit()

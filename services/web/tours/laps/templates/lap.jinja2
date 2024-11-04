@@ -163,6 +163,14 @@
       </div>
       {% endif %}
 
+      {% if lap.has_photos %}
+      <div class="row">
+        <div class="w3-container w3-center w3-mobile>
+            <p id="photo_show" class="wbold">Foto</p>
+        </div>
+      </div>
+      {% endif %}
+
       {% if '_user_id' in session.keys() %}
         <div class="w3-container w3-center" style="margin-top: 60px;">
           <div class="w3-bar">

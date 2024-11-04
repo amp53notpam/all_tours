@@ -1,12 +1,16 @@
 from os import remove
 from os.path import join
-from datetime import date, time, timedelta
+from datetime import datetime, date, time, timedelta
 from re import compile
+from subprocess import Popen, PIPE, STDOUT
+from shlex import split
 from flask import Blueprint, render_template, redirect, request, url_for, flash, current_app
 from flask.views import View
 from flask_login import login_required
+from exiftool import ExifToolHelper
+from sqlalchemy.exc import IntegrityError
 from werkzeug.utils import secure_filename
-from ..models import Lap, Hotel, Tour
+from ..models import Lap, Hotel, Tour, TripImage
 from .forms import AddLapForm, UpdLapForm, AddHotelForm, UpdHotelForm
 from .. import db
 
@@ -59,6 +63,44 @@ def update_all_date(laps, delta_t):
             hotel.check_out += delta_t
 
 
+def register_photos(id, gpx, pics):
+    track = join(current_app.config['UPLOAD_FOLDER'], 'tracks', gpx)
+    pic_dir = join(current_app.config['UPLOAD_FOLDER'], 'images')
+    et = ExifToolHelper()
+    for pic in pics:
+        pic_fp = join(pic_dir, pic)
+        et.execute("-geotag", track, pic_fp)
+        et.execute("-delete_original!", pic_fp )
+        p = Popen(
+            split(f"exiftool -s -s -s -d '%Y%m%dT%H%M%S' -createdate {pic_fp}"),
+            stdout=PIPE, stderr=STDOUT).communicate()[0].decode().split("\n")[:-1][0]
+        pic_date = datetime.fromisoformat(p)
+        p = Popen(
+            split(f"exiftool -s -s -s -n -gpslatitude -gpslongitude {pic_fp}"),
+            stdout=PIPE, stderr=STDOUT).communicate()[0].decode()
+        if p:
+            latitude = float(p.split("\n")[0])
+            longitude = float(p.split("\n")[1])
+        else:
+            latitude = None
+            longitude = None
+
+        new_picture = TripImage(
+            lap_id=id,
+            img_src=pic,
+            date=pic_date,
+        )
+        db.session.add(new_picture)
+        if latitude:
+            new_picture.lat = latitude
+        if longitude:
+            new_picture.long = longitude
+        try:
+            db.session.commit()
+        except IntegrityError:
+            current_app.logger.warning(f"Tentativo di caricare la foto {pic} già caricata.")
+
+
 class AddLap(View):
     methods = ['GET', 'POST']
     decorators = [login_required]
@@ -81,6 +123,7 @@ class AddLap(View):
                 if file.filename != '' and allowed_file(file.filename):
                     gpx = secure_filename(file.filename)
                     file.save(join(current_app.config['UPLOAD_FOLDER'], 'tracks', gpx))
+
             trip_id = get_trip()
             # save to database
             new_lap = Lap(
@@ -129,6 +172,14 @@ class UpdLap(View):
                     gpx = secure_filename(file.filename)
                     file.save(join(current_app.config['UPLOAD_FOLDER'], 'tracks', gpx))
 
+            pictures = []
+            files  = request.files.getlist("photos")
+            for file in files:
+                if file.filename != '' and allowed_file(file.filename):
+                    foto = secure_filename(file.filename)
+                    file.save(join(current_app.config['UPLOAD_FOLDER'], 'images', foto))
+                    pictures.append(foto)
+
             lap = db.session.get(Lap, id)
             if data != lap.date:
                 delta_t = data - lap.date
@@ -149,10 +200,17 @@ class UpdLap(View):
             lap.done = fatta
             if gpx:
                 lap.gpx = gpx
+            if pictures:
+                lap.has_photos = True
 
             db.session.commit()
+
             flash(f"Tappa {lap.start} - {lap.destination} aggiornata .", category='info')
             current_app.logger.info(f"Aggiornata tappa {lap.start} - {lap.destination}.")
+
+            # update the photos table
+            register_photos(lap.id, lap.gpx, pictures)
+
             return redirect(url_for("lap_bp.lap_dashboard"))
 
         lap = db.session.get(Lap, id)

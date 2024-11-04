@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from flask_wtf.file import FileField, FileRequired, FileAllowed
+from flask_wtf.file import FileField, MultipleFileField, FileRequired, FileAllowed
 from wtforms import StringField, IntegerField, FloatField, SubmitField, URLField, BooleanField, EmailField, TelField
 from wtforms.widgets import CheckboxInput, ListWidget
 from wtforms.validators import DataRequired
@@ -27,6 +27,7 @@ class UpdLapForm(FlaskForm):
     descent = IntegerField("Dislivello discesa")
     duration = StringField("Tempo previsto")
     gpx = FileField("Track file (.gpx)", validators=[FileAllowed(['gpx'])])
+    photos = MultipleFileField("Foto", validators=[FileAllowed(['jpg', 'jpeg', 'mov'])])
     done = BooleanField('OK è fatta!')
     submit = SubmitField('OK')
 
