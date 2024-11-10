@@ -6,7 +6,6 @@ from logging.handlers import RotatingFileHandler
 from locale import LC_ALL, setlocale
 from json import load
 
-import sqlalchemy as sa
 from click import echo
 
 from flask import Flask, session

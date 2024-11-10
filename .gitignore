@@ -25,3 +25,6 @@ flask_app/
 progetto.*
 utils/
 uploaded/
+
+w3_unminified.css
+s_*.jinja2

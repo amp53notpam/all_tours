@@ -92,3 +92,4 @@ app.add_url_rule("/init_db", view_func=InitDb.as_view("init_db"))
 app.add_url_rule("/language/<string:lang>", view_func=SetLanguage.as_view("set_language"))
 app.add_url_rule("/static/<path:filename>", view_func=StaticFiles.as_view("static_files"))
 app.add_url_rule("/download/<path:filename>", view_func=DownloadFiles.as_view("download_files"))
+

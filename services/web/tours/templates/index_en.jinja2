@@ -70,8 +70,6 @@ h1 {
 <script>
 const session = {{ session|tojson }};
 const LANG_ROOT = {{ url_for("set_language", lang='')|tojson }}
-console.log(LANG_ROOT)
-console.log(session)
 
 let slideIndex = 1;
 

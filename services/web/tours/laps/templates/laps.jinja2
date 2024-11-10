@@ -2,212 +2,91 @@
 
 {% block title %}Tappe{% endblock %}
 
+{% block header %}
+{{ header }}
+{% endblock %}
+
 {% block hamburger %}
-  <a id="openNav" href="javascript: void(0)" class="w3-bar-item w3-ripple w3-button w3-hover-theme w3-xlarge w3-hide-large" onclick="toggleMenu()">&#9776;</a>
+<a id="open_list" href="javascript: void(0)" class="w3-bar-item w3-right w3-ripple w3-button w3-hover-theme w3-hide-large"><i class="fa-solid fa-list fa-lg"></i></a>
 {% endblock %}
 
 {% block aside %}
-{# sidebar con l'elenco delle tappe #}
-<div id="sidebar" class="w3-sidebar w3-w3-card w3-theme-l4 w3-collapse w3-animate-top" style="width: 25%; overflow: auto;">
-    <div class="w3-bar-block">
-        <h5 class="w3-bar-item w3-theme-d4">Tappe</h5>
-        {% for lap in laps %}
-            <button id="btn_{{ lap.Lap.id }}" class="w3-bar-item w3-button w3-ripple w3-hover-theme tablink"  data-lap-id="{{ lap.Lap.id }}">{{ lap.Lap.start }} - {{ lap.Lap.destination }}</button>
-        {% endfor %}
-    </div>
+<div id="sidebar" class="w3-sidebar w3-bar-block w3-collapse w3-card w3-animate-zoom w3-theme-l4" style="width: 25%; overflow: auto">
+    <h5 class="w3-bar-item w3-theme-d4">Tappe</h5>
+    {% for lap in laps %}
+    <button id="btn_{{ lap.Lap.id }}" class="w3-bar-item w3-button w3-ripple w3-hover-theme tablink"  data-lap-id="{{ lap.Lap.id }}">{{ lap.Lap.start }} - {{ lap.Lap.destination }}</button>
+    {% endfor %}
 
     {% if '_user_id' in session.keys() %}
-    <div class="w3-container w3-center" style="margin-top: 50px;">
-        <div class="w3-bar">
-            <a href="{{ url_for('dbms_bp.add_lap') }}" class="w3-bar-item w3-ripple" title="Aggiungi tappa"><span class="material-symbols-outlined icon28">add</span></a>
-        </div>
+    <div class="w3-panel w3-center w3-bar-item" style="margin-top: 30px;">
+        <a href="{{ url_for('dbms_bp.add_lap') }}" class="w3-ripple" title="Aggiungi tappa"><i class="fa-solid fa-plus icon28"></i></a>
     </div>
     {% endif %}
-    <div stile="height: 120px;">
-    </div>
+    {% for number in range(laps|count + 1, laps|count + 8) %}
+    <button id="btn_{{ number }}" class="w3-bar-item w3-button w3-hover-none" style="opacity: 0;">x</button>
+    {% endfor %}
 </div>
 {% endblock %}
 
 {% block content %}
 <div id="display" class="w3-main" style="margin-left: 25%;">
-  <div id="summary" class="w3-container w3-center" style="display: block">
-    <header>
-      <div class="w3-display-container" style="height: 200px;">
-        <h2 class="w3-display-middle">Dati generali</h2>
-      </div>
-    </header>
+    {% if stats %}
+    <div id="summary" class="w3-container w3-center" style="display: block;">
+        <header>
+            <div class="w3-display-container" style="height: 200px;">
+                <h2 class="w3-display-middle">Dati generali</h2>
+            </div>
+        </header>
 
-    <article style="margin-right: 5%; margin-left: 5%;">
-      <div class="row w3-row">
-        <div class="w3-container w3-third w3-mobile">
-          <p class="w3-left-align wbold">Numero tappe:</p>
-        </div>
-        <div class="w3-container w3-twothird w3-mobile">
-          <p class="w3-left-align">{{ stats['num_tappe'] }}</p>
-        </div>
-      </div>
+        <article style="margin-right: 5%; margin-left: 5%;">
+            <div class="row w3-row">
+                <div class="w3-container w3-third w3-mobile">
+                    <p class="w3-left-align wbold">Numero tappe:</p>
+                </div>
+                <div class="w3-container w3-twothird w3-mobile">
+                    <p class="w3-left-align">{{ stats['num_tappe'] }}</p>
+                </div>
+            </div>
 
-      <div class="row w3-row">
-        <div class="w3-container w3-third w3-mobile">
-          <p class="w3-left-align wbold">Kilometri totali:</p>
-        </div>
-        <div class="w3-container w3-twothird w3-mobile">
-          <p class="w3-left-align">{{ stats['total_km'] }}</p>
-        </div>
-      </div>
+            <div class="row w3-row">
+                <div class="w3-container w3-third w3-mobile">
+                    <p class="w3-left-align wbold">Kilometri totali:</p>
+                </div>
+                <div class="w3-container w3-twothird w3-mobile">
+                    <p class="w3-left-align">{{ stats['total_km'] }}</p>
+                </div>
+            </div>
 
-      {% if stats['tappe_fatte'] %}
-      <div class="row w3-row">
-        <div class="w3-container w3-third w3-mobile">
-          <p class="w3-left-align wbold">Tappe fatte:</p>
-        </div>
-        <div class="w3-container w3-twothird w3-mobile">
-          <p class="w3-left-align">{{ stats['tappe_fatte'] }}</p>
-        </div>
-      </div>
-      <div class="row w3-row">
-        <div class="w3-container w3-third w3-mobile">
-          <p class="w3-left-align wbold">Kilometri percorsi:</p>
-        </div>
-        <div class="w3-container w3-twothird w3-mobile">
-          <p class="w3-left-align">{{ stats['done_km'] }}</p>
-        </div>
-      </div>
-      {% endif %}
-    </article>
-  </div>
+            {% if stats['tappe_fatte'] %}
+            <div class="row w3-row">
+                <div class="w3-container w3-third w3-mobile">
+                    <p class="w3-left-align wbold">Tappe fatte:</p>
+                </div>
+                <div class="w3-container w3-twothird w3-mobile">
+                    <p class="w3-left-align">{{ stats['tappe_fatte'] }}</p>
+                </div>
+            </div>
 
-  {#
-  {% for lap in laps %}
-  <div id="lap" class="w3-container tappa" style="display: none">
-    <header class="w3-container">
-      <div class="w3-display-container" style="height: 200px;">
-        <h2 class="w3-display-middle"></h2>
-      </div>
-    </header>
+            <div class="row w3-row">
+                <div class="w3-container w3-third w3-mobile">
+                    <p class="w3-left-align wbold">Kilometri percorsi:</p>
+                </div>
+                <div class="w3-container w3-twothird w3-mobile">
+                    <p class="w3-left-align">{{ stats['done_km'] }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </article>
 
-    <article style="margin: 0 5% 0 5%;">
-      <div class="row w3-row">
-        <div class="w3-container w3-third w3-mobile">
-          <p class="w3-left-align wbold">Data:</p>
-        </div>
-        <div class="w3-container w3-twothird w3-mobile">
-          <p class="w3-left-align">{{ lap.Lap.date.strftime("%A %d %b %Y") }}</p>
-        </div>
-      </div>
-
-      {% if lap.Lap.distance %}
-      <div class="row w3-row">
-        <div class="w3-container w3-third w3-mobile">
-          <p class="w3-left-align wbold">Distanza:</p>
-        </div>
-        <div class="w3-container w3-twothird w3-mobile">
-          <p class="w3-left-align">{{ lap.Lap.distance }} Km</p>
-        </div>
-      </div>
-      {% endif %}
-
-      {% if lap.Lap.ascent %}
-      <div class="row w3-row">
-        <div class="w3-container w3-third w3-mobile">
-          <p class="w3-left-align wbold">Dislivello salita:</p>
-        </div>
-        <div class="w3-container w3-twothird w3-mobile">
-          <p class="w3-left-align">{{ lap.Lap.ascent }} m</p>
-        </div>
-      </div>
-      {% endif %}
-
-      {% if lap.Lap.descent %}
-      <div class="row w3-row">
-        <div class="w3-container w3-third w3-mobile">
-          <p class="w3-left-align wbold">Dislivello discesa:</p>
-        </div>
-        <div class="w3-container w3-twothird w3-mobile">
-          <p class="w3-left-align">{{ lap.Lap.descent }} m</p>
-        </div>
-      </div>
-      {% endif %}
-
-      {% if lap.Lap.duration %}
-      <div class="row w3-row">
-        <div class="w3-container w3-third w3-mobile">
-          <p class="w3-left-align wbold">Tempo previsto:</p>
-        </div>
-        <div class="w3-container w3-twothird w3-mobile">
-          <p class="w3-left-align">{{ lap.Lap.duration.strftime("%H:%M:%S") }}</p>
-        </div>
-      </div>
-      {% endif %}
-
-      {% if lap.Lap.distance and lap.Lap.duration %}
-      <div class="row w3-row">
-        <div class="w3-container w3-third w3-mobile">
-          <p class="w3-left-align wbold">Media prevista:</p>
-        </div>
-        <div class="w3-container w3-twothird w3-mobile">
-          {% set media = lap.Lap.distance * 1000 / ( lap.Lap.duration.hour * 3600 + lap.Lap.duration.minute *60) * 3.6 %}
-          <p class="w3-left-align">{{ media|round(2) }} Km/h</p>
-        </div>
-      </div>
-      {% endif %}
-
-      <div class="row w3-row">
-        <div class="w3-container w3-third w3-mobile">
-          <p class="w3-left-align wbold">Fatta:</p>
-        </div>
-        <div class="w3-container w3-twothird w3-mobile">
-          {% if lap.Lap.done %}
-            <p class="w3-left-align"><span  class="material-symbols-outlined done">done</span></p>
-          {% else %}
-            <p></p>
-          {% endif %}
-        </div>
-      </div>
-
-      {% if lap.Lap.gpx %}
-      <div class="row w3-row">
-        <div class="w3-container w3-third w3-mobile">
-          <p class="w3-left-align wbold">Traccia gpx:</p>
-        </div>
-        <div class="w3-container w3-twothird w3-mobile">
-            <p class="w3-left-align"><a href='{{ url_for("download_files", filename="tracks/"+lap.Lap.gpx) }}'>{{ lap.Lap.start }}-{{ lap.Lap.destination }}</a></p>
-        </div>
-      </div>
-      {% endif %}
-
-      {% if lap.Lap.hotels %}
-      <div class="row w3-row">
-        <div class="w3-container w3-third w3-mobile">
-          <p class="w3-left-align wbold">Alberghi:</p>
-        </div>
-        <div class="w3-container w3-twothird w3-mobile">
-          {% for hotel in lap.Lap.hotels %}
-            <p class="w3-left-align"><a href='{{ url_for("lap_bp.albergo", id=hotel.id) }}' target="_blank">{{ hotel.name }}</a></p>
-          {% endfor %}
-        </div>
-      </div>
-      {% endif %}
-
-      {% if '_user_id' in session.keys() %}
-        <div class="w3-container w3-center" style="margin-top: 60px;">
-          <div class="w3-bar">
-            <a href="{{ url_for('dbms_bp.update_lap', id=lap.Lap.id) }}" class="w3-bar-item w3-ripple" title="Modifica tappa"><span class="material-symbols-outlined icon28">edit</span></a>
-            <a href="{{ url_for('dbms_bp.delete_lap', id=lap.Lap.id) }}" class="w3-bar-item w3-ripple" title="Cancella tappa"><span class="material-symbols-outlined icon28">delete</span></a>
-            
-          </div>
-        </div>
-      {% endif %}
-    </article> 
-  </div>
-  {% endfor %}
-  #}
+    </div>
+    {% endif %}
+    {% block single_lap %}{% endblock %}
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-   const SCRIPT_ROOT = {{ url_for("lap_bp.tappaJSON", id=-1)|tojson }};
-   const session = {{ session|tojson }};
+    const SCRIPT_ROOT = {{ url_for("lap_bp.lapJS", id=-1)|tojson }};
+    const session = {{ session|tojson }};
 </script>
 {% endblock %}

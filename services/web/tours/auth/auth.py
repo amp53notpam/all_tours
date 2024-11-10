@@ -6,6 +6,7 @@ from wtforms.validators import ValidationError
 from ..models import Admin
 from .forms import LogInForm
 from .. import db
+from ..utils import make_header
 
 
 auth_bp = Blueprint('auth_bp', __name__,
@@ -36,7 +37,12 @@ class Login(View):
             current_app.logger.info(f"Login utente {email}")
             return redirect(url_for('start'))
 
-        return render_template('login.jinja2', form=form)
+        if session['lang'] == 'it':
+            header = make_header('it')
+            return render_template("login.jinja2", form=form, header=header)
+        else:
+            header = make_header('en')
+            return render_template("login_en.jinja2", form=form, header=header)
 
 
 class Logout(View):

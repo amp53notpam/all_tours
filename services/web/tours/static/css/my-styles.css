@@ -8,46 +8,44 @@ aside {
 	width: 25%;
 	padding-left: 15px;
 	float: left;
-	overflow: scroll;
 }
 h1 {
 	text-align: center;
 	letter-spacing: 5px;
 	font-size: 2rem;
 }
-/*
-h2 {
-	margin-top: 50px;
-	margin-bottom: 60px;
-}
-
-h2.no-margins {
-	margin: 0;
-}
-*/
-.flash { 
+.flash {
 	margin: auto;
 	margin-top: 10px;
 	padding: 1em;
 	max-width: 400px;
 	border: 3px solid;
 }
-span.icon28 {
-	font-size: 28px;
+.icon28 {
+	font-size: 24px;
 	background: #fefae8;
 	color: chocolate;
+}
+span.icon28 {
 	font-variation-settings: 'OPSZ' 28;
 	font-variation-settings: 'GRAD' 50;
 }
-span.icon28:hover {
+.icon28:hover {
 	color: red;
 	background: #f9e58c
 }
-span.done {
+.done {
 	font-size: 24px;
 	color: teal;
+}
+span.done {
 	font-variation-settings: 'OPSZ' 36;
 	font-variation-settings: 'GRAD' 400;
+}
+
+span.icon28:hover {
+	color: red;
+	background: #f9e58c
 }
 nav a {
 	font-size: 1.2rem;
@@ -85,3 +83,4 @@ img.webp {
 .form_label {
     padding-top: 7px;
 }
+

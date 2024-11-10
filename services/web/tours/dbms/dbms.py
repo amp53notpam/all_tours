@@ -4,7 +4,7 @@ from datetime import datetime, date, time, timedelta
 from re import compile
 from subprocess import Popen, PIPE, STDOUT
 from shlex import split
-from flask import Blueprint, render_template, redirect, request, url_for, flash, current_app
+from flask import Blueprint, render_template, redirect, request, url_for, flash, current_app, session
 from flask.views import View
 from flask_login import login_required
 from exiftool import ExifToolHelper
@@ -13,6 +13,7 @@ from werkzeug.utils import secure_filename
 from ..models import Lap, Hotel, Tour, TripImage
 from .forms import AddLapForm, UpdLapForm, AddHotelForm, UpdHotelForm
 from .. import db
+from ..utils import make_header
 
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'webp', 'gpx'}
 
@@ -147,7 +148,12 @@ class AddLap(View):
             current_app.logger.info(f"Aggiunta tappa {partenza} - {arrivo}.")
             return redirect(url_for("lap_bp.lap_dashboard"))
 
-        return render_template("add_lap.jinja2", form=form)
+        if session['lang'] == 'it':
+            header = make_header('it')
+            return render_template("add_lap.jinja2", form=form, header=header)
+        else:
+            header = make_header('en')
+            return render_template("add_lap_en.jinja2", form=form, header=header)
 
 
 class UpdLap(View):
@@ -214,7 +220,12 @@ class UpdLap(View):
             return redirect(url_for("lap_bp.lap_dashboard"))
 
         lap = db.session.get(Lap, id)
-        return render_template("upd_lap.jinja2", form=form, lap=lap)
+        if session['lang'] == 'it':
+            header = make_header('it')
+            return render_template("upd_lap.jinja2", form=form, lap=lap, header=header)
+        else:
+            header = make_header('en')
+            return render_template("upd_lap_en.jinja2", form=form, lap=lap, header=header)
 
 
 class DeleteLap(View):
@@ -304,7 +315,12 @@ class AddHotel(View):
             current_app.logger.info(f"Aggiunto albergo {name} a {town}.")
             return redirect(url_for("lap_bp.hotel_dashboard"))
 
-        return render_template("add_hotel.jinja2", form=form)
+        if session['lang'] == 'it':
+            header = make_header('it')
+            return render_template("add_hotel.jinja2", form=form, header=header)
+        else:
+            header = make_header('en')
+            return render_template("add_hotel_en.jinja2", form=form, header=header)
 
 
 class UpdHotel(View):
@@ -370,7 +386,12 @@ class UpdHotel(View):
             return redirect(url_for("lap_bp.hotel_dashboard"))
 
         hotel = db.session.get(Hotel, id)
-        return render_template("upd_hotel.jinja2", form=form, hotel=hotel, timedelta=timedelta)
+        if session['lang'] == 'it':
+            header = make_header('it')
+            return render_template("upd_hotel.jinja2", form=form, hotel=hotel, header=header)
+        else:
+            header = make_header('en')
+            return render_template("upd_hotel_en.jinja2", form=form, hotel=hotel, header=header)
 
 
 class DeleteHotel(View):
