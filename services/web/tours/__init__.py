@@ -8,11 +8,13 @@ from json import load
 
 from click import echo
 
-from flask import Flask, session
+from flask import Flask, session, request, current_app
 from flask.logging import default_handler
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
+from flask_session import Session
+from flask_babel import Babel
 from sqlalchemy.orm import DeclarativeBase
 from werkzeug.security import generate_password_hash
 
@@ -20,10 +22,11 @@ from werkzeug.security import generate_password_hash
 class Base(DeclarativeBase):
     pass
 
-
 db = SQLAlchemy(model_class=Base)
 migrate = Migrate()
 login_manager = LoginManager()
+sess = Session()
+babel = Babel()
 
 
 def create_app(test_config=None):
@@ -45,6 +48,12 @@ def create_app(test_config=None):
 
     return app
 
+def get_locale():
+    # try:
+    return session.get("lang", "it")
+    # except RuntimeError:
+    #     return "it"
+
 
 # Helper functions
 def initialize_extensions(app):
@@ -52,16 +61,18 @@ def initialize_extensions(app):
     # extension instance to bind it to the Flask application instance (app)
     db.init_app(app)
     migrate.init_app(app, db)
+    sess.init_app(app)
 
     login_manager.login_view = 'auth_bp.login'
     login_manager.init_app(app)
 
     from .models import Admin
-
     @login_manager.user_loader
     def load_user(user_id):
         result = db.session.get(Admin, int(user_id))
         return result
+
+    babel.init_app(app, default_locale='it', locale_selector=get_locale)
 
 
 def register_blueprints(app):
@@ -145,8 +156,8 @@ def register_cli_commands(app):
         from .models import Tour
 
         with app.app_context():
-            tours = [{'name': 'Berlin', 'is_active': False, 'trip_mode': "bicycling"},
-                     {'name': 'Santiago', 'is_active': False, 'trip_mode': 'walking'}
+            tours = [{'name': 'Berlin', 'is_active': False, 'trip_mode': "bicycling", 'carousel_pos': 2},
+                     {'name': 'Santiago', 'is_active': False, 'trip_mode': 'walking', "carousel_pos": 1}
                      ]
             db.session.bulk_insert_mappings(Tour, tours)
             db.session.commit()

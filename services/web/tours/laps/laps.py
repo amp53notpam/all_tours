@@ -53,30 +53,21 @@ def get_trip():
 
 class Laps(View):
     def dispatch_request(self):
-        lang = session['lang']
-        header = make_header(lang)
+        header = make_header(session['lang'])
 
         try:
             trip_id = get_trip()
             laps = db.session.execute(db.select(Lap).where(Lap.tour_id == trip_id).order_by(Lap.date)).all()
         except (OperationalError, ProgrammingError):
-            if lang == 'it':
-                flash("Database assente! Prova più tardi", category="error")
-                return render_template('index.jinja2', header=header)
-            else:
-                flash("Internal error: database not found.")
-                return render_template('index_en.jinja2', header=header)
+            flash({{ _('Database assente! Prova più tardi') }}, category="error")
+            return render_template('index.jinja2', header=header)
 
-        if lang == 'it':
-            return render_template("laps.jinja2", laps=laps, stats=get_stats(laps), header=header)
-        else:
-            return render_template(f"laps_{lang}.jinja2", laps=laps, stats=get_stats(laps), header=header)
+        return render_template("laps.jinja2", laps=laps, stats=get_stats(laps), header=header)
 
 
 class Hotels(View):
     def dispatch_request(self):
-        lang = session['lang']
-        header = make_header(lang)
+        header = make_header(session['lang'])
 
         try:
             trip_id = get_trip()
@@ -85,38 +76,27 @@ class Hotels(View):
                     Hotel.check_in)).all()
             hotels_unbound = db.session.execute(db.select(Hotel).where(Hotel.lap_id == None)).all()
         except (OperationalError, ProgrammingError):
-            if lang == 'it':
-                flash("Database assente! Prova più tardi", category="error")
-                return render_template('index.jinja2', header=header)
-            else:
-                flash("Internal error: database not found.")
-                return render_template('index_en.jinja2', header=header)
+            flash({{ _('Database assente! Prova più tardi') }}, category="error")
+            return render_template('index.jinja2', header=header)
 
-        if lang == 'it':
-            return render_template("hotels.jinja2", hotels=hotels, hotels_nb=hotels_unbound, splash_page=True, timedelta=timedelta, header=header)
-        else:
-            return render_template(f"hotels_{lang}.jinja2", hotels=hotels, hotels_nb=hotels_unbound, timedelta=timedelta, header=header)
+        return render_template("hotels.jinja2", hotels=hotels, hotels_nb=hotels_unbound, splash_page=True, timedelta=timedelta, header=header)
 
 
 class SingleLap(View):
     def dispatch_request(self, id):
-        lang =  session['lang']
-        header = make_header(lang)
+        header = make_header(session['lang'])
 
         lap = db.session.get(Lap, id)
         laps = db.session.execute(db.select(Lap).where(Lap.tour_id == lap.tour_id).order_by(Lap.date)).all()
         prev_lap = db.session.execute(db.select(Lap.id, Lap.start, Lap.destination).where(Lap.destination == lap.start)).fetchone()
         next_lap = db.session.execute(db.select(Lap.id, Lap.start, Lap.destination).where(Lap.start == lap.destination)).fetchone()
-        if lang == 'it':
-            return render_template("lap.jinja2", laps=laps, lap=lap, prev_lap=prev_lap, next_lap=next_lap, stats=None, header=header)
-        else:
-            return render_template(f"lap_{lang}.jinja2", laps=laps, lap=lap, prev_lap=prev_lap, next_lap=next_lap, stats=None, header=header)
+
+        return render_template("lap.jinja2", laps=laps, lap=lap, prev_lap=prev_lap, next_lap=next_lap, stats=None, header=header)
 
 
 class SingleHotel(View):
     def dispatch_request(self, id):
-        lang = session['lang']
-        header = make_header(lang)
+        header = make_header(session['lang'])
 
         hotel = db.session.get(Hotel, id)
         hotels = db.session.execute(
@@ -124,10 +104,7 @@ class SingleHotel(View):
                 Hotel.check_in)).all()
         hotels_unbound = db.session.execute(db.select(Hotel).where(Hotel.lap_id == None)).all()
 
-        if lang == 'it':
-            return render_template("hotel.jinja2", header=header, hotels=hotels, hotels_nb=hotels_unbound, hotel=hotel, timedelta=timedelta)
-        else:
-            return render_template(f"hotel_{lang}.jinja2", header=header, hotels=hotels, hotels_nb=hotels_unbound, hotel=hotel,
+        return render_template("hotel.jinja2", header=header, hotels=hotels, hotels_nb=hotels_unbound, hotel=hotel,
                                    timedelta=timedelta)
 
 class SingleLapJS(View):

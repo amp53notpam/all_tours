@@ -1,0 +1,330 @@
+# English translations for PROJECT.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-11-16 18:30+0100\n"
+"PO-Revision-Date: 2024-11-16 18:32+0100\n"
+"Last-Translator: \n"
+"Language-Team: en <LL@li.org>\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Generated-By: Babel 2.16.0\n"
+"X-Generator: Poedit 3.5\n"
+
+#: tours/auth/auth.py:35
+msgid "E-mail o password errate! Riprova..."
+msgstr "Wrong e-mail or password! Please try again..."
+
+#: tours/auth/forms.py:15
+msgid "E-mail non inserita."
+msgstr "Missing e-mail."
+
+#: tours/auth/forms.py:16
+msgid "Password non inserita."
+msgstr "Missing password."
+
+#: tours/auth/forms.py:17
+msgid "Ricordami"
+msgstr "Remember me"
+
+#: tours/dbms/dbms.py:148
+#, python-format
+msgid "Aggiunta tappa %(partenza)s - %(arrivo)s."
+msgstr "Added stage %(partenza)s - %(arrivo)s."
+
+#: tours/dbms/dbms.py:211
+#, python-format
+msgid "Tappa %(start)s - %(destination)s aggiornata."
+msgstr "Lap %(start)s - %(destination)s updated."
+
+#: tours/dbms/dbms.py:235
+#, python-format
+msgid "Cancellata tappa %(start)s - %(destination)s."
+msgstr "Deleted lap %(start)s - %(destination)s."
+
+#: tours/dbms/dbms.py:261
+msgid "Albergo non associabile ad alcuna tappa."
+msgstr "No lap for this hotel."
+
+#: tours/dbms/dbms.py:265
+msgid "Date di check-in e check-out incongrenti"
+msgstr "Inconsistent check-in and check-out dates"
+
+#: tours/dbms/dbms.py:308
+#, python-format
+msgid "Aggiunto albergo %(name)s a %(town)s."
+msgstr "Added hotel  %(name)s in %(town)s."
+
+#: tours/dbms/dbms.py:333
+msgid "Albergo non associabile ad alcuna tappa"
+msgstr "No stage for this hotel"
+
+#: tours/dbms/dbms.py:337
+msgid "Date di check-in e check-out incongrenti."
+msgstr "Inconsistent check-in and check-out dates."
+
+#: tours/dbms/dbms.py:374
+#, python-format
+msgid "Hotel %(hotel)s aggiornato."
+msgstr "Hotel %(hotel)s updated."
+
+#: tours/dbms/dbms.py:393
+#, python-format
+msgid "Cancellato albergo %(hotel)s."
+msgstr "Deleted hotel %(hotel)s."
+
+#: tours/dbms/forms.py:10 tours/dbms/forms.py:22
+msgid "Data della tappa"
+msgstr "Lap date"
+
+#: tours/dbms/forms.py:11
+msgid "Partenza"
+msgstr "Start"
+
+#: tours/dbms/forms.py:12
+msgid "Arrivo"
+msgstr "Arrival"
+
+#: tours/dbms/forms.py:13 tours/dbms/forms.py:23
+#: tours/laps/templates/lap.jinja2:56 tours/laps/templates/s_lap.jinja2:20
+msgid "Distanza"
+msgstr "Distance"
+
+#: tours/dbms/forms.py:14 tours/dbms/forms.py:24
+#: tours/laps/templates/lap.jinja2:67 tours/laps/templates/s_lap.jinja2:31
+msgid "Dislivello salita"
+msgstr "Ascent"
+
+#: tours/dbms/forms.py:15 tours/dbms/forms.py:25
+#: tours/laps/templates/lap.jinja2:78 tours/laps/templates/s_lap.jinja2:42
+msgid "Dislivello discesa"
+msgstr "Descent"
+
+#: tours/dbms/forms.py:16
+msgid "Tempo previsto"
+msgstr "(Estimated) time"
+
+#: tours/dbms/forms.py:17 tours/dbms/forms.py:27
+msgid "Traccia gpx (.gpx)"
+msgstr "Gpx track (.gpx)"
+
+#: tours/dbms/forms.py:26 tours/laps/templates/lap.jinja2:89
+#: tours/laps/templates/s_lap.jinja2:53
+msgid "Tempo"
+msgstr "Time"
+
+#: tours/dbms/forms.py:28 tours/laps/templates/lap.jinja2:171
+#: tours/laps/templates/s_lap.jinja2:135
+msgid "Foto"
+msgstr "Photo"
+
+#: tours/dbms/forms.py:29
+msgid "OK è fatta!"
+msgstr "OK it's done!"
+
+#: tours/dbms/forms.py:34
+msgid "Albergo"
+msgstr "Hotel"
+
+#: tours/dbms/forms.py:35 tours/laps/templates/hotel.jinja2:62
+#: tours/laps/templates/s_hotel.jinja2:20
+msgid "Indirizzo"
+msgstr "Address"
+
+#: tours/dbms/forms.py:36 tours/laps/templates/hotel.jinja2:76
+#: tours/laps/templates/s_hotel.jinja2:34
+msgid "Città"
+msgstr "Town"
+
+#: tours/dbms/forms.py:40 tours/dbms/forms.py:52
+#: tours/laps/templates/hotel.jinja2:86 tours/laps/templates/s_hotel.jinja2:44
+msgid "Telefono"
+msgstr "Telephone"
+
+#: tours/dbms/forms.py:41 tours/dbms/forms.py:55
+msgid "Data check-in"
+msgstr "Check-in date"
+
+#: tours/dbms/forms.py:42 tours/dbms/forms.py:56
+msgid "Data check-out"
+msgstr "Check-out date"
+
+#: tours/dbms/forms.py:43 tours/dbms/forms.py:57
+#: tours/laps/templates/hotel.jinja2:151
+#: tours/laps/templates/s_hotel.jinja2:109
+msgid "Costo"
+msgstr "Price"
+
+#: tours/dbms/forms.py:44 tours/dbms/forms.py:58
+msgid "Foto dell'albergo"
+msgstr "Hotel photo"
+
+#: tours/dbms/forms.py:45 tours/dbms/forms.py:59
+#: tours/laps/templates/hotel.jinja2:173
+#: tours/laps/templates/s_hotel.jinja2:131
+msgid "Sito web"
+msgstr "Website"
+
+#: tours/dbms/forms.py:46 tours/dbms/forms.py:60
+msgid "È prenotato"
+msgstr "It's booked"
+
+#: tours/dbms/templates/add_hotel.jinja2:10
+msgid "Nuovo albergo"
+msgstr "New hotel"
+
+#: tours/dbms/templates/add_hotel.jinja2:57
+#: tours/dbms/templates/upd_hotel.jinja2:37
+msgid "latitudine"
+msgstr "latitude"
+
+#: tours/dbms/templates/add_hotel.jinja2:60
+#: tours/dbms/templates/upd_hotel.jinja2:40
+msgid "longitudine"
+msgstr "longitude"
+
+#: tours/dbms/templates/add_lap.jinja2:10
+msgid "Nuova Tappa"
+msgstr "New lap"
+
+#: tours/dbms/templates/upd_hotel.jinja2:10
+msgid "Aggiorna albergo"
+msgstr "Edit  this hotel"
+
+#: tours/dbms/templates/upd_lap.jinja2:10
+msgid "Aggiorna Tappa"
+msgstr "Edit this lap"
+
+#: tours/forms.py:7 tours/routes.py:35
+msgid "Scegli il viaggio"
+msgstr "Select a trip"
+
+#: tours/laps/laps.py:62 tours/laps/laps.py:79
+msgid "Database assente! Prova più tardi"
+msgstr "Database missing! Try again later"
+
+#: tours/laps/templates/hotel.jinja2:107 tours/laps/templates/s_hotel.jinja2:65
+msgid "Prenotazione"
+msgstr "Reservation"
+
+#: tours/laps/templates/hotel.jinja2:121 tours/laps/templates/s_hotel.jinja2:79
+msgid "Check-in"
+msgstr "Check-in"
+
+#: tours/laps/templates/hotel.jinja2:140 tours/laps/templates/s_hotel.jinja2:98
+msgid "Check-out"
+msgstr "Check-out"
+
+#: tours/laps/templates/hotel.jinja2:162
+#: tours/laps/templates/s_hotel.jinja2:120
+msgid "Tappa"
+msgstr "Lap"
+
+#: tours/laps/templates/hotel.jinja2:184
+#: tours/laps/templates/s_hotel.jinja2:142
+msgid "Modifica questo albergo"
+msgstr "Edit this  hotel"
+
+#: tours/laps/templates/hotel.jinja2:185
+#: tours/laps/templates/s_hotel.jinja2:143
+msgid "Cancella questo albergo"
+msgstr "Delete this hotel"
+
+#: tours/laps/templates/hotels.jinja2:15 tours/laps/templates/hotels.jinja2:43
+#: tours/laps/templates/lap.jinja2:136 tours/laps/templates/s_lap.jinja2:100
+#: tours/templates/layout.jinja2:35 tours/templates/layout.jinja2:51
+msgid "Alberghi"
+msgstr "Hotels"
+
+#: tours/laps/templates/hotels.jinja2:28
+msgid "Aggiungi hotel"
+msgstr "Add hotel"
+
+#: tours/laps/templates/lap.jinja2:46 tours/laps/templates/s_lap.jinja2:10
+msgid "Data"
+msgstr "Date"
+
+#: tours/laps/templates/lap.jinja2:100 tours/laps/templates/s_lap.jinja2:64
+msgid "Media prevista"
+msgstr "(Expected) Average speed"
+
+#: tours/laps/templates/lap.jinja2:111 tours/laps/templates/s_lap.jinja2:75
+msgid "Fatta"
+msgstr "Done"
+
+#: tours/laps/templates/lap.jinja2:125 tours/laps/templates/s_lap.jinja2:89
+msgid "Traccia gpx"
+msgstr "Gpx track"
+
+#: tours/laps/templates/lap.jinja2:149 tours/laps/templates/s_lap.jinja2:113
+msgid "Tappa precedente"
+msgstr "Previous lap"
+
+#: tours/laps/templates/lap.jinja2:160 tours/laps/templates/s_lap.jinja2:124
+msgid "Tappa successiva"
+msgstr "Next Lap"
+
+#: tours/laps/templates/lap.jinja2:179 tours/laps/templates/s_lap.jinja2:143
+msgid "Modifica questa tappa"
+msgstr "Edit this lap"
+
+#: tours/laps/templates/lap.jinja2:180 tours/laps/templates/s_lap.jinja2:144
+msgid "Cancella questa tappa"
+msgstr "Delete this lap"
+
+#: tours/laps/templates/laps.jinja2:15 tours/templates/layout.jinja2:34
+#: tours/templates/layout.jinja2:50
+msgid "Tappe"
+msgstr "Laps"
+
+#: tours/laps/templates/laps.jinja2:22
+msgid "Aggiungi tappa"
+msgstr "Add lap"
+
+#: tours/laps/templates/laps.jinja2:37
+msgid "Dati generali"
+msgstr "General data"
+
+#: tours/laps/templates/laps.jinja2:44
+msgid "Numero tappe"
+msgstr "Number of laps"
+
+#: tours/laps/templates/laps.jinja2:53
+msgid "Kilometri totali"
+msgstr "Total kilometers"
+
+#: tours/laps/templates/laps.jinja2:63
+msgid "Tappe fatte"
+msgstr "Laps done"
+
+#: tours/laps/templates/laps.jinja2:72
+msgid "Kilometri percorsi"
+msgstr "Kilometers traveled"
+
+#: tours/routes.py:54 tours/routes.py:59 tours/routes.py:64
+msgid "Creazione database fallita"
+msgstr "Database creation failed"
+
+#: tours/routes.py:68
+msgid "Database inizializzato..."
+msgstr "Database initialized..."
+
+#: tours/templates/index.jinja2:26
+msgid "Santiago de Compostela - Cattedrale"
+msgstr "Santiago de Compostela - Cathedral"
+
+#: tours/templates/index.jinja2:33
+msgid "Berlino - Porta di Brandeburgo"
+msgstr "Berlin - Brandenburg Gate"
+
+#: tours/templates/layout.jinja2:25
+msgid "I miei viaggi"
+msgstr "My trips"

@@ -7,6 +7,7 @@ from shlex import split
 from flask import Blueprint, render_template, redirect, request, url_for, flash, current_app, session
 from flask.views import View
 from flask_login import login_required
+from flask_babel import _
 from exiftool import ExifToolHelper
 from sqlalchemy.exc import IntegrityError
 from werkzeug.utils import secure_filename
@@ -144,16 +145,12 @@ class AddLap(View):
             if gpx:
                 new_lap.gpx = gpx
             db.session.commit()
-            flash(f"Aggiunta tappa {partenza} - {arrivo}.", category="info")
+            flash(_("Aggiunta tappa %(partenza)s - %(arrivo)s.", partenza=partenza, arrivo=arrivo), category="info")
             current_app.logger.info(f"Aggiunta tappa {partenza} - {arrivo}.")
             return redirect(url_for("lap_bp.lap_dashboard"))
 
-        if session['lang'] == 'it':
-            header = make_header('it')
-            return render_template("add_lap.jinja2", form=form, header=header)
-        else:
-            header = make_header('en')
-            return render_template("add_lap_en.jinja2", form=form, header=header)
+        header = make_header(session['lang'])
+        return render_template("add_lap.jinja2", form=form, header=header)
 
 
 class UpdLap(View):
@@ -211,21 +208,18 @@ class UpdLap(View):
 
             db.session.commit()
 
-            flash(f"Tappa {lap.start} - {lap.destination} aggiornata .", category='info')
+            flash(_('Tappa %(start)s - %(destination)s aggiornata.', start=lap.start, destination=lap.destination), category='info')
             current_app.logger.info(f"Aggiornata tappa {lap.start} - {lap.destination}.")
 
             # update the photos table
-            register_photos(lap.id, lap.gpx, pictures)
+            if pictures:
+                register_photos(lap.id, lap.gpx, pictures)
 
             return redirect(url_for("lap_bp.lap_dashboard"))
 
         lap = db.session.get(Lap, id)
-        if session['lang'] == 'it':
-            header = make_header('it')
-            return render_template("upd_lap.jinja2", form=form, lap=lap, header=header)
-        else:
-            header = make_header('en')
-            return render_template("upd_lap_en.jinja2", form=form, lap=lap, header=header)
+        header = make_header(session['lang'])
+        return render_template("upd_lap.jinja2", form=form, lap=lap, header=header)
 
 
 class DeleteLap(View):
@@ -238,7 +232,7 @@ class DeleteLap(View):
             remove(join(current_app.config['UPLOAD_FOLDER'], 'tracks', lap.gpx))
         db.session.delete(lap)
         db.session.commit()
-        flash(f"Cancellata tappa {lap.start} - {lap.destination}", category='info')
+        flash(_('Cancellata tappa %(start)s - %(destination)s.', start=lap.start, destination=lap.destination), category='info')
         current_app.logger.info(f"Cancellata tappa {lap.start} - {lap.destination}")
         return redirect(url_for("lap_bp.lap_dashboard"))
 
@@ -264,11 +258,11 @@ class AddHotel(View):
             if check_in:
                 lap_id = db.session.scalars(db.select(Lap.id).where(Lap.date == check_in)).first()
                 if lap_id is None:
-                    flash("Albergo non associabile ad alcuna tappa. ", category='warning')
+                    flash(_('Albergo non associabile ad alcuna tappa.'), category='warning')
 
                 if check_out and check_out <= check_in:
                     # data di check-out anteriore o uguale a quella di check-in???
-                    flash("Date di check-in e check-out incongrenti.", category='error')
+                    flash(_('Date di check-in e check-out incongrenti'), category='error')
                     return redirect(url_for("lap_bp.hotel_dashboard"))
 
             price = request.form.get('price')
@@ -311,16 +305,12 @@ class AddHotel(View):
                 new_hotel.photo = photo
 
             db.session.commit()
-            flash(f"Aggiunto albergo {name} a {town}.", category="info")
+            flash(_('Aggiunto albergo %(name)s a %(town)s.', name=name, town=town), category="info")
             current_app.logger.info(f"Aggiunto albergo {name} a {town}.")
             return redirect(url_for("lap_bp.hotel_dashboard"))
 
-        if session['lang'] == 'it':
-            header = make_header('it')
-            return render_template("add_hotel.jinja2", form=form, header=header)
-        else:
-            header = make_header('en')
-            return render_template("add_hotel_en.jinja2", form=form, header=header)
+        header = make_header(session['lang'])
+        return render_template("add_hotel.jinja2", form=form, header=header)
 
 
 class UpdHotel(View):
@@ -340,11 +330,11 @@ class UpdHotel(View):
             if check_in:
                 lap_id = db.session.scalars(db.select(Lap.id).where(Lap.date == check_in)).first()
                 if lap_id is None:
-                    flash("Albergo non associabile ad alcuna tappa. ", category='warning')
+                    flash(_('Albergo non associabile ad alcuna tappa'), category='warning')
 
                 if check_out and check_out <= check_in:
                     # data di check-out anteriore o uguale a quella di check-in???
-                    flash("Date di check-in e check-out incongrenti.", category='error')
+                    flash(_('Date di check-in e check-out incongrenti.'), category='error')
                     return redirect(url_for("lap_bp.hotel_dashboard"))
 
             price = request.form.get('price')
@@ -381,17 +371,13 @@ class UpdHotel(View):
                 hotel.photo = photo
 
             db.session.commit()
-            flash(f"Hotel {hotel.name} aggiornato.", category="info")
+            flash(_('Hotel %(hotel)s aggiornato.', hotel=hotel.name), category="info")
             current_app.logger.info(f"Aggiornato hotel {hotel.name}.")
             return redirect(url_for("lap_bp.hotel_dashboard"))
 
         hotel = db.session.get(Hotel, id)
-        if session['lang'] == 'it':
-            header = make_header('it')
-            return render_template("upd_hotel.jinja2", form=form, hotel=hotel, header=header)
-        else:
-            header = make_header('en')
-            return render_template("upd_hotel_en.jinja2", form=form, hotel=hotel, header=header)
+        header = make_header(session['lang'])
+        return render_template("upd_hotel.jinja2", form=form, hotel=hotel, header=header)
 
 
 class DeleteHotel(View):
@@ -404,7 +390,7 @@ class DeleteHotel(View):
             remove(join(current_app.config['UPLOAD_FOLDER'], 'images', hotel.photo))
         db.session.delete(hotel)
         db.session.commit()
-        flash(f"Cancellato albergo {hotel.name}", category='info')
+        flash(_('Cancellato albergo %(hotel)s.', hotel=hotel.name), category="info")
         current_app.logger.info(f"Cancellato albergo {hotel.name}.")
         return redirect(url_for("lap_bp.hotel_dashboard"))
 

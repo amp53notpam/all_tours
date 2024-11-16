@@ -18,6 +18,7 @@ class Tour(db.Model):
     trip_mode: Mapped[TripMode] = mapped_column(Enum("walking", "bicycling", "driving", name="mode_enum", native_enum=True), default="walking")
     name: Mapped[str] = mapped_column(String(64), unique=True)
     is_active: Mapped[bool] = mapped_column(BOOLEAN, default=False)
+    carousel_pos: Mapped[Optional[int]]
 
     def __repr__(self) -> str:
         return self.name

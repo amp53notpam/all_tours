@@ -1,5 +1,6 @@
 from os import environ, path
 from dotenv import load_dotenv
+from tours import db
 
 
 load_dotenv('.env')
@@ -24,6 +25,16 @@ class DevelopmentConfig:
 
     # Logging
     LOG_WITH_GUNICORN = environ.get('LOG_WITH_GUNICORN', default=False)
+
+    # server-side sessions from flask-session
+    SESSION_TYPE = "sqlalchemy"
+    SESSION_PERMANENT = False
+    SESSION_SERIALIZATION_FORMAT = "msgpack"
+    SESSION_SQLALCHEMY = db
+    SESSION_SQLALCHEMY_TABLE = 'tour_session'
+
+    # internationalization
+    LANGUAGES = ['it', 'en']
 
 
 class ProductionConfig(DevelopmentConfig):

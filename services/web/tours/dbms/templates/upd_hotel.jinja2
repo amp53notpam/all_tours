@@ -7,7 +7,7 @@
 {% block content %}
   <div class="w3-card-4" style="max-width: 620px; margin:auto; margin-top: 60px">
     <div class="w3-container w3-theme-d2">
-      <h2 class="w3-center no-margins">Aggiorna albergo</h2>
+      <h2 class="w3-center no-margins">{{ _('Aggiorna albergo') }}</h2>    {#  #}
       <h3 class="w3-center">{{ hotel.name }}</h3>
     </div>
 
@@ -34,10 +34,10 @@
                 <p class="w3-left-align wbold form_label">{{ form.geo_lat.label(class="w3-theme-l4") }}</p>
             </div>
             <div class="w3-col m4 w3-mobile" style="padding-right: 5px;">
-                <p class="w3-left-align">{{ form.geo_lat(class="w3-input w3-theme-l4", placeholder="latitudine") }}</p>
+                <p class="w3-left-align">{{ form.geo_lat(class="w3-input w3-theme-l4", placeholder=_('latitudine')) }}</p>
             </div>
             <div class="w3-col m4 w3-mobile">
-                <p class="w3-left-align">{{ form.geo_long(class="w3-input w3-theme-l4", placeholder="longitudine") }}</p>
+                <p class="w3-left-align">{{ form.geo_long(class="w3-input w3-theme-l4", placeholder=_('longitudine')) }}</p>
             </div>
 
             <div class="w3-col m4 w3-mobile">

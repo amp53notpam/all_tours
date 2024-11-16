@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, redirect, request, url_for, flash, current_app, session
 from flask.views import View
 from flask_login import login_user, logout_user, login_required, current_user
+from flask_babel import _
 from werkzeug.security import check_password_hash
 from wtforms.validators import ValidationError
 from ..models import Admin
@@ -31,18 +32,16 @@ class Login(View):
             user = db.session.execute(db.select(Admin).where(Admin.email == email)).first()
 
             if not user or not check_password_hash(user.Admin.password, password):
-                flash('Wrong e-mail or password. Try again...', category='error')
+                flash(_('E-mail o password errate! Riprova...'), category='error')
                 return redirect(url_for('auth_bp.login'))
             login_user(user.Admin, remember=remember)
+            current_app.session_interface.regenerate(session)
             current_app.logger.info(f"Login utente {email}")
             return redirect(url_for('start'))
 
-        if session['lang'] == 'it':
-            header = make_header('it')
-            return render_template("login.jinja2", form=form, header=header)
-        else:
-            header = make_header('en')
-            return render_template("login_en.jinja2", form=form, header=header)
+        lang = session['lang']
+        header = make_header(lang)
+        return render_template("login.jinja2", form=form, header=header)
 
 
 class Logout(View):

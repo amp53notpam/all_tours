@@ -1,6 +1,7 @@
 from locale import setlocale, LC_ALL
-from flask import current_app as app
+from flask import current_app as app, current_app
 from flask import session, make_response, redirect, render_template, request, url_for, send_from_directory, flash
+from flask_babel import _, lazy_gettext as _l
 from . import db
 from .models import Tour
 from .forms import SelectTripForm
@@ -29,41 +30,43 @@ class Start(View):
 
         if 'lang' not in session:
             session['lang'] = 'it'
+            session['locale'] = "it_IT"
         tours = db.session.execute(db.select(Tour).order_by(Tour.id)).all()
-        if session['lang'] == 'it':
-            form.trip.choices = [("", "Scegli il viaggio", {"disabled": "disabled"})]
-        else:
-            form.trip.choices = [("", "Choose a trip", {"disabled": "disabled"})]
+        form.trip.choices = [("", _("Scegli il viaggio"), {"disabled": "disabled"})]
         form.trip.choices.extend([(tour.Tour.name, tour.Tour.name, dict()) for tour in tours])
         form.trip.default = ""
         form.process([])
 
-        if session['lang'] == 'it':
-            header = make_header('it')
-            lang_selector = make_dd_lang('it')
-            return render_template("index.jinja2", form=form, header=header, lang_selector=lang_selector)
+        header = make_header(session['lang'])
+        lang_selector = make_dd_lang(session['lang'])
+        if 'trip' not in session:
+            carousel_pos = 1
         else:
-            header = make_header('en')
-            lang_selector = make_dd_lang('en')
-            return render_template("index_en.jinja2", form=form, header=header, lang_selector=lang_selector)
+            carousel_pos = db.session.execute(db.select(Tour.carousel_pos).where(Tour.is_active == True)).scalar()
+
+        return render_template("index.jinja2", form=form, header=header, lang_selector=lang_selector, carousel_pos=carousel_pos)
 
 
 class InitDb(View):
     def dispatch_request(self):
         res = Popen(['flask', 'create_db'], stdout=PIPE, stderr=STDOUT).wait()
         if res != 0:
-            flash("Creazione database: 'create_db' KO   ", category='error')
+            flash(_("Creazione database fallita"), category='error')
+            current_app.logger.error("Creazione database fallita - causa: 'create_db' KO")
             return redirect(url_for("index"))
         res = Popen(['flask', 'register_admins'], stdout=PIPE, stderr=STDOUT).wait()
         if res != 0:
-            flash("Creazione database: 'register_admin' KO", category='error')
+            flash(_("Creazione database fallita"), category='error')
+            current_app.logger.error("Creazione database fallita - causa: 'register_admin' KO")
             return redirect(url_for("index"))
         res = Popen(['flask', 'populate_db'], stdout=PIPE, stderr=STDOUT).wait()
         if res != 0:
-            flash("Creazione database: 'populate_db' KO", category='error')
+            flash(_("Creazione database fallita"),category='error')
+            current_app.logger.error("Creazione database fallita - causa: 'populate_db' KO")
             return redirect(url_for("index"))
 
-        flash("Database started...", category='info')
+        flash(_("Database inizializzato..."), category='info')
+        current_app.logger.info("Database creato")
         return redirect(url_for("index"))
 
 
@@ -81,8 +84,10 @@ class SetLanguage(View):
     def dispatch_request(self, lang):
         session['lang'] = lang
         if lang == 'it':
+            session['locale'] = 'it_IT.UTF-8'
             setlocale(LC_ALL, 'it_IT.UTF-8')
         elif lang == 'en':
+            session['locale'] = 'en_GB.UTF-8'
             setlocale(LC_ALL, 'en_GB.UTF-8')
         return "done"
 

@@ -33,6 +33,7 @@ async function selectLanguage(evt) {
     const sel_lang = evt.target.dataset.lang;
     const dd_btn = document.querySelector("#dd_btn");
     const cur_lang = dd_btn.dataset.curLang;
+    console.log(sel_lang, cur_lang)
     if (cur_lang == sel_lang) {
         dropDown()
     } else {
@@ -419,7 +420,6 @@ async function openHotel(evt) {
 
 
 const buttons = document.querySelectorAll("button");
-console.log(buttons)
 
 buttons.forEach((button) => {
     if (button.dataset.lapId) {
@@ -468,6 +468,6 @@ const openNav = document.querySelector("#open_nav")
 openNav.addEventListener("click", toggleMenu)
 
 const openList = document.querySelector("#open_list")
-if (open_list) {
+if (openList) {
     openList.addEventListener("click", toggleList)
 }

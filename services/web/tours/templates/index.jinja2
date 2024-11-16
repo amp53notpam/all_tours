@@ -11,8 +11,9 @@ h1 {
 {% endblock %}
 
 {% block header %}
-{{ header }}
+{{ header if header is not none else super() }}
 {% endblock %}
+
 
 {% block language %}
 {{ lang_selector }}
@@ -22,14 +23,14 @@ h1 {
 <div style="margin-top: 60px">
     <div class="w3-content w3-display-container" style="max-width: 800px">
         <div class="w3-display-container mySlides" >
-		    <img src="{{ url_for('static', filename='images/santiago.jpg') }}" alt="cattedrale di Santiago de Compostela" style="width: 100%">
+		    <img src="{{ url_for('static', filename='images/santiago.jpg') }}" alt="{{ _("Santiago de Compostela - Cattedrale") }}" style="width: 100%">     {# Santiago de Compostela - Cattedrale #}
 		    <div class="w3-display-bottomright w3-container w3-padding-16 w3-black">
                 Santiago de Compostela
             </div>
         </div>
 
         <div class="w3-display-container mySlides">
-		    <img src="{{ url_for('static', filename='images/berlin.jpg') }}" alt="Berlino" style="width: 100%">
+		    <img src="{{ url_for('static', filename='images/berlin.jpg') }}" alt="{{ _('Berlino - Porta di Brandeburgo') }}" style="width: 100%">        {# Berlino - Porta di Brandeburgo #}
             <div class="w3-display-bottomright w3-container w3-padding-16 w3-black">
                 Berlin
             </div>
@@ -61,7 +62,7 @@ h1 {
     const session = {{ session|tojson }};
     const LANG_ROOT = {{ url_for("set_language", lang='')|tojson }}
 
-    let slideIndex = 1;
+    let slideIndex = {{ carousel_pos }};
 
     showDivs(slideIndex);
 

@@ -28,3 +28,6 @@ uploaded/
 
 w3_unminified.css
 s_*.jinja2
+*.pot
+*.mo
+

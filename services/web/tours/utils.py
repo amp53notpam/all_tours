@@ -4,6 +4,7 @@ from re import search
 from . import db
 from sqlalchemy import func
 from flask import session, current_app
+from flask_babel import _
 from .models import Tour, Lap
 
 def make_header(lang):
@@ -15,27 +16,20 @@ def make_header(lang):
             Lap.date == db.session.execute(db.select(func.max(Lap.date)).where(Lap.tour_id == trip)).scalar())).fetchone()
         header = f"""
             <h2>{start.start } - {end.destination }</h2>
-            <h4>{start.date.strftime("%d %b %Y")} - {end.date.strftime("%d %b %Y")}</h4>
+            <h4>{start.date.strftime("%d %B %Y")} - {end.date.strftime("%d %B %Y")}</h4>
         """
     else:
-        if lang == 'it':
-            header = " <h2>I miei viaggi</h2>"
-        elif lang == 'en':
-            header = "<h2>My trips</h2>"
+        header = None
+
     return header
 
 def make_dd_lang(lang):
-    dd_lang = """
-	    <div class='w3-dropdown-click w3-right'>
-	    """
-    if lang == 'it':
-        dd_lang += '<button  id="dd_btn" class="w3-button w3-theme w3-hover-theme w3-ripple" data-cur-lang="it">ITA <i id="dd_caret" class="fa-solid fa-caret-down"></i></button>'
-    elif lang == 'en':
-        dd_lang += '<button  id="dd_btn" class="w3-button w3-theme w3-hover-theme w3-ripple" data-cur-lang="en">ENG <i id="dd_caret" class="fa-solid fa-caret-down"></i></button>'
-    dd_lang += """
-	    <div id="dd_menu" class="w3-dropdown-content w3-bar-block w3-border w3-card-4 w3-border-theme">
-		    <button class="w3-bar-item w3-button w3-theme-l2 w3-hover-theme" data-lang="it">ITA</button>
-		    <button class="w3-bar-item w3-button w3-theme-l2 w3-hover-theme" data-lang="en">ENG</button>
+    cap_lang = 'ITA' if lang == 'it' else 'ENG'
+    dd_lang = f"""<div class='w3-dropdown-click w3-right'>
+    <button  id="dd_btn" class="w3-button w3-theme w3-hover-theme w3-ripple" data-cur-lang={lang}>{cap_lang}<i id="dd_caret" class="fa-solid fa-caret-down"></i></button>
+        <div id="dd_menu" class="w3-dropdown-content w3-bar-block w3-border w3-card-4 w3-border-theme">
+            <button class="w3-bar-item w3-button w3-theme-l2 w3-hover-theme" data-lang="it">It</button>
+		    <button class="w3-bar-item w3-button w3-theme-l2 w3-hover-theme" data-lang="en">En</button>
 		</div>
 	</div>
     """
