@@ -1,15 +1,16 @@
 import enum
-from datetime import date, time
+from datetime import date, time, datetime
 from . import db
-from sqlalchemy import Integer, String, BOOLEAN, FLOAT, DATE, TIME, ForeignKey, Enum
+from sqlalchemy import String, BOOLEAN, INT, FLOAT, DATE, TIMESTAMP, ForeignKey, UniqueConstraint, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from flask_login import UserMixin
-from typing import Optional, List, Literal
+from typing import Optional, List
+from flask_babel import _, lazy_gettext as _l
 
 
 class TripMode(enum.Enum):
     WALKING = "walking"
-    BYCICLING = "bicycling"
+    BICYCLING = "bicycling"
     DRIVING = "driving"
 
 
@@ -40,7 +41,7 @@ class Lap(db.Model):
     hotels: Mapped[List["Hotel"]] = relationship(back_populates="lap")
 
     def __repr__(self) -> str:
-        return f"Tappa: {self.start}-{self.destination}  Giorno: {self.date}"
+        return f"{_('Tappa')}: {self.start}-{self.destination}  {_('Giorno')}: {self.date}"
 
 
 class Hotel(db.Model):
@@ -63,7 +64,7 @@ class Hotel(db.Model):
     lap: Mapped["Lap"] = relationship(back_populates="hotels")
 
     def __repr__(self) -> str:
-        return f"Hotel: {self.name} - {self.town}"
+        return f"{_('Albergo')}: {self.name} - {self.town}"
 
 
 class Admin(UserMixin, db.Model):
@@ -73,16 +74,20 @@ class Admin(UserMixin, db.Model):
     password: Mapped[str]
 
     def __repr__(self) -> str:
-        return ("db administrator")
+        return "db administrator"
 
 
 class TripImage(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     lap_id: Mapped[int] = mapped_column(ForeignKey("lap.id", ondelete="set null"), nullable=True)
-    img_src:  Mapped[str] = mapped_column(String(96), unique=True)
-    date: Mapped[date] = mapped_column(DATE)
+    img_src:  Mapped[str] = mapped_column(String(96))
+    img_width: Mapped[int] = mapped_column(INT, default=0)
+    img_height: Mapped[int] = mapped_column(INT, default=0)
+    date: Mapped[datetime] = mapped_column(TIMESTAMP)
     lat: Mapped[Optional[float]] = mapped_column(FLOAT, default=0)
     long: Mapped[Optional[float]] = mapped_column(FLOAT, default=0)
+    caption: Mapped[Optional[str]] = mapped_column(String(128))
+    __table_args__ = (UniqueConstraint('lap_id', 'img_src', name='lap_img_uc'), )
 
-    def __repr__(selfself) -> str:
-        return f"Foto {img_src[: -4]}"
+    def __repr__(self) -> str:
+        return f"{_('Foto')} {self.img_src[: -4]}"

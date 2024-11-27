@@ -49,10 +49,10 @@ def create_app(test_config=None):
     return app
 
 def get_locale():
-    # try:
-    return session.get("lang", "it")
-    # except RuntimeError:
-    #     return "it"
+    try:
+        return session.get("lang", "it")
+    except RuntimeError:
+        return "it"
 
 
 # Helper functions

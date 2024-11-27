@@ -1,13 +1,13 @@
 from os import getcwd
 from datetime import datetime, date, timedelta
 from flask import (
-    Blueprint, flash, render_template, current_app, url_for, jsonify, session
+    Blueprint, flash, render_template, current_app, url_for, jsonify, session, typing as ft
 )
 from flask.views import View
 from werkzeug.exceptions import abort
 from sqlalchemy.exc import OperationalError, ProgrammingError
 from .. import db
-from ..models import Lap, Hotel, Tour
+from ..models import Lap, Hotel, Tour, TripImage
 from locale import setlocale, LC_ALL
 from ..utils import make_header, make_short_template, make_dd_lang
 
@@ -53,7 +53,11 @@ def get_trip():
 
 class Laps(View):
     def dispatch_request(self):
-        header = make_header(session['lang'])
+        try:
+            lang = session['lang']
+        except KeyError:
+            lang = 'it'
+        header = make_header(lang)
 
         try:
             trip_id = get_trip()
@@ -67,7 +71,11 @@ class Laps(View):
 
 class Hotels(View):
     def dispatch_request(self):
-        header = make_header(session['lang'])
+        try:
+            lang = session['lang']
+        except KeyError:
+            lang = 'it'
+        header = make_header(lang)
 
         try:
             trip_id = get_trip()
@@ -84,7 +92,11 @@ class Hotels(View):
 
 class SingleLap(View):
     def dispatch_request(self, id):
-        header = make_header(session['lang'])
+        try:
+            lang = session['lang']
+        except KeyError:
+            lang = 'it'
+        header = make_header(lang)
 
         lap = db.session.get(Lap, id)
         laps = db.session.execute(db.select(Lap).where(Lap.tour_id == lap.tour_id).order_by(Lap.date)).all()
@@ -96,7 +108,11 @@ class SingleLap(View):
 
 class SingleHotel(View):
     def dispatch_request(self, id):
-        header = make_header(session['lang'])
+        try:
+            lang = session['lang']
+        except KeyError:
+            lang = 'it'
+        header = make_header(lang)
 
         hotel = db.session.get(Hotel, id)
         hotels = db.session.execute(
@@ -114,100 +130,58 @@ class SingleLapJS(View):
         next_lap = db.session.execute(db.select(Lap.id, Lap.start, Lap.destination).where(Lap.start == this_lap.destination)).fetchone()
 
         short_html = make_short_template("lap.jinja2")
-        # data = {}
-        # if prev_lap:
-        #     data["prev_lap"] = {"id": prev_lap.id,
-        #                         "start": prev_lap.start,
-        #                         "destination": prev_lap.destination}
-        # else:
-        #     data["previous_lap"] = None
-        #
-        # if next_lap:
-        #     data["next_lap"] = {"id": next_lap.id,
-        #                         "start": next_lap.start,
-        #                         "destination": next_lap.destination}
-        # else:
-        #     data["next_lap"] = None
-        #
-        # data["this_lap"] = {"id": id,
-        #                     "start": this_lap.start,
-        #                     "destination": this_lap.destination,
-        #                     "date": this_lap.date.strftime("%A %d %b %Y"),
-        #                     "distance": this_lap.distance,
-        #                     "ascent": this_lap.ascent,
-        #                     "descent": this_lap.descent,
-        #                     "duration": this_lap.duration.strftime("%H:%M:%S") if this_lap.duration else None,
-        #                     "done": this_lap.done,
-        #                     "gpx": url_for("download_files", filename="tracks/"+this_lap.gpx) if this_lap.gpx else None,
-        #                     "update": url_for("dbms_bp.update_lap", id=this_lap.id),
-        #                     "delete": url_for("dbms_bp.delete_lap", id=this_lap.id),
-        #                     "hotels": [],
-        #                     }
-        # for hotel in this_lap.hotels:
-        #     hotel = {"id": hotel.id,
-        #              "URL": url_for("lap_bp.hotel", id=hotel.id),
-        #              "name": hotel.name,
-        #              }
-        #     data["this_lap"]["hotels"].append(hotel)
-        #
-        # data["this_lap"]["media"] = round(this_lap.distance * 1000 / (this_lap.duration.hour * 3600 + this_lap.duration.minute * 60 + this_lap.duration.second) * 3.6, 2) if this_lap.duration else None
-
-        # response = jsonify(data)
         return  render_template(short_html, lap=this_lap, prev_lap=prev_lap, next_lap=next_lap)
 
 
 class SingleHotelJS(View):
     def dispatch_request(self, id):
-        # def check_out():
-        #     if this_hotel.check_out:
-        #         return this_hotel.check_out.strftime("%A %d %b %Y")
-        #     elif this_hotel.check_in:
-        #         return (this_hotel.check_in + timedelta(days=1)).strftime("%A %d %b %Y")
-        #     else:
-        #         return None
-
         this_hotel = db.session.get(Hotel, id)
 
         short_html = make_short_template("hotel.jinja2")
-        # data = {}
-        # data["this_hotel"] = {"id": this_hotel.id,
-        #                       "name": this_hotel.name,
-        #                       "photo": url_for("download_files", filename="images/"+this_hotel.photo) if this_hotel.photo else url_for("static", filename="images/default.webp"),
-        #                       "address": this_hotel.address,
-        #                       "town": this_hotel.town,
-        #                       "reserved": this_hotel.reserved,
-        #                       "phone": this_hotel.phone,
-        #                       "href_phone": this_hotel.href_phone,
-        #                       "email": this_hotel.email,
-        #                       "coord": None,
-        #                       "check_in": this_hotel.check_in.strftime("%A %d %b %Y") if this_hotel.check_in else None,
-        #                       "check_out": check_out(),
-        #                       "price": this_hotel.price,
-        #                       "tappa": {"URL": url_for("lap_bp.tappa", id=this_hotel.lap.id),
-        #                                 "start": this_hotel.lap.start,
-        #                                 "destination": this_hotel.lap.destination
-        #                                 } if this_hotel.lap_id else None,
-        #                       "link": this_hotel.link,
-        #                       "update": url_for("dbms_bp.update_hotel", id=this_hotel.id),
-        #                       "delete": url_for("dbms_bp.delete_hotel", id=this_hotel.id),
-        #                       }
-        #
-        # if this_hotel.lat and this_hotel.long:
-        #     data["this_hotel"]["coord"] = {
-        #         "latitude": this_hotel.lat,
-        #         "longitude": this_hotel.long
-        #     }
-        #
-        # response = jsonify(data)
-        #
-        # return response
         return render_template(short_html, hotel=this_hotel)
+
+
+class SingleLapMedia(View):
+    def dispatch_request(self, id):
+        try:
+            lang = session['lang']
+        except KeyError:
+            lang = 'it'
+        header = make_header(lang)
+
+        this_lap = db.session.get(Lap, id)
+        prev_lap = db.session.execute(db.select(Lap.id, Lap.start, Lap.destination).where(Lap.destination == this_lap.start)).fetchone()
+        next_lap = db.session.execute(db.select(Lap.id, Lap.start, Lap.destination).where(Lap.start == this_lap.destination)).fetchone()
+        photos = db.session.execute(db.select(TripImage).where(TripImage.lap_id == id).order_by(TripImage.date)).fetchall()
+
+        return render_template("photos.jinja2", header=header, lap=this_lap, prev_lap=prev_lap, next_lap=next_lap, photos=photos)
+
+class SingleLapMediaJS(View):
+    def dispatch_request(selfself, id):
+        photos = db.session.execute(db.select(TripImage).where(TripImage.lap_id == id).order_by(TripImage.date)).fetchall()
+
+        data = []
+        for photo in photos:
+            foto = {"src": photo.TripImage.img_src,
+                    "width": photo.TripImage.img_width,
+                    "height": photo.TripImage.img_height,
+                    "date": photo.TripImage.date,
+                    "caption": photo.TripImage.caption,
+                    "lat": photo.TripImage.lat,
+                    "long": photo.TripImage.long
+                    }
+            data.append(foto)
+
+        return jsonify(data)
+
 
 
 # lap_bp.add_url_rule('/', view_func=Index.as_view('index'))
 lap_bp.add_url_rule('/tappe', view_func=Laps.as_view('lap_dashboard'))
 lap_bp.add_url_rule('/tappe/<int:id>', view_func=SingleLap.as_view('lap'))
 lap_bp.add_url_rule('/tappe/<int:id>/js', view_func=SingleLapJS.as_view('lapJS'))
+lap_bp.add_url_rule('/tappe/<int:id>/photos', view_func=SingleLapMedia.as_view('lap_media'))
+lap_bp.add_url_rule('/tappe/<int:id>/photos/js', view_func=SingleLapMediaJS.as_view('lap_media_js'))
 lap_bp.add_url_rule('/alberghi', view_func=Hotels.as_view('hotel_dashboard'))
 lap_bp.add_url_rule('/alberghi/<int:id>', view_func=SingleHotel.as_view('hotel'))
 lap_bp.add_url_rule('/alberghi/<int:id>/js', view_func=SingleHotelJS.as_view('hotelJS'))

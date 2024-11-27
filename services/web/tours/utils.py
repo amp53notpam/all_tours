@@ -26,7 +26,7 @@ def make_header(lang):
 def make_dd_lang(lang):
     cap_lang = 'ITA' if lang == 'it' else 'ENG'
     dd_lang = f"""<div class='w3-dropdown-click w3-right'>
-    <button  id="dd_btn" class="w3-button w3-theme w3-hover-theme w3-ripple" data-cur-lang={lang}>{cap_lang}<i id="dd_caret" class="fa-solid fa-caret-down"></i></button>
+    <button  id="dd_btn" class="w3-button w3-theme w3-hover-theme w3-ripple" data-cur-lang={lang}>{cap_lang} <i id="dd_caret" class="fa-solid fa-caret-down"></i></button>
         <div id="dd_menu" class="w3-dropdown-content w3-bar-block w3-border w3-card-4 w3-border-theme">
             <button class="w3-bar-item w3-button w3-theme-l2 w3-hover-theme" data-lang="it">It</button>
 		    <button class="w3-bar-item w3-button w3-theme-l2 w3-hover-theme" data-lang="en">En</button>

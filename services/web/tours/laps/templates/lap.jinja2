@@ -148,8 +148,8 @@
             <div class="w3-container w3-third w3-mobile">
                 <p class="w3-left-align wbold">{{ _('Tappa precedente') }}:</p>
             </div>
-            <div class="w3-container w3-twothird w3-mobile">
-                <p id="info_prev" class="w3-left-align" data-lap-id="{{ prev_lap.id }}">{{ prev_lap.start}} - {{ prev_lap.destination }}</p>
+            <div class="w3-container w3-twothird w3-mobile" >
+                <p class="w3-left-align"><span id="info_prev" class="a-like" data-lap-id="{{ prev_lap.id }}">{{ prev_lap.start}} - {{ prev_lap.destination }}</span></p>
             </div>
         </div>
         {% endif %}
@@ -160,24 +160,23 @@
                 <p class="w3-left-align wbold">{{ _('Tappa successiva') }}:</p>
             </div>
             <div class="w3-container w3-twothird w3-mobile">
-                <p id="info_next" class="w3-left-align" data-lap-id="{{ next_lap.id }}">{{ next_lap.start}} - {{ next_lap.destination }}</p>
+                <p class="w3-left-align"><span id="info_next" class="a-like" data-lap-id="{{ next_lap.id }}">{{ next_lap.start}} - {{ next_lap.destination }}</span></p>
             </div>
         </div>
         {% endif %}
 
         {% if lap.has_photos %}
-        <div class="row">
-            <div class="w3-container w3-center w3-mobile>
-                <p id="photo_show" class="wbold">{{ _('Foto') }}</p>
-            </div>
+        <div class="w3-content w3-theme w3-hover-theme Xref">
+            <a href={{ url_for("lap_bp.lap_media", id=lap.id) }} class="a-no-decoration">{{ _('Foto') }}</a>
         </div>
         {% endif %}
 
         {% if '_user_id' in session.keys() %}
         <div class="w3-container w3-center" style="margin-top: 60px;">
             <div class="w3-bar">
-                <a href="{{ url_for('dbms_bp.update_lap', id=lap.id) }}" class="w3-bar-item w3-ripple" title="{{ _('Modifica questa tappa') }}"><i class="fa-solid fa-pencil icon28"></i></a>     {#  #}
-                <a href="{{ url_for('dbms_bp.delete_lap', id=lap.id) }}" class="w3-bar-item w3-ripple" title="{{ _('Cancella questa tappa') }}"><i class="fa-solid fa-trash-can icon28"></i></a   {#  #}
+                <a href="{{ url_for('dbms_bp.load_lap_media', id=lap.id) }}" class="w3-bar-item w3-left w3-ripple" title="{{ _('Aggiungi foto/film') }}"><i class="fa-solid fa-photo-film icon28"></i></a>
+                <a href="{{ url_for('dbms_bp.update_lap', id=lap.id) }}" class="w3-bar-item w3-ripple" title="{{ _('Modifica questa tappa') }}"><i class="fa-solid fa-pencil icon28"></i></a>
+                <a href="{{ url_for('dbms_bp.delete_lap', id=lap.id) }}" class="w3-bar-item w3-ripple" title="{{ _('Cancella questa tappa') }}"><i class="fa-solid fa-trash-can icon28"></i></a>
             </div>
         </div>
         {% endif %}

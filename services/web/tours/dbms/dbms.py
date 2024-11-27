@@ -1,6 +1,6 @@
 from os import remove
 from os.path import join
-from datetime import datetime, date, time, timedelta
+from datetime import datetime, date, time
 from re import compile
 from subprocess import Popen, PIPE, STDOUT
 from shlex import split
@@ -12,7 +12,7 @@ from exiftool import ExifToolHelper
 from sqlalchemy.exc import IntegrityError
 from werkzeug.utils import secure_filename
 from ..models import Lap, Hotel, Tour, TripImage
-from .forms import AddLapForm, UpdLapForm, AddHotelForm, UpdHotelForm
+from .forms import AddLapForm, UpdLapForm, AddHotelForm, UpdHotelForm, LoadMediaForm
 from .. import db
 from ..utils import make_header
 
@@ -65,42 +65,65 @@ def update_all_date(laps, delta_t):
             hotel.check_out += delta_t
 
 
-def register_photos(id, gpx, pics):
+def register_media(id, gpx, pic, caption):
     track = join(current_app.config['UPLOAD_FOLDER'], 'tracks', gpx)
     pic_dir = join(current_app.config['UPLOAD_FOLDER'], 'images')
-    et = ExifToolHelper()
-    for pic in pics:
-        pic_fp = join(pic_dir, pic)
-        et.execute("-geotag", track, pic_fp)
-        et.execute("-delete_original!", pic_fp )
-        p = Popen(
-            split(f"exiftool -s -s -s -d '%Y%m%dT%H%M%S' -createdate {pic_fp}"),
-            stdout=PIPE, stderr=STDOUT).communicate()[0].decode().split("\n")[:-1][0]
-        pic_date = datetime.fromisoformat(p)
-        p = Popen(
-            split(f"exiftool -s -s -s -n -gpslatitude -gpslongitude {pic_fp}"),
-            stdout=PIPE, stderr=STDOUT).communicate()[0].decode()
-        if p:
-            latitude = float(p.split("\n")[0])
-            longitude = float(p.split("\n")[1])
-        else:
-            latitude = None
-            longitude = None
+    # et = ExifToolHelper()
+    pic_fp = join(pic_dir, pic)
 
+    Popen(split(f"exiftool -geotag {track} {pic_fp}"), stdout=PIPE, stderr=STDOUT).wait()
+    Popen(split(f"exiftool -delete_original! {pic_fp}"), stdout=PIPE, stderr=STDOUT).wait()
+    dates = Popen(        split(f"exiftool -s2 -d '%Y%m%dT%H%M%S' -datetimeoriginal -createdate {pic_fp}"), stdout=PIPE, stderr=STDOUT).communicate()[0].decode().split("\n")[:-1]
+    dates = {x[0]:x[1] for x in [y.split(': ') for y in dates]}
+    if 'CreateDate' in dates:
+        pic_date = datetime.fromisoformat(dates['CreateDate'])
+    elif 'DateTimeOriginal' in dates:
+        pic_date = datetime.fromisoformat(dates['DateTimeOriginal'])
+    else:
+        pic_date = None
+    meta = Popen(split(f"exiftool -s2 -n -imageheight -imagewidth {pic_fp}"), stdout=PIPE, stderr=STDOUT).communicate()[0].decode().split("\n")[:-1]
+    meta = {x[0]:float(x[1]) for x in [y.split(': ') for y in meta]}
+
+    img_height = meta['ImageHeight'] if 'ImageHeight' in meta else 0
+    img_width = meta['ImageWidth'] if 'ImageWidth' in meta else 0
+
+    Popen(split(f"convert {pic_fp} -resize {(lambda x: 1024/max(x) *100)([img_height, img_width])}% {pic_fp}")).wait()
+
+    meta = Popen(split(f"exiftool -s2 -n -imageheight -imagewidth -orientation -gpslatitude -gpslongitude {pic_fp}"), stdout=PIPE, stderr=STDOUT).communicate()[0].decode().split("\n")[:-1]
+    meta = {x[0]:float(x[1]) for x in [y.split(': ') for y in meta]}
+
+    # orientation = meta['Orientation'] if 'Orientation' in meta else 0
+    latitude = meta['GPSLatitude'] if 'GPSLatitude' in meta else None
+    longitude = meta['GPSLongitude'] if 'GPSLongitude' in meta else None
+    orientation = meta['Orientation']
+    img_width =  meta['ImageWidth'] if orientation <= 4 else meta['ImageHeight']
+    img_height = meta['ImageHeight'] if orientation <= 4 else meta['ImageWidth']
+
+    db_pic = db.session.execute(db.select(TripImage).where(TripImage.img_src == pic)).fetchone()
+    if db_pic is None or db_pic.TripImage.lap_id != id:
         new_picture = TripImage(
             lap_id=id,
             img_src=pic,
+            img_width=img_width,
+            img_height=img_height,
             date=pic_date,
+            lat=latitude,
+            long=longitude,
+            caption=caption
         )
         db.session.add(new_picture)
-        if latitude:
-            new_picture.lat = latitude
-        if longitude:
-            new_picture.long = longitude
-        try:
-            db.session.commit()
-        except IntegrityError:
-            current_app.logger.warning(f"Tentativo di caricare la foto {pic} già caricata.")
+    else:
+        db_pic.TripImage.img_width = img_width
+        db_pic.TripImage.img_height = img_height
+        db_pic.TripImage.date = pic_date
+        db_pic.TripImage.lat = latitude
+        db_pic.TripImage.long = longitude
+        db_pic.TripImage.caption = caption if caption else db_pic.TripImage.caption
+
+    try:
+        db.session.commit()
+    except IntegrityError:
+        current_app.logger.warning(f"Tentativo di caricare la foto {pic} già caricata per la stessa tappa.")
 
 
 class AddLap(View):
@@ -175,13 +198,13 @@ class UpdLap(View):
                     gpx = secure_filename(file.filename)
                     file.save(join(current_app.config['UPLOAD_FOLDER'], 'tracks', gpx))
 
-            pictures = []
-            files  = request.files.getlist("photos")
-            for file in files:
-                if file.filename != '' and allowed_file(file.filename):
-                    foto = secure_filename(file.filename)
-                    file.save(join(current_app.config['UPLOAD_FOLDER'], 'images', foto))
-                    pictures.append(foto)
+            # pictures = []
+            # files  = request.files.getlist("photos")
+            # for file in files:
+            #     if file.filename != '' and allowed_file(file.filename):
+            #         foto = secure_filename(file.filename)
+            #         file.save(join(current_app.config['UPLOAD_FOLDER'], 'images', foto))
+            #         pictures.append(foto)
 
             lap = db.session.get(Lap, id)
             if data != lap.date:
@@ -203,23 +226,58 @@ class UpdLap(View):
             lap.done = fatta
             if gpx:
                 lap.gpx = gpx
-            if pictures:
-                lap.has_photos = True
+            # if pictures:
+            #     lap.has_photos = True
 
             db.session.commit()
 
             flash(_('Tappa %(start)s - %(destination)s aggiornata.', start=lap.start, destination=lap.destination), category='info')
             current_app.logger.info(f"Aggiornata tappa {lap.start} - {lap.destination}.")
 
-            # update the photos table
-            if pictures:
-                register_photos(lap.id, lap.gpx, pictures)
-
+            # # update the photos table
+            # if pictures:
+            #     register_photos(lap.id, lap.gpx, pictures)
+            #
             return redirect(url_for("lap_bp.lap_dashboard"))
 
         lap = db.session.get(Lap, id)
         header = make_header(session['lang'])
         return render_template("upd_lap.jinja2", form=form, lap=lap, header=header)
+
+
+class LoadLapMedia(View):
+    methods = ['GET', 'POST']
+    decorators = [login_required]
+
+    def dispatch_request(self, id):
+        form = LoadMediaForm()
+
+        if request.method == 'POST':
+            caption = request.form.get("caption")
+            media_file = None
+            if 'media_file' in request.files:
+                file = request.files['media_file']
+                if file.filename != '' and allowed_file(file.filename):
+                    media_file = secure_filename(file.filename)
+                    file.save(join(current_app.config['UPLOAD_FOLDER'], 'images', media_file))
+
+            lap = db.session.get(Lap, id)
+            if media_file:
+                lap.has_photos = True
+            db.session.commit()
+            try:
+                register_media(lap.id, lap.gpx, media_file, caption)
+            except ZeroDivisionError:
+                flash(_(f"Il file {media_file} potrebbe essere corrotto"), category='error')
+
+            return redirect(url_for("lap_bp.lap", id=id))
+
+        lap = db.session.get(Lap, id)
+        header = make_header(session['lang'])
+        return render_template("load_media.jinja2", form=form, lap=lap, header=header)
+
+
+
 
 
 class DeleteLap(View):
@@ -397,6 +455,7 @@ class DeleteHotel(View):
 
 dbms_bp.add_url_rule('/lap/add/', view_func=AddLap.as_view("add_lap"))
 dbms_bp.add_url_rule('/lap/update/<int:id>', view_func=UpdLap.as_view("update_lap"))
+dbms_bp.add_url_rule('/lap/update/<int:id>/load_media', view_func=LoadLapMedia.as_view("load_lap_media"))
 dbms_bp.add_url_rule('/lap/delete/<int:id>', view_func=DeleteLap.as_view('delete_lap'))
 dbms_bp.add_url_rule('/hotel/add/', view_func=AddHotel.as_view("add_hotel"))
 dbms_bp.add_url_rule('/hotel/update/<int:id>', view_func=UpdHotel.as_view("update_hotel"))

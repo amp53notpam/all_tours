@@ -1,7 +1,7 @@
 from locale import setlocale, LC_ALL
 from flask import current_app as app, current_app
-from flask import session, make_response, redirect, render_template, request, url_for, send_from_directory, flash
-from flask_babel import _, lazy_gettext as _l
+from flask import session, redirect, render_template, request, url_for, send_from_directory, flash
+from flask_babel import _
 from . import db
 from .models import Tour
 from .forms import SelectTripForm
@@ -24,15 +24,16 @@ class Start(View):
                     active_trip.Tour.is_active = False
                     db.session.commit()
                 next_active = db.session.execute(db.select(Tour).where(Tour.name==trip)).fetchone()
-                next_active.Tour.is_active = True;
+                next_active.Tour.is_active = True
                 db.session.commit()
                 session['trip'] = trip
 
         if 'lang' not in session:
             session['lang'] = 'it'
             session['locale'] = "it_IT"
+        setlocale(LC_ALL, f"{session['locale']}.UTF-8")
         tours = db.session.execute(db.select(Tour).order_by(Tour.id)).all()
-        form.trip.choices = [("", _("Scegli il viaggio"), {"disabled": "disabled"})]
+        form.trip.choices = [("", _("Scegli un viaggio"), {"disabled": "disabled"})]
         form.trip.choices.extend([(tour.Tour.name, tour.Tour.name, dict()) for tour in tours])
         form.trip.default = ""
         form.process([])

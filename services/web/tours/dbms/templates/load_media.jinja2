@@ -1,0 +1,37 @@
+{% extends 'layout.jinja2' %}
+
+{% block header %}
+{{ header }}
+{% endblock %}
+
+{% block content %}
+<div class="w3-card-4" style="max-width: 620px; margin:auto; margin-top: 60px">
+    <div class="w3-container w3-theme-d2">
+      <h2 class="w3-center">{{ _('Carica foto/filmato') }}</h2>
+      <h3 class="w3-center">{{ _('Tappa') }} {{ lap.start }} - {{ lap.destination }}</h3>
+    </div>
+
+  <form method="POST" enctype="multipart/form-data">
+    {{ form.csrf_token }}
+    <div class="w3-container">
+        <div class="w3-row">
+            <div class="w3-col m4 w3-mobile">
+              <p class="w3-left-align wbold form_label">{{ form.media_file.label(class="w3-theme-l4 required") }}</p>
+            </div>
+            <div class="w3-col m8 w3-mobile">
+              <p class="w3-left-align">{{ form.media_file(class="w3-input w3-theme-l4") }}</p>
+            </div>
+
+            <div class="w3-col m4 w3-mobile">
+                <p class="w3-left-align wbold form_label">{{ form.caption.label(class="w3-theme-l4") }}</p>
+            </div>
+            <div class="w3-col m8 w3-mobile">
+                <p class="w3-left-align">{{ form.caption(class="w3-input w3-theme-l4") }}</p>
+            </div>
+
+            {{ form.submit(class="w3-button w3-block w3-theme-action w3-hover-theme-d2 w3-ripple w3-center") }}
+        </p>
+    </div>
+  </form>
+</div>
+{% endblock %}

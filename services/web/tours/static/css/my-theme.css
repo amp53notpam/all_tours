@@ -30,11 +30,11 @@
 
 .w3-theme {color:var(--black) !important; background-color:var(--th) !important}
 .w3-text-theme {color:var(--th) !important}
-.w3-border-theme {border-color:var(--th) !important}
+.w3-border-theme {border-color:var(--th-d1) !important}
 
 .w3-hover-theme:hover {color:var(--black) !important; background-color:var(--th-l2) !important}
 .w3-hover-text-theme:hover {color:var(--th) !important}
-.w3-hover-border-theme:hover {border-color:var(--th) !important}
+.w3-hover-border-theme:hover {border-color:var(--th-d4) !important}
 
 .w3-hover-theme-l4:hover {color:var(--black) !important; background-color:var(--th-l4) !important}
 .w3-hover-theme-d2:hover {color:var(--black) !important; background-color:var(--th-d2) !important}

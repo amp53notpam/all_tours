@@ -84,3 +84,19 @@ img.webp {
     padding-top: 7px;
 }
 
+.a-like {
+    text-decoration-line: underline;
+}
+.a-like:hover, .a-like-hover:hover {
+    cursor: pointer;
+}
+
+.a-no-decoration {
+    text-decoration-line: none;
+}
+
+.Xref {
+    max-width: 300px;
+    margin-top: 50px;
+    padding: 20px 100px;
+}

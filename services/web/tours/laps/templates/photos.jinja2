@@ -1,0 +1,72 @@
+{% extends 'layout_light.jinja2' %}
+
+{% block title %}Tappe{% endblock %}
+
+{% block header %}
+{{ header }}
+{% endblock %}
+
+{% block extend %}
+id="album" data-lap-id="{{ lap.id }}"
+{% endblock %}
+
+{% block content %}
+<div id="lap" class="w3-container w3-center">
+    <header>
+        <div class="w3-display-container" style="height: 200px;">
+            <h2 class="w3-display-middle">{{ lap.start }} - {{ lap.destination }} | {{ _('Foto') }}</h2>
+        </div>
+    </header>
+    <nav class="w3-row-padding">
+        <div class="w3-col w3-margin-bottom w3-mobile w3-theme w3-hover-theme w3-left" style="width: 48%" >
+            {% if prev_lap %}
+            <a href={{ url_for("lap_bp.lap_media", id=prev_lap.id) }} class="a-no-decoration">
+            <p>{{ _('Tappa precedente') }}
+            <p class="wbold">{{ prev_lap.start}} - {{ prev_lap.destination }}</p>
+            </a>
+            {% endif %}
+        </div>
+        <div class="w3-col w3-margin-bottom w3-mobile w3-theme w3-hover-theme w3-right" style="width: 48%">
+            {% if next_lap %}
+            <a href={{ url_for("lap_bp.lap_media", id=next_lap.id) }} class="a-no-decoration">
+            <p>{{ _('Tappa successiva') }}
+            <p class="wbold">{{ next_lap.start}} - {{ next_lap.destination }}</p>
+            </a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div id="images" class="w3-content" style="max-width: 640px">
+        <div class="w3-card w3-margin-top w3-border w3-border-theme w3-hover-border-theme">
+            <a target="_blank" href="{{ url_for("download_files", filename="images/"+photos[0][0].img_src) }}">
+                <img src="{{ url_for("download_files", filename="images/"+photos[0][0].img_src) }}" style="width: 100%">
+            </a>
+            <div class="w3-container w3-center w3-padding">
+                <p class="w3-large">{{ photos[0][0].caption }}</p>
+            </div>
+        </div>
+        <div class="w3-card w3-margin-top w3-border w3-border-theme w3-hover-border-theme">
+            <a target="_blank" href="{{ url_for("download_files", filename="images/"+photos[1][0].img_src) }}">
+                <img src="{{ url_for("download_files", filename="images/"+photos[1][0].img_src) }}" style="width: 66.5%">
+            </a>
+            <div class="w3-container w3-center w3-padding">
+                <p class="w3-large">{{ photos[1][0].caption }}</p>
+            </div>
+        </div>
+        <div class="w3-container w3-margin-top w3-padding w3-center">
+            <button class="w3-btn w3-theme w3-hover-theme">{{ _('Altre foto...') }}</button>
+        </div>
+    </div>
+
+    <div class="w3-content w3-btn w3-theme w3-hover-theme Xref">
+        <a href={{ url_for("lap_bp.lap", id=lap.id) }} class="a-no-decoration">{{ _('Tappa') }}</a>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const SCRIPT_ROOT = {{ url_for("lap_bp.lap_media_js", id=-1)|tojson }};
+</script>
+{% endblock %}

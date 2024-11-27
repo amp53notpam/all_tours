@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
-from flask_babel import _, lazy_gettext as _l
+from flask_babel import lazy_gettext as _l
 from flask_wtf.file import FileField, MultipleFileField, FileRequired, FileAllowed
-from wtforms import StringField, IntegerField, FloatField, SubmitField, URLField, BooleanField, EmailField, TelField
+from wtforms import StringField, IntegerField, FloatField, SubmitField, URLField, BooleanField, EmailField, TelField, RadioField, validators
 from wtforms.widgets import CheckboxInput, ListWidget
 from wtforms.validators import DataRequired
 
@@ -25,8 +25,14 @@ class UpdLapForm(FlaskForm):
     descent = IntegerField(_l('Dislivello discesa'))
     duration = StringField(_l('Tempo'))
     gpx = FileField(_l("Traccia gpx (.gpx)"), validators=[FileAllowed(['gpx'])])
-    photos = MultipleFileField(_l('Foto'), validators=[FileAllowed(['jpg', 'jpeg', 'mov'])])
+    photos = FileField(_l('Foto'), validators=[FileAllowed(['jpg', 'jpeg', 'mov'])])
     done = BooleanField(_l('OK è fatta!'))
+    submit = SubmitField('OK')
+
+
+class LoadMediaForm(FlaskForm):
+    media_file = FileField(_l('File'), validators=[FileAllowed(['jpg', 'jpeg', 'mov', 'mp4'])])
+    caption = StringField(_l('Didascalia'), [validators.length(max=128)])
     submit = SubmitField('OK')
 
 
