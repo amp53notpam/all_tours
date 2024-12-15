@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+<head>
+<title>AMP - Mappa</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/w3-styles.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/my-styles.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/my-theme.css') }}">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+
+<script src="https://kit.fontawesome.com/40f7c1eb26.js" crossorigin="anonymous"></script>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+
+<script src="{{ url_for('static', filename='scripts/gpx.js') }}" defer></script>
+<script src="{{ url_for('static', filename='scripts/map.js') }}" defer></script>
+
+<style>
+body {
+    padding: 0;
+    margin: 0;
+}
+html, body, #map {
+    height: 100%;
+    width: 100vw;
+}
+
+</style>
+</head>
+
+<body>
+    <div id="map"></div>
+
+<script type="module">
+    const myMap = L.map('map');
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(myMap);
+
+    const gpxURL = {{ url_for("download_files", filename="tracks/"+track)|tojson }}
+    displayTrack(myMap, gpxURL);
+
+    myMap.setView([{{ lat }}, {{ long }}], 16);
+
+    const marker = L.marker([{{ lat }}, {{ long }}]).addTo(myMap);
+    {% if popup %}
+    marker.bindPopup("<p class='w3-medium'>{{ popup }}</p>").openPopup();
+    {% endif %}
+</script>
+</body>
+</html>

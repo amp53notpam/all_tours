@@ -93,6 +93,9 @@ def register_blueprints(app):
         from tours.dbms import dbms
         app.register_blueprint(dbms.dbms_bp)
 
+        from tours.maps import  maps
+        app.register_blueprint(maps.map_bp)
+
 
 def configure_logging(app):
     if app.config['LOG_WITH_GUNICORN']:

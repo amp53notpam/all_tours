@@ -146,28 +146,94 @@ async function openHotel(evt) {
 }
 
 async function displayLapPictures(evt) {
-    console.log("executing displayLapPictures")
 
     const lapId = evt.target.dataset.lapId;
     const requestURL = SCRIPT_ROOT.replace("-1", `${lapId}`)
     const request = new Request(requestURL);
     const response = await fetch(request);
     const  catalog = await response.json();
-    console.log(catalog);
 
-//    display_photos(catalog)
+    const imageBox = document.querySelector("#image_box");
+    imageBox.style.display = "block";
+    displayPhotos(imageBox, catalog);
 }
 
-function display_photos(catalog) {
+function displayPhotos(imageBox, catalog) {
     let nrPic = 4;
-    let img;
-    while (nrPic > 0 && catalog.length > 0) {
-        img = catalog.shift();
 
-        nrPic--;
-        console.log(img);
-    }
+    while (nrPic > 0 && catalog.length > 0) {
+        const pic = catalog.shift();
+        console.log(pic);
+        const widthFactor = (pic.width > pic.height) ? 100 : pic.width / pic.height * 100
+        const outerDiv = document.createElement("div");
+        outerDiv.setAttribute("class", "w3-card w3-margin-top w3-border w3-border-theme w3-hover-border-theme");
+        outerDiv.style.paddingTop = "16px";
+        outerDiv.style.paddingLeft = "16px";
+        outerDiv.style.paddingRight = "16px";
+        if (pic.type == 'image') {
+            const imgRef = document.createElement("a");
+            setAttributes(imgRef, {target: "_blank", href: pic.src});
+            const img = document.createElement("img");
+            img.setAttribute("src", pic.src);
+            img.style.width = `${widthFactor}%`
+            imgRef.appendChild(img);
+            outerDiv.appendChild(imgRef);
+        } else {
+            const video = document.createElement("video");
+            const width = (pic.width > pic.height) ? 640 : 640 / 16 * 9;
+            const height = (pic.width > pic.height) ? 640 / 16 * 9 : 640
+            setAttributes(video, {width: width, height: height, controls: true });
+            const video_src = document.createElement("source");
+            setAttributes(video_src, {src: pic.src, type: "video/mp4"});
+            const info = document.createElement("p");
+            info.textContent = 'Il browser non supporta il tag "video"';
+            video.appendChild(video_src);
+            video.appendChild(info);
+            outerDiv.appendChild(video);
+        }
+        const innerDiv = document.createElement("div");
+        innerDiv.setAttribute("class", "w3-container w3-center w3-padding");
+
+        const caption = document.createElement("p");
+        caption.setAttribute("class", "w3-large");
+        caption.textContent = pic.caption;
+        if ( pic.lat && pic.long) {
+            const mapRef = document.createElement("a");
+            setAttributes(mapRef, {target: "_blank", href: pic.map, class: "w3-hover-theme-d3 w3-right"});
+            const mapSym = document.createElement("i");
+            mapSym.setAttribute("class", "fa-solid fa-map-location-dot icon28");
+            mapRef.appendChild(mapSym);
+            caption.appendChild(mapRef);
+        }
+        innerDiv.appendChild(caption)
+        outerDiv.appendChild(innerDiv)
+        imageBox.appendChild(outerDiv)
+        nrPic--
+    };
+
+    if (catalog.length > 0) {
+        const moreImgDiv = document.createElement("div");
+        setAttributes(moreImgDiv, {id: "more_pics", class: "w3-container w3-margin-top w3-padding w3-center"});
+        const btn = document.createElement("button");
+        btn.setAttribute("class", "w3-btn w3-theme w3-hover-theme")
+        btn.dataset.catalog = JSON.stringify(catalog);
+        btn.textContent = "Altre foto..."
+        moreImgDiv.appendChild(btn);
+        imageBox.appendChild(moreImgDiv);
+
+        btn.addEventListener("click", displayMorePictures);
+    };
 }
+
+function displayMorePictures(evt) {
+    const catalog = JSON.parse(evt.target.dataset.catalog);
+    const imageBox = document.querySelector("#image_box");
+
+    document.querySelector("#more_pics").remove();
+
+    displayPhotos(imageBox, catalog);
+}
+
 
 const buttons = document.querySelectorAll("button");
 
@@ -218,5 +284,6 @@ const bd = document.querySelector("#album")
 if (bd) {
     bd.addEventListener("picShow", displayLapPictures);
 }
-
-bd.dispatchEvent(playPictures);
+if (bd) {
+    bd.dispatchEvent(playPictures);
+}

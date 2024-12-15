@@ -35,27 +35,7 @@ id="album" data-lap-id="{{ lap.id }}"
             {% endif %}
         </div>
     </nav>
-
-    <div id="images" class="w3-content" style="max-width: 640px">
-        <div class="w3-card w3-margin-top w3-border w3-border-theme w3-hover-border-theme">
-            <a target="_blank" href="{{ url_for("download_files", filename="images/"+photos[0][0].img_src) }}">
-                <img src="{{ url_for("download_files", filename="images/"+photos[0][0].img_src) }}" style="width: 100%">
-            </a>
-            <div class="w3-container w3-center w3-padding">
-                <p class="w3-large">{{ photos[0][0].caption }}</p>
-            </div>
-        </div>
-        <div class="w3-card w3-margin-top w3-border w3-border-theme w3-hover-border-theme">
-            <a target="_blank" href="{{ url_for("download_files", filename="images/"+photos[1][0].img_src) }}">
-                <img src="{{ url_for("download_files", filename="images/"+photos[1][0].img_src) }}" style="width: 66.5%">
-            </a>
-            <div class="w3-container w3-center w3-padding">
-                <p class="w3-large">{{ photos[1][0].caption }}</p>
-            </div>
-        </div>
-        <div class="w3-container w3-margin-top w3-padding w3-center">
-            <button class="w3-btn w3-theme w3-hover-theme">{{ _('Altre foto...') }}</button>
-        </div>
+    <div id="image_box" class="w3-content" style="max-width: 672px">
     </div>
 
     <div class="w3-content w3-btn w3-theme w3-hover-theme Xref">

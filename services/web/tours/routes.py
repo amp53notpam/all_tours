@@ -1,9 +1,10 @@
 from locale import setlocale, LC_ALL
+from os.path import join
 from flask import current_app as app, current_app
 from flask import session, redirect, render_template, request, url_for, send_from_directory, flash
 from flask_babel import _
 from . import db
-from .models import Tour
+from .models import Tour, Hotel
 from .forms import SelectTripForm
 from flask.views import View
 from subprocess import Popen, STDOUT, PIPE
@@ -78,7 +79,8 @@ class StaticFiles(View):
 
 class DownloadFiles(View):
     def dispatch_request(self, filename):
-        return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+        uploads = join(current_app.root_path, app.config['UPLOAD_FOLDER'])
+        return send_from_directory(uploads, filename)
 
 
 class SetLanguage(View):
@@ -93,9 +95,17 @@ class SetLanguage(View):
         return "done"
 
 
+class Map(View):
+    def dispatch_request(self, lat, long):
+        hotel = db.session.execute(db.select(Hotel).where)
+        return render_template("map.jinja2", lat=lat, long=long)
+
+
 app.add_url_rule('/', view_func=Start.as_view('start'))
 app.add_url_rule("/init_db", view_func=InitDb.as_view("init_db"))
 app.add_url_rule("/language/<string:lang>", view_func=SetLanguage.as_view("set_language"))
 app.add_url_rule("/static/<path:filename>", view_func=StaticFiles.as_view("static_files"))
 app.add_url_rule("/download/<path:filename>", view_func=DownloadFiles.as_view("download_files"))
+
+app.add_url_rule('/map/<float:lat>/<float:long>', view_func=Map.as_view('map'))
 

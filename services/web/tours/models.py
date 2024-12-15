@@ -14,6 +14,11 @@ class TripMode(enum.Enum):
     DRIVING = "driving"
 
 
+class MediaType(enum.Enum):
+    VIDEO = "video"
+    IMAGE = "image"
+
+
 class Tour(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     trip_mode: Mapped[TripMode] = mapped_column(Enum("walking", "bicycling", "driving", name="mode_enum", native_enum=True), default="walking")
@@ -77,17 +82,18 @@ class Admin(UserMixin, db.Model):
         return "db administrator"
 
 
-class TripImage(db.Model):
+class Media(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     lap_id: Mapped[int] = mapped_column(ForeignKey("lap.id", ondelete="set null"), nullable=True)
-    img_src:  Mapped[str] = mapped_column(String(96))
-    img_width: Mapped[int] = mapped_column(INT, default=0)
-    img_height: Mapped[int] = mapped_column(INT, default=0)
+    media_src:  Mapped[str] = mapped_column(String(96))
+    media_width: Mapped[int] = mapped_column(INT, default=0)
+    media_height: Mapped[int] = mapped_column(INT, default=0)
+    media_type: Mapped[MediaType] = mapped_column(Enum("video", "image", name="media_types", native_enum=True), default="image")
     date: Mapped[datetime] = mapped_column(TIMESTAMP)
     lat: Mapped[Optional[float]] = mapped_column(FLOAT, default=0)
     long: Mapped[Optional[float]] = mapped_column(FLOAT, default=0)
     caption: Mapped[Optional[str]] = mapped_column(String(128))
-    __table_args__ = (UniqueConstraint('lap_id', 'img_src', name='lap_img_uc'), )
+    __table_args__ = (UniqueConstraint('lap_id', 'media_src', name='lap_media_uc'), )
 
     def __repr__(self) -> str:
-        return f"{_('Foto')} {self.img_src[: -4]}"
+        return f"{_('Foto')} {self.media_src[: -4]}"

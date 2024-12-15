@@ -23,7 +23,6 @@ h1 {
 }
 .icon28 {
 	font-size: 24px;
-	background: #fefae8;
 	color: chocolate;
 }
 span.icon28 {
@@ -32,7 +31,7 @@ span.icon28 {
 }
 .icon28:hover {
 	color: red;
-	background: #f9e58c
+	background: var(--th-d3)
 }
 .done {
 	font-size: 24px;
@@ -65,10 +64,10 @@ img.webp {
 	height: 170px;
 }
 .row:nth-of-type(even) {
-	background-color: #fdf4d0;
+	background-color: var(--th-l3);
 }
 .row:nth-of-type(odd) {
-	background-color: #faeaa2;
+	background-color: var(--th-l1);
 }
 .clearfix::after {
     content: "";

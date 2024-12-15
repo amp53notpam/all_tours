@@ -11,12 +11,12 @@ from flask_babel import _
 from exiftool import ExifToolHelper
 from sqlalchemy.exc import IntegrityError
 from werkzeug.utils import secure_filename
-from ..models import Lap, Hotel, Tour, TripImage
+from ..models import Lap, Hotel, Tour, Media
 from .forms import AddLapForm, UpdLapForm, AddHotelForm, UpdHotelForm, LoadMediaForm
 from .. import db
 from ..utils import make_header
 
-ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'webp', 'gpx'}
+ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'webp', 'gpx', 'mp4'}
 
 dbms_bp = Blueprint('dbms_bp', __name__,
                     url_prefix='/dbms',
@@ -25,7 +25,6 @@ dbms_bp = Blueprint('dbms_bp', __name__,
                     )
 
 date_pattern = compile(r'[-./]')
-
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -64,66 +63,83 @@ def update_all_date(laps, delta_t):
             hotel.check_in += delta_t
             hotel.check_out += delta_t
 
+def add_geo_tag(media, track):
+    p = Popen(split(f"exiftool -s2 -n -gpslatitude -gpslongitude {media}"), stdout=PIPE, stderr=STDOUT, encoding="utf-8")
+    position,  error = p.communicate()
+    if not position:
+        Popen(split(f"exiftool -geotag {track} -geosync=1:00:00 {media}"), stdout=PIPE, stderr=STDOUT, encoding="utf-8").wait()
+        Popen(split(f"exiftool -delete_original! {media}"), stdout=PIPE, stderr=STDOUT).wait()
 
-def register_media(id, gpx, pic, caption):
+def register_media(id, gpx, media, caption):
     track = join(current_app.config['UPLOAD_FOLDER'], 'tracks', gpx)
-    pic_dir = join(current_app.config['UPLOAD_FOLDER'], 'images')
-    # et = ExifToolHelper()
-    pic_fp = join(pic_dir, pic)
+    media_dir = join(current_app.config['UPLOAD_FOLDER'], 'images')
+    media_fp = join(media_dir, media)
 
-    Popen(split(f"exiftool -geotag {track} {pic_fp}"), stdout=PIPE, stderr=STDOUT).wait()
-    Popen(split(f"exiftool -delete_original! {pic_fp}"), stdout=PIPE, stderr=STDOUT).wait()
-    dates = Popen(        split(f"exiftool -s2 -d '%Y%m%dT%H%M%S' -datetimeoriginal -createdate {pic_fp}"), stdout=PIPE, stderr=STDOUT).communicate()[0].decode().split("\n")[:-1]
-    dates = {x[0]:x[1] for x in [y.split(': ') for y in dates]}
-    if 'CreateDate' in dates:
-        pic_date = datetime.fromisoformat(dates['CreateDate'])
-    elif 'DateTimeOriginal' in dates:
-        pic_date = datetime.fromisoformat(dates['DateTimeOriginal'])
+    add_geo_tag(media_fp, track)
+    p = Popen(        split(f"exiftool -s2 -d '%Y%m%dT%H%M%S' -datetimeoriginal -createdate -mimetype {media_fp}"), stdout=PIPE, stderr=STDOUT, encoding="utf-8")
+    meta, error = p.communicate()
+    meta = {x[0]:x[1] for x in [y.split(': ') for y in meta.splitlines()]}
+    if 'CreateDate' in meta:
+        media_date = datetime.fromisoformat(meta['CreateDate'])
+    elif 'DateTimeOriginal' in meta:
+        media_date = datetime.fromisoformat(meta['DateTimeOriginal'])
     else:
-        pic_date = None
-    meta = Popen(split(f"exiftool -s2 -n -imageheight -imagewidth {pic_fp}"), stdout=PIPE, stderr=STDOUT).communicate()[0].decode().split("\n")[:-1]
-    meta = {x[0]:float(x[1]) for x in [y.split(': ') for y in meta]}
+        media_date = None
 
-    img_height = meta['ImageHeight'] if 'ImageHeight' in meta else 0
-    img_width = meta['ImageWidth'] if 'ImageWidth' in meta else 0
+    media_type, x = meta['MIMEType'].split('/')
 
-    Popen(split(f"convert {pic_fp} -resize {(lambda x: 1024/max(x) *100)([img_height, img_width])}% {pic_fp}")).wait()
+    if media_type == 'image':
+        p = Popen(split(f"exiftool -s2 -n -imageheight -imagewidth {media_fp}"), stdout=PIPE, stderr=STDOUT, encoding="utf-8")
+        meta, error = p.communicate()
+        meta = {x[0]:float(x[1]) for x in [y.split(': ') for y in meta.splitlines()]}
 
-    meta = Popen(split(f"exiftool -s2 -n -imageheight -imagewidth -orientation -gpslatitude -gpslongitude {pic_fp}"), stdout=PIPE, stderr=STDOUT).communicate()[0].decode().split("\n")[:-1]
-    meta = {x[0]:float(x[1]) for x in [y.split(': ') for y in meta]}
+        media_height = meta['ImageHeight'] if 'ImageHeight' in meta else 0
+        media_width = meta['ImageWidth'] if 'ImageWidth' in meta else 0
+
+        Popen(split(f"convert {media_fp} -resize {(lambda x: 1024/max(x) *100)([media_height, media_width])}% {media_fp}")).wait()
+
+    p = Popen(split(f"exiftool -s2 -n -imageheight -imagewidth -orientation -rotation -gpslatitude -gpslongitude {media_fp}"), stdout=PIPE, stderr=STDOUT, encoding="utf-8")
+    meta, error = p.communicate()
+    meta = {x[0]:x[1] for x in [y.split(': ') for y in meta.splitlines()]}
 
     # orientation = meta['Orientation'] if 'Orientation' in meta else 0
-    latitude = meta['GPSLatitude'] if 'GPSLatitude' in meta else None
-    longitude = meta['GPSLongitude'] if 'GPSLongitude' in meta else None
-    orientation = meta['Orientation']
-    img_width =  meta['ImageWidth'] if orientation <= 4 else meta['ImageHeight']
-    img_height = meta['ImageHeight'] if orientation <= 4 else meta['ImageWidth']
+    latitude = float(meta['GPSLatitude']) if 'GPSLatitude' in meta else None
+    longitude = float(meta['GPSLongitude']) if 'GPSLongitude' in meta else None
+    if 'Orientation' in meta:
+        orientation = int(meta['Orientation'])
+    elif 'Rotation' in meta:
+        orientation = (int(meta['Rotation']) // 90) % 2 * 5
+    media_width =  int(meta['ImageWidth']) if orientation <= 4 else int(meta['ImageHeight'])
+    media_height = int(meta['ImageHeight']) if orientation <= 4 else int(meta['ImageWidth'])
 
-    db_pic = db.session.execute(db.select(TripImage).where(TripImage.img_src == pic)).fetchone()
-    if db_pic is None or db_pic.TripImage.lap_id != id:
-        new_picture = TripImage(
+    db_media = db.session.execute(db.select(Media).where(Media.media_src == media)).fetchone()
+    if db_media is None or db_media.Media.lap_id != id:
+        new_picture = Media(
             lap_id=id,
-            img_src=pic,
-            img_width=img_width,
-            img_height=img_height,
-            date=pic_date,
+            media_src=media,
+            media_width=media_width,
+            media_height=media_height,
+            media_type=media_type,
             lat=latitude,
             long=longitude,
             caption=caption
         )
+        if media_date:
+            new_picture.date = media_date
         db.session.add(new_picture)
     else:
-        db_pic.TripImage.img_width = img_width
-        db_pic.TripImage.img_height = img_height
-        db_pic.TripImage.date = pic_date
-        db_pic.TripImage.lat = latitude
-        db_pic.TripImage.long = longitude
-        db_pic.TripImage.caption = caption if caption else db_pic.TripImage.caption
+        db_media.Media.media_width = media_width
+        db_media.Media.media_height = media_height
+        db_media.Media.media = media_date
+        db_media.Media.lat = latitude
+        db_media.Media.long = longitude
+        if caption:
+            db_media.Media.caption = caption
 
     try:
         db.session.commit()
     except IntegrityError:
-        current_app.logger.warning(f"Tentativo di caricare la foto {pic} già caricata per la stessa tappa.")
+        current_app.logger.warning(f"Tentativo di caricare la foto {media} già caricata per la stessa tappa.")
 
 
 class AddLap(View):
@@ -197,14 +213,6 @@ class UpdLap(View):
                 if file.filename != '' and allowed_file(file.filename):
                     gpx = secure_filename(file.filename)
                     file.save(join(current_app.config['UPLOAD_FOLDER'], 'tracks', gpx))
-
-            # pictures = []
-            # files  = request.files.getlist("photos")
-            # for file in files:
-            #     if file.filename != '' and allowed_file(file.filename):
-            #         foto = secure_filename(file.filename)
-            #         file.save(join(current_app.config['UPLOAD_FOLDER'], 'images', foto))
-            #         pictures.append(foto)
 
             lap = db.session.get(Lap, id)
             if data != lap.date:

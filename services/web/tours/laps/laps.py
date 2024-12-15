@@ -1,15 +1,12 @@
-from os import getcwd
-from datetime import datetime, date, timedelta
+from datetime import date, timedelta
 from flask import (
     Blueprint, flash, render_template, current_app, url_for, jsonify, session, typing as ft
 )
 from flask.views import View
-from werkzeug.exceptions import abort
 from sqlalchemy.exc import OperationalError, ProgrammingError
 from .. import db
-from ..models import Lap, Hotel, Tour, TripImage
-from locale import setlocale, LC_ALL
-from ..utils import make_header, make_short_template, make_dd_lang
+from ..models import Lap, Hotel, Tour, Media
+from ..utils import make_header, make_short_template
 
 lap_bp = Blueprint('lap_bp', __name__,
                    url_prefix="/laps",
@@ -152,28 +149,29 @@ class SingleLapMedia(View):
         this_lap = db.session.get(Lap, id)
         prev_lap = db.session.execute(db.select(Lap.id, Lap.start, Lap.destination).where(Lap.destination == this_lap.start)).fetchone()
         next_lap = db.session.execute(db.select(Lap.id, Lap.start, Lap.destination).where(Lap.start == this_lap.destination)).fetchone()
-        photos = db.session.execute(db.select(TripImage).where(TripImage.lap_id == id).order_by(TripImage.date)).fetchall()
+        photos = db.session.execute(db.select(Media).where(Media.lap_id == id).order_by(Media.date)).fetchall()
 
         return render_template("photos.jinja2", header=header, lap=this_lap, prev_lap=prev_lap, next_lap=next_lap, photos=photos)
 
 class SingleLapMediaJS(View):
-    def dispatch_request(selfself, id):
-        photos = db.session.execute(db.select(TripImage).where(TripImage.lap_id == id).order_by(TripImage.date)).fetchall()
+    def dispatch_request(self, id):
+        medias = db.session.execute(db.select(Media).where(Media.lap_id == id).order_by(Media.date)).fetchall()
 
         data = []
-        for photo in photos:
-            foto = {"src": photo.TripImage.img_src,
-                    "width": photo.TripImage.img_width,
-                    "height": photo.TripImage.img_height,
-                    "date": photo.TripImage.date,
-                    "caption": photo.TripImage.caption,
-                    "lat": photo.TripImage.lat,
-                    "long": photo.TripImage.long
+        for media in medias:
+            foto = {"src": url_for("download_files", filename="images/"+media.Media.media_src),
+                    "width": media.Media.media_width,
+                    "height": media.Media.media_height,
+                    "type": media.Media.media_type,
+                    "date": media.Media.date,
+                    "caption": media.Media.caption,
+                    "lat": media.Media.lat,
+                    "long": media.Media.long,
+                    "map": url_for("map_bp.photo_map", lat=media.Media.lat, long=media.Media.long) if media.Media.lat else None
                     }
             data.append(foto)
 
         return jsonify(data)
-
 
 
 # lap_bp.add_url_rule('/', view_func=Index.as_view('index'))
