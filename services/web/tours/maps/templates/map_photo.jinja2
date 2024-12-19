@@ -45,7 +45,7 @@ html, body, #map {
 
     const gpxURL = {{ url_for("download_files", filename="tracks/"+track)|tojson }};
 
-    displayTrack(myMap, gpxURL, true);
+    displayTrack(myMap, gpxURL);
 
     let mediaURL;
     let marker;
@@ -54,6 +54,8 @@ html, body, #map {
     marker = L.marker([{{ md.Media.lat }}, {{ md.Media.long }}]).addTo(myMap);
     marker.bindPopup(`<a target="_blank" href=${mediaURL}><img src=${mediaURL} style='width: 100px;'></a>`).openPopup();
     {% endfor %}
+
+    myMap.setView([{{ lat }}, {{ long }}], 14);
 
 </script>
 </body>

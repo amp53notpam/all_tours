@@ -40,7 +40,7 @@ class PhotoMap(View):
 
         #gpx = join(current_app.config['UPLOAD_FOLDER'], 'tracks', gpx)
 
-        return render_template("map_photo.jinja2",  media=foto_on_track, track=gpx)
+        return render_template("map_photo.jinja2", lat=lat, long=long, media=foto_on_track, track=gpx)
 
 
 map_bp.add_url_rule('/albergi/<float:lat>/<float:long>', view_func=HotelMap.as_view('hotel_map'))
