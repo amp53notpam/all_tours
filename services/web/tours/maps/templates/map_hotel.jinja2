@@ -205,7 +205,7 @@ function checkSize() {
 map.on('change:size', checkSize);
 checkSize();
 
-content.innerHTML = '<p>{{ popup }}</p>';
+content.innerHTML = '<p class="w3-medium w3-center">{{ popup }}</p>';
 overlay.setPosition(ol.proj.fromLonLat([{{ long }}, {{ lat }}]));
 
 </script>
