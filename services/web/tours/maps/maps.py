@@ -35,12 +35,14 @@ class HotelMap(View):
 class PhotoMap(View):
     def dispatch_request(self, lat, long):
         media = db.session.execute(db.select(Media).where(Media.lat == lat and Media.long == long)).scalar()
+        media_url = url_for('download_files', filename='images/'+media.media_src)
+        popup = f'<a target="_blank" href={media_url}><img src={media_url} style="width: 100px;"></a>'
         gpx = db.session.get(Lap, media.lap_id).gpx
         foto_on_track = db.session.execute(db.select(Media).where(Media.lap_id == media.lap_id, Media.lat != None)).fetchall()
 
         #gpx = join(current_app.config['UPLOAD_FOLDER'], 'tracks', gpx)
 
-        return render_template("map_photo.jinja2", lat=lat, long=long, media=foto_on_track, track=gpx)
+        return render_template("map_photo.jinja2", lat=lat, long=long, popup=popup, media=foto_on_track, track=gpx)
 
 
 map_bp.add_url_rule('/albergi/<float:lat>/<float:long>', view_func=HotelMap.as_view('hotel_map'))

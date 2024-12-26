@@ -7,18 +7,10 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/w3-styles.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/my-styles.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/my-theme.css') }}">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-     crossorigin=""/>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ol.css') }}">
 
 <script src="https://kit.fontawesome.com/40f7c1eb26.js" crossorigin="anonymous"></script>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-     crossorigin=""></script>
-
-<script src="{{ url_for('static', filename='scripts/gpx.js') }}" defer></script>
-<script src="{{ url_for('static', filename='scripts/map.js') }}" defer></script>
+<script src="{{ url_for('static', filename='scripts/ol.js') }}"></script>
 
 <style>
 body {
@@ -30,28 +22,192 @@ html, body, #map {
     width: 100vw;
 }
 
+.ol-popup {
+    position: absolute;
+    background-color: white;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #cccccc;
+    bottom: 12px;
+    left: -50px;
+    min-width: 250px;
+}
+.ol-popup:after, .ol-popup:before {
+    top: 100%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+}
+.ol-popup:after {
+    border-top-color: white;
+    border-width: 10px;
+    left: 48px;
+    margin-left: -10px;
+}
+.ol-popup:before {
+    border-top-color: #cccccc;
+    border-width: 11px;
+    left: 48px;
+    margin-left: -11px;
+}
+.ol-popup-closer {
+    text-decoration: none;
+    position: absolute;
+    top: 2px;
+    right: 8px;
+}
+.ol-popup-closer:after {
+    content: "✖";
+}
 </style>
 </head>
 
 <body>
     <div id="map"></div>
+    <div id="popup" class="ol-popup">
+        <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+        <div id="popup-content"></div>
+    </div>
 
-<script type="module">
-    const myMap = L.map('map');
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+
+<script>
+const container = document.querySelector("#popup");
+const content = document.querySelector("#popup-content");
+const closer = document.querySelector("#popup-closer");
+
+var overlay = new ol.Overlay({
+     element: container,
+     offset: [0, -20],
+     autoPan: true,
+     autoPanAnimation: {
+         duration: 250
+     }
+ });
+
+closer.onclick = function() {
+     overlay.setPosition(undefined);
+     closer.blur();
+     return false;
+ };
+
+const attribution = new ol.control.Attribution({
+  attributions: ['<a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap</a>',
+                 '<a target="_blank" href="https://icons8.com/icon/97370/location"> | Marker</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>'],
+  collapsible: false,
+});
+
+const tileLayer = new ol.layer.Tile({
+    source: new ol.source.OSM({
+        attributions: '',
         maxZoom: 19,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(myMap);
+    }),
+});
 
-    const gpxURL = {{ url_for("download_files", filename="tracks/"+track)|tojson }}
-    displayTrack(myMap, gpxURL);
+const style = {
+  'Point': new ol.style.Style({
+    image: new ol.style.Circle({
+      fill: new ol.style.Fill({
+        color: 'rgba(255,255,0,0.4)',
+      }),
+      radius: 5,
+      stroke: new ol.style.Stroke({
+        color: '#ff0',
+        width: 1,
+      }),
+    }),
+  }),
+  'LineString': new ol.style.Style({
+    stroke: new ol.style.Stroke({
+      color: '#00f',
+      width: 2,
+    }),
+  }),
+  'MultiLineString': new ol.style.Style({
+    stroke: new ol.style.Stroke({
+      color: '#00f',
+      width: 3,
+    }),
+  }),
+};
 
-    myMap.setView([{{ lat }}, {{ long }}], 16);
+const gpxLayer = new ol.layer.Vector({
+    source: new ol.source.Vector({
+        url: {{ url_for("download_files", filename="tracks/"+track)|tojson }},
+        format: new ol.format.GPX(),
+        }),
+    style: function (feature) {
+        return style[feature.getGeometry().getType()];
+    },
+});
 
-    const marker = L.marker([{{ lat }}, {{ long }}]).addTo(myMap);
-    {% if popup %}
-    marker.bindPopup("<p class='w3-medium'>{{ popup }}</p>").openPopup();
-    {% endif %}
+const iconStyle = new ol.style.Style({
+    image: new ol.style.Icon({
+        anchor: [0.5, 40],
+        anchorXUnits: 'fraction',
+        anchorYUnits: 'pixels',
+        src: "{{ url_for('static', filename='images/marker.png') }}"
+    })
+});
+
+const map = new ol.Map({
+  layers: [
+    tileLayer,
+    gpxLayer
+  ],
+  controls: ol.control.defaults.defaults({attribution: false}).extend([attribution]),
+  target: 'map',
+  view: new ol.View({
+    center: ol.proj.fromLonLat([{{ long }}, {{ lat }}]),
+    maxZoom: 19,
+    zoom: 17,
+  }),
+});
+
+map.addOverlay(overlay);
+
+const iconFeature =  new ol.Feature ({
+    geometry: new ol.geom.Point(ol.proj.fromLonLat([{{ long }}, {{ lat }}]))
+});
+
+iconFeature.setStyle(iconStyle);
+
+const marker = new ol.layer.Vector({
+    source: new ol.source.Vector({
+        features: [iconFeature]
+    })
+});
+
+map.addLayer(marker);
+
+map.on('click', function (evt) {
+     if (map.hasFeatureAtPixel(evt.pixel) === true) {
+         const coordinate = evt.coordinate;
+
+         content.innerHTML = '<p>{{ popup }}</p>';
+         overlay.setOffset([0,0]);
+         overlay.setPosition(coordinate);
+     } else {
+         overlay.setPosition(undefined);
+         closer.blur();
+     }
+ });
+
+function checkSize() {
+  const small = map.getSize()[0] < 600;
+  attribution.setCollapsible(small);
+  attribution.setCollapsed(small);
+}
+
+map.on('change:size', checkSize);
+checkSize();
+
+content.innerHTML = '<p>{{ popup }}</p>';
+overlay.setPosition(ol.proj.fromLonLat([{{ long }}, {{ lat }}]));
+
 </script>
 </body>
 </html>
