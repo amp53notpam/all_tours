@@ -78,13 +78,19 @@ const container = document.querySelector("#popup");
 const content = document.querySelector("#popup-content");
 const closer = document.querySelector("#popup-closer");
 
-var overlay = new ol.Overlay({
+const overlay = new ol.Overlay({
      element: container,
      offset: [0, -20],
      autoPan: true,
      autoPanAnimation: {
          duration: 250
      }
+ });
+
+closer.addEventListener("click",  (evt) => {
+     overlay.setPosition(undefined);
+     closer.blur();
+     return false;
  });
 
 closer.onclick = function() {
@@ -172,7 +178,7 @@ let iconFeature;
     map.addLayer(marker);
 {% endfor %}
 
-map.on('singleclick', function (evt) {
+map.addEventListener('singleclick', (evt) => {
     if (map.hasFeatureAtPixel(evt.pixel) === true) {
         const coordinate = evt.coordinate;
         const features = map.getFeaturesAtPixel(evt.pixel);
@@ -187,9 +193,6 @@ map.on('singleclick', function (evt) {
         content.innerHTML = `<a target="_blank" href=${mediaURL}><img src=${mediaURL} style='width: 100px;'></a>`;
         overlay.setOffset([0,0]);
         overlay.setPosition(coordinate);
-    } else {
-        overlay.setPosition(undefined);
-        closer.blur();
     }
  });
 

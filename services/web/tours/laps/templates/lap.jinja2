@@ -121,11 +121,14 @@
 
         {% if lap.gpx %}
         <div class="row w3-row">
-            <div class="w3-container w3-third w3-mobile">
+            <div class="w3-container w3-col m4 w3-mobile">
                 <p class="w3-left-align wbold">{{ _('Traccia gpx') }}:</p>
             </div>
-            <div class="w3-container w3-twothird w3-mobile">
+            <div class="w3-container w3-col m7 w3-mobile">
                 <p class="w3-left-align"><a href='{{ url_for("download_files", filename="tracks/"+lap.gpx) }}'>{{ lap.start }} - {{ lap.destination }}</a></p>
+            </div>
+            <div class="w3-container w3-col m1 w3-mobile">
+                <p class="w3-left-align"><a target="_blank" href="{{ url_for("map_bp.lap_map", id=lap.id) }}" class="w3-hover-theme-d3 w3-right"><i class="fa-solid fa-map-location-dot icon28"></i></a></p>
             </div>
         </div>
         {% endif %}

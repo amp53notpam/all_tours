@@ -8,7 +8,6 @@ from flask import Blueprint, render_template, redirect, request, url_for, flash,
 from flask.views import View
 from flask_login import login_required
 from flask_babel import _
-from exiftool import ExifToolHelper
 from sqlalchemy.exc import IntegrityError
 from werkzeug.utils import secure_filename
 from ..models import Lap, Hotel, Tour, Media

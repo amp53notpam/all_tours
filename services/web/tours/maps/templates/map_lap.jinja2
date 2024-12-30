@@ -1,0 +1,282 @@
+<!doctype html>
+<html>
+<head>
+<title>AMP - Mappa</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/w3-styles.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/my-styles.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/my-theme.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ol.css') }}">
+
+<script src="https://kit.fontawesome.com/40f7c1eb26.js" crossorigin="anonymous"></script>
+<script src="{{ url_for('static', filename='scripts/ol.js') }}"></script>
+
+<style>
+body {
+    padding: 0;
+    margin: 0;
+}
+html, body, #map {
+    height: 100%;
+    width: 100vw;
+}
+
+.ol-popup {
+    position: absolute;
+    background-color: white;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    border-radius: 8px;
+    border: 1px solid #cccccc;
+    bottom: 12px;
+    left: -50px;
+    min-width: 180px;
+}
+.ol-popup:after, .ol-popup:before {
+    top: 100%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+}
+.ol-popup:after {
+    border-top-color: white;
+    border-width: 10px;
+    left: 48px;
+    margin-left: -10px;
+}
+.ol-popup:before {
+    border-top-color: #cccccc;
+    border-width: 11px;
+    left: 48px;
+    margin-left: -11px;
+}
+.ol-popup-closer {
+    text-decoration: none;
+    position: absolute;
+    top: 2px;
+    right: 8px;
+}
+.ol-popup-closer:after {
+    content: "✖";
+}
+</style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <div id="popup-1" class="ol-popup">
+        <div id="popup-content-1"></div>
+    </div>
+    <div id="popup-2" class="ol-popup">
+        <div id="popup-content-2"></div>
+    </div>
+
+<script>
+const containerStart = document.querySelector("#popup-1");
+const contentStart = document.querySelector("#popup-content-1");
+
+const containerEnd = document.querySelector("#popup-2");
+const contentEnd = document.querySelector("#popup-content-2");
+
+const overlayStart = new ol.Overlay({
+     element: containerStart,
+     offset: [0, 0],
+     autoPan: true,
+     autoPanAnimation: {
+         duration: 250
+     }
+ });
+const overlayEnd = new ol.Overlay({
+     element: containerEnd,
+     offset: [0, 0],
+     autoPan: true,
+     autoPanAnimation: {
+         duration: 250
+     }
+ });
+
+{#
+closerStart.addEventListener("click", (evt) => {
+     overlayStart.setPosition(undefined);
+     closerStart.blur();
+     return false;
+ });
+
+closerEnd.addEventListener("click", (evt) => {
+     overlayEnd.setPosition(undefined);
+     closerEnd.blur();
+     return false;
+ });
+#}
+const attribution = new ol.control.Attribution({
+  attributions: ['<a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap</a>',
+                ],
+  collapsible: false,
+});
+
+const tileLayer = new ol.layer.Tile({
+    source: new ol.source.OSM({
+        attributions: '',
+        maxZoom: 19,
+    }),
+});
+
+const style = {
+  'Point': new ol.style.Style({
+    image: new ol.style.Circle({
+      fill: new ol.style.Fill({
+        color: 'rgba(80,100,230,1)',
+      }),
+      radius: 6,
+      stroke: new ol.style.Stroke({
+        color: '#00f',
+        width: 2,
+      }),
+    }),
+  }),
+  'MultiLineString': new ol.style.Style({
+    stroke: new ol.style.Stroke({
+      color: '#00f',
+      width: 3,
+    }),
+  }),
+};
+
+const gpxLayer = new ol.layer.Vector({
+    source: new ol.source.Vector({
+        url: {{ url_for("download_files", filename="tracks/"+track)|tojson }},
+        format: new ol.format.GPX(),
+        }),
+    style: function (feature) {
+        return style[feature.getGeometry().getType()];
+    },
+});
+
+{#
+const iconStyle = new ol.style.Style({
+    image: new ol.style.Icon({
+        anchor: [0.5, 40],
+        anchorXUnits: 'fraction',
+        anchorYUnits: 'pixels',
+        src: "{{ url_for('static', filename='images/marker.png') }}"
+    })
+});
+#}
+
+const map = new ol.Map({
+  layers: [
+    tileLayer,
+    gpxLayer
+  ],
+  controls: ol.control.defaults.defaults({attribution: false}).extend([attribution]),
+  target: 'map',
+  view: new ol.View({
+    maxZoom: 19
+  }),
+});
+
+map.addOverlay(overlayStart);
+map.addOverlay(overlayEnd);
+
+map.getView().setCenter([0, 0]);
+map.getView().setZoom(0);
+
+function showPopup(evt) {
+    const track = gpxLayer.getSource().getFeatures()[0].getGeometry()
+    const startCoord = track.getFirstCoordinate().slice(0,2)
+    const endCoord = track.getLastCoordinate().slice(0,2)
+    if (map.hasFeatureAtPixel(evt.pixel) === true) {
+        const featureUid = map.getFeaturesAtPixel(evt.pixel)[0].ol_uid
+
+
+        const layers = []
+        map.getLayers().forEach((layer) => {
+            layers.push(layer.getSource())
+        });
+        const markerLayers = layers.slice(2);
+
+        extent0 = markerLayers[0].getExtent()
+        extent1 = markerLayers[1].getExtent()
+
+        if (ol.extent.containsXY(extent0, startCoord[0], startCoord[1])) {
+            // markerLayer[0] is at the beginning of track
+            if (featureUid == markerLayers[0].getFeatures()[0].ol_uid) {
+                contentStart.innerHTML = `<p class="w3-small, w3-center">{{ lap.start }}</p>`;
+                overlayStart.setPosition(startCoord);
+            }
+        } else if (ol.extent.containXY(extent0, endCoord[0], endCoord[1])) {
+            // markerLayer[0] is at the end of track
+            if (featureUid == markerLayers[0].getFeatures()[0].ol_uid) {
+                contentEnd.innerHTML = `<p class="w3-small, w3-center">{{ lap.destination }}</p>`;
+                overlayEnd.setPosition(endCoord);
+            }
+        }
+        if (ol.extent.containsXY(extent1, startCoord[0], startCoord[1])) {
+            // markerLayer[0] is at the beginning of track
+            if (featureUid == markerLayers[1].getFeatures()[0].ol_uid) {
+                contentStart.innerHTML = `<p class="w3-small, w3-center">{{ lap.start }}</p>`;
+                overlayStart.setPosition(startCoord);
+            }
+        } else if (ol.extent.containsXY(extent1, endCoord[0], endCoord[1])) {
+            // markerLayer[0] is at the end of track
+            if (featureUid == markerLayers[1].getFeatures()[0].ol_uid) {
+                contentEnd.innerHTML = `<p class="w3-small, w3-center">{{ lap.destination }}</p>`;
+                overlayEnd.setPosition(endCoord);
+            }
+        }
+    }  else {
+            overlayStart.setPosition(undefined);
+            overlayEnd.setPosition(undefined);
+            // closerStart.blur();
+            // closerEnd.blur();
+    }
+
+}
+
+gpxLayer.getSource().addEventListener("addfeature", (evt) => {
+    map.getView().fit(gpxLayer.getSource().getExtent());
+    map.getView().adjustZoom(-0.2);
+    const coords = evt.feature.getGeometry();
+    addMarker(coords.getFirstCoordinate(), overlayStart, contentStart, "{{ lap.start }}");
+    addMarker(coords.getLastCoordinate(), overlayEnd, contentEnd, "{{ lap.destination }}");
+});
+
+function addMarker(coord, overlay, content, popup) {
+    marker = new ol.layer.Vector({
+        source: new ol.source.Vector({
+            features: [
+                new ol.Feature({
+                    geometry: new ol.geom.Point([coord[0], coord[1]])
+                }),
+            ]
+        }),
+        style: function (feature) {
+                return style[feature.getGeometry().getType()];
+        }
+    });
+    map.addLayer(marker);
+
+    // show popup
+    console.log(popup)
+    content.innerHTML = `<p class="w3-small, w3-center">${popup}</p>`;
+    overlay.setPosition([coord[0], coord[1]]);
+    overlay.setProperties({'content': popup});
+};
+
+map.addEventListener('click', showPopup);
+
+function checkSize() {
+  const small = map.getSize()[0] < 600;
+  attribution.setCollapsible(small);
+  attribution.setCollapsed(small);
+}
+
+map.on('change:size', checkSize);
+checkSize();
+
+</script>
+</body>
+</html>

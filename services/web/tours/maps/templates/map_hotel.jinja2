@@ -79,7 +79,7 @@ const container = document.querySelector("#popup");
 const content = document.querySelector("#popup-content");
 const closer = document.querySelector("#popup-closer");
 
-var overlay = new ol.Overlay({
+const overlay = new ol.Overlay({
      element: container,
      offset: [0, -20],
      autoPan: true,
@@ -88,11 +88,11 @@ var overlay = new ol.Overlay({
      }
  });
 
-closer.onclick = function() {
+closer.addEventListener("click",  (evt) => {
      overlay.setPosition(undefined);
      closer.blur();
      return false;
- };
+ });
 
 const attribution = new ol.control.Attribution({
   attributions: ['<a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap</a>',
@@ -108,24 +108,6 @@ const tileLayer = new ol.layer.Tile({
 });
 
 const style = {
-  'Point': new ol.style.Style({
-    image: new ol.style.Circle({
-      fill: new ol.style.Fill({
-        color: 'rgba(255,255,0,0.4)',
-      }),
-      radius: 5,
-      stroke: new ol.style.Stroke({
-        color: '#ff0',
-        width: 1,
-      }),
-    }),
-  }),
-  'LineString': new ol.style.Style({
-    stroke: new ol.style.Stroke({
-      color: '#00f',
-      width: 2,
-    }),
-  }),
   'MultiLineString': new ol.style.Style({
     stroke: new ol.style.Stroke({
       color: '#00f',
@@ -183,16 +165,13 @@ const marker = new ol.layer.Vector({
 
 map.addLayer(marker);
 
-map.on('click', function (evt) {
+map.addEventListener('click', (evt) => {
      if (map.hasFeatureAtPixel(evt.pixel) === true) {
          const coordinate = evt.coordinate;
 
-         content.innerHTML = '<p>{{ popup }}</p>';
+         content.innerHTML = '<p class="w3-medium w3-center">{{ popup }}</p>';
          overlay.setOffset([0,0]);
          overlay.setPosition(coordinate);
-     } else {
-         overlay.setPosition(undefined);
-         closer.blur();
      }
  });
 

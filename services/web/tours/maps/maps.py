@@ -32,6 +32,12 @@ class HotelMap(View):
         return render_template("map_hotel.jinja2", lat=lat, long=long, popup=hotel.name, media=None, track=gpx)
 
 
+class LapMap(View):
+    def dispatch_request(self, id):
+        lap = db.session.get(Lap, id)
+
+        return render_template("map_lap.jinja2", lap=lap, track=lap.gpx)
+
 class PhotoMap(View):
     def dispatch_request(self, lat, long):
         media = db.session.execute(db.select(Media).where(Media.lat == lat and Media.long == long)).scalar()
@@ -45,5 +51,6 @@ class PhotoMap(View):
         return render_template("map_photo.jinja2", lat=lat, long=long, popup=popup, media=foto_on_track, track=gpx)
 
 
+map_bp.add_url_rule('/lap/<int:id>', view_func=LapMap.as_view('lap_map'))
 map_bp.add_url_rule('/albergi/<float:lat>/<float:long>', view_func=HotelMap.as_view('hotel_map'))
 map_bp.add_url_rule('/foto/<float:lat>/<float:long>', view_func=PhotoMap.as_view('photo_map'))
