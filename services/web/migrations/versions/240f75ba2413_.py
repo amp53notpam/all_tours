@@ -31,8 +31,8 @@ def downgrade():
         batch_op.drop_column('trip_mode')
 
     op.create_table('test',
-    sa.Column('id', sa.INTEGER(), autoincrement=True, nullable=False),
-    sa.Column('trip_mode', postgresql.ENUM('walking', 'bicycling', 'driving', name='mode_enum'), autoincrement=False, nullable=False),
-    sa.PrimaryKeyConstraint('id', name='test_pkey')
-    )
+                    sa.Column('id', sa.INTEGER(), autoincrement=True, nullable=False),
+                    sa.Column('trip_mode', postgresql.ENUM('walking', 'bicycling', 'driving', name='mode_enum'), autoincrement=False, nullable=False),
+                    sa.PrimaryKeyConstraint('id', name='test_pkey')
+                    )
     # ### end Alembic commands ###

@@ -15,12 +15,14 @@ map_bp = Blueprint('map_bp', __name__,
                    template_folder='templates'
                    )
 
+
 @map_bp.context_processor
 def add_upload_path():
     return dict(upload_path=current_app.config['UPLOAD_FOLDER'])
 
+
 def get_trip():
-    active_trip = db.session.execute(db.select(Tour).where(Tour.is_active == True)).fetchone()
+    active_trip = db.session.execute(db.select(Tour).where(Tour.is_active)).fetchone()
     return active_trip.Tour.id
 
 
@@ -38,15 +40,14 @@ class LapMap(View):
 
         return render_template("map_lap.jinja2", lap=lap, track=lap.gpx)
 
+
 class PhotoMap(View):
     def dispatch_request(self, lat, long):
         media = db.session.execute(db.select(Media).where(Media.lat == lat and Media.long == long)).scalar()
-        media_url = url_for('download_files', filename='images/'+media.media_src)
+        media_url = url_for('download_files', filename='images/' + media.media_src)
         popup = f'<a target="_blank" href={media_url}><img src={media_url} style="width: 100px;"></a>'
         gpx = db.session.get(Lap, media.lap_id).gpx
         foto_on_track = db.session.execute(db.select(Media).where(Media.lap_id == media.lap_id, Media.lat != None)).fetchall()
-
-        #gpx = join(current_app.config['UPLOAD_FOLDER'], 'tracks', gpx)
 
         return render_template("map_photo.jinja2", lat=lat, long=long, popup=popup, media=foto_on_track, track=gpx)
 

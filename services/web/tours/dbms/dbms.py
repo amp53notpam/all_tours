@@ -25,6 +25,7 @@ dbms_bp = Blueprint('dbms_bp', __name__,
 
 date_pattern = compile(r'[-./]')
 
+
 def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -51,7 +52,7 @@ def to_datetime_time(time_str):
 
 
 def get_trip():
-    active_trip = db.session.execute(db.select(Tour).where(Tour.is_active == True)).fetchone()
+    active_trip = db.session.execute(db.select(Tour).where(Tour.is_active)).fetchone()
     return active_trip.Tour.id
 
 
@@ -62,12 +63,14 @@ def update_all_date(laps, delta_t):
             hotel.check_in += delta_t
             hotel.check_out += delta_t
 
+
 def add_geo_tag(media, track):
     p = Popen(split(f"exiftool -s2 -n -gpslatitude -gpslongitude {media}"), stdout=PIPE, stderr=STDOUT, encoding="utf-8")
-    position,  error = p.communicate()
+    position, error = p.communicate()
     if not position:
         Popen(split(f"exiftool -geotag {track} -geosync=1:00:00 {media}"), stdout=PIPE, stderr=STDOUT, encoding="utf-8").wait()
         Popen(split(f"exiftool -delete_original! {media}"), stdout=PIPE, stderr=STDOUT).wait()
+
 
 def register_media(id, gpx, media, caption):
     track = join(current_app.config['UPLOAD_FOLDER'], 'tracks', gpx)
@@ -75,9 +78,9 @@ def register_media(id, gpx, media, caption):
     media_fp = join(media_dir, media)
 
     add_geo_tag(media_fp, track)
-    p = Popen(        split(f"exiftool -s2 -d '%Y%m%dT%H%M%S' -datetimeoriginal -createdate -mimetype {media_fp}"), stdout=PIPE, stderr=STDOUT, encoding="utf-8")
+    p = Popen(split(f"exiftool -s2 -d '%Y%m%dT%H%M%S' -datetimeoriginal -createdate -mimetype {media_fp}"), stdout=PIPE, stderr=STDOUT, encoding="utf-8")
     meta, error = p.communicate()
-    meta = {x[0]:x[1] for x in [y.split(': ') for y in meta.splitlines()]}
+    meta = {x[0]: x[1] for x in [y.split(': ') for y in meta.splitlines()]}
     if 'CreateDate' in meta:
         media_date = datetime.fromisoformat(meta['CreateDate'])
     elif 'DateTimeOriginal' in meta:
@@ -90,16 +93,16 @@ def register_media(id, gpx, media, caption):
     if media_type == 'image':
         p = Popen(split(f"exiftool -s2 -n -imageheight -imagewidth {media_fp}"), stdout=PIPE, stderr=STDOUT, encoding="utf-8")
         meta, error = p.communicate()
-        meta = {x[0]:float(x[1]) for x in [y.split(': ') for y in meta.splitlines()]}
+        meta = {x[0]: float(x[1]) for x in [y.split(': ') for y in meta.splitlines()]}
 
         media_height = meta['ImageHeight'] if 'ImageHeight' in meta else 0
         media_width = meta['ImageWidth'] if 'ImageWidth' in meta else 0
 
-        Popen(split(f"convert {media_fp} -resize {(lambda x: 1024/max(x) *100)([media_height, media_width])}% {media_fp}")).wait()
+        Popen(split(f"convert {media_fp} -resize {(lambda x: 1024 / max(x) * 100)([media_height, media_width])} % {media_fp}")).wait()
 
     p = Popen(split(f"exiftool -s2 -n -imageheight -imagewidth -orientation -rotation -gpslatitude -gpslongitude {media_fp}"), stdout=PIPE, stderr=STDOUT, encoding="utf-8")
     meta, error = p.communicate()
-    meta = {x[0]:x[1] for x in [y.split(': ') for y in meta.splitlines()]}
+    meta = {x[0]: x[1] for x in [y.split(': ') for y in meta.splitlines()]}
 
     # orientation = meta['Orientation'] if 'Orientation' in meta else 0
     latitude = float(meta['GPSLatitude']) if 'GPSLatitude' in meta else None
@@ -108,7 +111,7 @@ def register_media(id, gpx, media, caption):
         orientation = int(meta['Orientation'])
     elif 'Rotation' in meta:
         orientation = (int(meta['Rotation']) // 90) % 2 * 5
-    media_width =  int(meta['ImageWidth']) if orientation <= 4 else int(meta['ImageHeight'])
+    media_width = int(meta['ImageWidth']) if orientation <= 4 else int(meta['ImageHeight'])
     media_height = int(meta['ImageHeight']) if orientation <= 4 else int(meta['ImageWidth'])
 
     db_media = db.session.execute(db.select(Media).where(Media.media_src == media)).fetchone()
@@ -282,9 +285,6 @@ class LoadLapMedia(View):
         lap = db.session.get(Lap, id)
         header = make_header(session['lang'])
         return render_template("load_media.jinja2", form=form, lap=lap, header=header)
-
-
-
 
 
 class DeleteLap(View):

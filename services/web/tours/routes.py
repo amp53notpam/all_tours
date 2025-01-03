@@ -20,11 +20,11 @@ class Start(View):
         if request.method == 'POST':
             trip = request.form.get('trip')
             if trip:
-                active_trip = db.session.execute(db.select(Tour).where(Tour.is_active==True)).fetchone()
+                active_trip = db.session.execute(db.select(Tour).where(Tour.is_active)).fetchone()
                 if active_trip:
                     active_trip.Tour.is_active = False
                     db.session.commit()
-                next_active = db.session.execute(db.select(Tour).where(Tour.name==trip)).fetchone()
+                next_active = db.session.execute(db.select(Tour).where(Tour.name == trip)).fetchone()
                 next_active.Tour.is_active = True
                 db.session.commit()
                 session['trip'] = trip
@@ -44,7 +44,7 @@ class Start(View):
         if 'trip' not in session:
             carousel_pos = 1
         else:
-            carousel_pos = db.session.execute(db.select(Tour.carousel_pos).where(Tour.is_active == True)).scalar()
+            carousel_pos = db.session.execute(db.select(Tour.carousel_pos).where(Tour.is_active)).scalar()
 
         return render_template("index.jinja2", form=form, header=header, lang_selector=lang_selector, carousel_pos=carousel_pos)
 
@@ -63,7 +63,7 @@ class InitDb(View):
             return redirect(url_for("index"))
         res = Popen(['flask', 'populate_db'], stdout=PIPE, stderr=STDOUT).wait()
         if res != 0:
-            flash(_("Creazione database fallita"),category='error')
+            flash(_("Creazione database fallita"), category='error')
             current_app.logger.error("Creazione database fallita - causa: 'populate_db' KO")
             return redirect(url_for("index"))
 
@@ -95,11 +95,11 @@ class SetLanguage(View):
         return "done"
 
 
-class Map(View):
-    def dispatch_request(self, lat, long):
-        hotel = db.session.execute(db.select(Hotel).where)
-        return render_template("map.jinja2", lat=lat, long=long)
-
+# class Map(View):
+#     def dispatch_request(self, lat, long):
+#         hotel = db.session.execute(db.select(Hotel).where)
+#         return render_template("map.jinja2", lat=lat, long=long)
+#
 
 app.add_url_rule('/', view_func=Start.as_view('start'))
 app.add_url_rule("/init_db", view_func=InitDb.as_view("init_db"))
@@ -107,5 +107,4 @@ app.add_url_rule("/language/<string:lang>", view_func=SetLanguage.as_view("set_l
 app.add_url_rule("/static/<path:filename>", view_func=StaticFiles.as_view("static_files"))
 app.add_url_rule("/download/<path:filename>", view_func=DownloadFiles.as_view("download_files"))
 
-app.add_url_rule('/map/<float:lat>/<float:long>', view_func=Map.as_view('map'))
-
+# app.add_url_rule('/map/<float:lat>/<float:long>', view_func=Map.as_view('map'))

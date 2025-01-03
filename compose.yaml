@@ -4,9 +4,9 @@ services:
             context: ./services/web
             dockerfile: Dockerfile
             tags: 
-                - wheelsofhope:latest
-                - angelo53/wheelsofhope:latest
-        container_name: wheelsofhope
+                - amptours:latest
+                - angelo53/amptours:latest
+        container_name: amptours
         command: >-
                   gunicorn --worker-class gthread --workers 4
                   --bind 0.0.0.0:10000 wsgi:app

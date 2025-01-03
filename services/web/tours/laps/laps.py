@@ -7,6 +7,7 @@ from sqlalchemy.exc import OperationalError, ProgrammingError
 from .. import db
 from ..models import Lap, Hotel, Tour, Media
 from ..utils import make_header, make_short_template
+from flask_babel import _
 
 lap_bp = Blueprint('lap_bp', __name__,
                    url_prefix="/laps",
@@ -14,9 +15,11 @@ lap_bp = Blueprint('lap_bp', __name__,
                    template_folder='templates'
                    )
 
+
 @lap_bp.context_processor
 def add_upload_path():
     return dict(upload_path=current_app.config['UPLOAD_FOLDER'])
+
 
 def get_stats(laps):
     km_tot = 0
@@ -37,8 +40,9 @@ def get_stats(laps):
 
     return dict([('total_km', round(km_tot, 2)), ('done_km', round(km_done, 2)), ('left_km', km_tot - km_done), ('num_tappe', tappe_tot), ('tappe_fatte', tappe_fatte), ('tappe_da_fare', tappe_tot - tappe_fatte)])
 
+
 def get_trip():
-    active_trip = db.session.execute(db.select(Tour).where(Tour.is_active == True)).fetchone()
+    active_trip = db.session.execute(db.select(Tour).where(Tour.is_active)).fetchone()
     return active_trip.Tour.id
 
 
@@ -60,7 +64,7 @@ class Laps(View):
             trip_id = get_trip()
             laps = db.session.execute(db.select(Lap).where(Lap.tour_id == trip_id).order_by(Lap.date)).all()
         except (OperationalError, ProgrammingError):
-            flash({{ _('Database assente! Prova più tardi') }}, category="error")
+            flash(_('Database assente! Prova più tardi'), category="error")
             return render_template('index.jinja2', header=header)
 
         return render_template("laps.jinja2", laps=laps, stats=get_stats(laps), header=header)
@@ -81,7 +85,7 @@ class Hotels(View):
                     Hotel.check_in)).all()
             hotels_unbound = db.session.execute(db.select(Hotel).where(Hotel.lap_id == None)).all()
         except (OperationalError, ProgrammingError):
-            flash({{ _('Database assente! Prova più tardi') }}, category="error")
+            flash(_('Database assente! Prova più tardi'), category="error")
             return render_template('index.jinja2', header=header)
 
         return render_template("hotels.jinja2", hotels=hotels, hotels_nb=hotels_unbound, splash_page=True, timedelta=timedelta, header=header)
@@ -120,6 +124,7 @@ class SingleHotel(View):
         return render_template("hotel.jinja2", header=header, hotels=hotels, hotels_nb=hotels_unbound, hotel=hotel,
                                    timedelta=timedelta)
 
+
 class SingleLapJS(View):
     def dispatch_request(self, id):
         this_lap = db.session.get(Lap, id)
@@ -127,7 +132,7 @@ class SingleLapJS(View):
         next_lap = db.session.execute(db.select(Lap.id, Lap.start, Lap.destination).where(Lap.start == this_lap.destination)).fetchone()
 
         short_html = make_short_template("lap.jinja2")
-        return  render_template(short_html, lap=this_lap, prev_lap=prev_lap, next_lap=next_lap)
+        return render_template(short_html, lap=this_lap, prev_lap=prev_lap, next_lap=next_lap)
 
 
 class SingleHotelJS(View):
@@ -153,13 +158,14 @@ class SingleLapMedia(View):
 
         return render_template("photos.jinja2", header=header, lap=this_lap, prev_lap=prev_lap, next_lap=next_lap, photos=photos)
 
+
 class SingleLapMediaJS(View):
     def dispatch_request(self, id):
         medias = db.session.execute(db.select(Media).where(Media.lap_id == id).order_by(Media.date)).fetchall()
 
         data = []
         for media in medias:
-            foto = {"src": url_for("download_files", filename="images/"+media.Media.media_src),
+            foto = {"src": url_for("download_files", filename="images/" + media.Media.media_src),
                     "width": media.Media.media_width,
                     "height": media.Media.media_height,
                     "type": media.Media.media_type,

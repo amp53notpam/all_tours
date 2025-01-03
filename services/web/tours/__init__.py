@@ -22,6 +22,7 @@ from werkzeug.security import generate_password_hash
 class Base(DeclarativeBase):
     pass
 
+
 db = SQLAlchemy(model_class=Base)
 migrate = Migrate()
 login_manager = LoginManager()
@@ -48,6 +49,7 @@ def create_app(test_config=None):
 
     return app
 
+
 def get_locale():
     try:
         return session.get("lang", "it")
@@ -67,6 +69,7 @@ def initialize_extensions(app):
     login_manager.init_app(app)
 
     from .models import Admin
+
     @login_manager.user_loader
     def load_user(user_id):
         result = db.session.get(Admin, int(user_id))
@@ -93,7 +96,7 @@ def register_blueprints(app):
         from tours.dbms import dbms
         app.register_blueprint(dbms.dbms_bp)
 
-        from tours.maps import  maps
+        from tours.maps import maps
         app.register_blueprint(maps.map_bp)
 
 

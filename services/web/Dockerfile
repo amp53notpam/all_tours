@@ -3,14 +3,14 @@
 ###########
 
 # pull the official base image
-FROM python:3.12.3-slim-bookworm as BUILDER
+FROM python:3.13.1-slim-bookworm AS builder
 
 # set the work directory
 WORKDIR /usr/src/app
 
 # set the environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 # install system dependencies
 RUN apt-get update && \
@@ -20,7 +20,7 @@ RUN apt-get update && \
 RUN pip install --upgrade pip
 RUN pip install flake8
 COPY . /usr/src/app/
-RUN flake8 --ignore=E127,E501,F401 .
+RUN flake8 --ignore=E127,E501,F401,E711 .
 
 # install python dependecies
 COPY ./requirements.txt .
@@ -31,7 +31,7 @@ RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requir
 #########
 
 # pull official base image for python
-FROM python:3.12.3-slim-bookworm
+FROM python:3.13.1-slim-bookworm
 
 # install system dependencies
 RUN apt-get update && apt-get install -y locales bind9-dnsutils && rm -r /var/lib/apt/lists/*
@@ -53,9 +53,9 @@ RUN mkdir -p ${APP_HOME} && mkdir ${APP_HOME}/logs
 WORKDIR $APP_HOME
 
 # install dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends netcat-openbsd && apt-get purge expat
-COPY --from=BUILDER /usr/src/app/wheels /wheels
-COPY --from=BUILDER /usr/src/app/requirements.txt .
+RUN apt-get update && apt-get install -y --no-install-recommends netcat-openbsd imagemagick && apt-get purge expat
+COPY --from=builder /usr/src/app/wheels /wheels
+COPY --from=builder /usr/src/app/requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install --no-cache /wheels/*
 
@@ -73,7 +73,7 @@ USER flasker
 
 EXPOSE 10000
 
-CMD  gunicorn --workers 2 --bind 0.0.0.0:10000 wsgi:app --access-logfile /home/flasker/web/logs/gunicorn-access.log --error-logfile /home/flasker/web/logs/gunicorn-error.log
+CMD  ["gunicorn", "--workers", "2", "--bind", "0.0.0.0:10000", "wsgi:app", "--timeout", "60", "--access-logfile", "/home/flasker/web/logs/gunicorn-access.log", "--error-logfile", "/home/flasker/web/logs/gunicorn-error.log"]
 
 # run entrypoint.sh
 ENTRYPOINT ["/home/flasker/web/entrypoint.sh"]
