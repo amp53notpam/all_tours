@@ -10,24 +10,31 @@ from flask.views import View
 from subprocess import Popen, STDOUT, PIPE
 from .utils import make_header, make_dd_lang
 
+translations = {'bicycling': _('in bici'), 'walking': _('a piedi'), 'driving': _('in auto')}
+
 
 class Start(View):
     methods = ['GET', 'POST']
 
     def dispatch_request(self):
+
         form = SelectTripForm()
 
         if request.method == 'POST':
             trip = request.form.get('trip')
             if trip:
-                active_trip = db.session.execute(db.select(Tour).where(Tour.is_active)).fetchone()
-                if active_trip:
-                    active_trip.Tour.is_active = False
+                if trip != 'add_tour':
+                    active_trip = db.session.execute(db.select(Tour).where(Tour.is_active)).fetchone()
+                    if active_trip:
+                        active_trip.Tour.is_active = False
+                        db.session.commit()
+                    trip = int(trip)
+                    next_active = db.session.execute(db.select(Tour).where(Tour.id == trip)).fetchone()
+                    next_active.Tour.is_active = True
                     db.session.commit()
-                next_active = db.session.execute(db.select(Tour).where(Tour.name == trip)).fetchone()
-                next_active.Tour.is_active = True
-                db.session.commit()
-                session['trip'] = trip
+                    session['trip'] = trip
+                else:
+                    return redirect(url_for('dbms_bp.add_tour'))
 
         if 'lang' not in session:
             session['lang'] = 'it'
@@ -35,18 +42,20 @@ class Start(View):
         setlocale(LC_ALL, f"{session['locale']}.UTF-8")
         tours = db.session.execute(db.select(Tour).order_by(Tour.id)).all()
         form.trip.choices = [("", _("Scegli un viaggio"), {"disabled": "disabled"})]
-        form.trip.choices.extend([(tour.Tour.name, tour.Tour.name, dict()) for tour in tours])
+        form.trip.choices.extend([(tour.Tour.id, tour.Tour.name + " " + translations[tour.Tour.trip_mode], dict()) for tour in tours])
+        form.trip.choices.append(("add_tour", _("Nuovo Viaggio"), {}))
         form.trip.default = ""
         form.process([])
 
         header = make_header(session['lang'])
         lang_selector = make_dd_lang(session['lang'])
+        tours = tours = db.session.execute(db.select(Tour).order_by(Tour.carousel_pos)).fetchall()
         if 'trip' not in session:
             carousel_pos = 1
         else:
             carousel_pos = db.session.execute(db.select(Tour.carousel_pos).where(Tour.is_active)).scalar()
 
-        return render_template("index.jinja2", form=form, header=header, lang_selector=lang_selector, carousel_pos=carousel_pos)
+        return render_template("index.jinja2", form=form, header=header, lang_selector=lang_selector, tours=tours, carousel_pos=carousel_pos)
 
 
 class InitDb(View):

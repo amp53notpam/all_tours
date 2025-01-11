@@ -1,7 +1,7 @@
 {% extends 'layout.jinja2' %}
 
 {% block header %}
-{{ header }}
+{{ header if header is not none else super() }}
 {% endblock %}
 
 {% block content %}
@@ -9,11 +9,10 @@
     <div class="w3-container">
     <h2 class="w3-theme-d2 w3-center">Login</h2>
     </div>
-
     <form method="POST">
         {{ form.csrf_token }}
         <p>
-        {{ form.email(class="w3-input w3-theme-l4", placeholder="E-mail", style="width: 90%; margin-left: 5%") }}
+        {{ form.username(class="w3-input w3-theme-l4", placeholder="Username", style="width: 90%; margin-left: 5%") }}
         </p>
         <p>
         {{ form.password(class="w3-input w3-theme-l4", placeholder="Password", style="width: 90%; margin-left: 5%") }}
@@ -25,5 +24,9 @@
         {{ form.submit(class="w3-button w3-block w3-theme-action w3-hover-theme-d2 w3-ripple w3-center") }}
         </p>
     </form>
+    <div class="w3-container">
+    <p class="w3-small">{{ _('oppure') }}<span class="w3-center w3-margin-left"><a href="{{ url_for('auth_bp.signup') }}" class="w3-large w3-ripple w3-hover-theme" style:"vertical-align: baseline;">{{ _('Registrati') }}</a></span><p>
+    </div>
 </div>
+
 {% endblock %}

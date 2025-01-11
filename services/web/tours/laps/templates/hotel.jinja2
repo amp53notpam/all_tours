@@ -24,7 +24,7 @@
     {% endfor %}
     {% endif %}
 
-    {% if '_user_id' in session.keys() %}
+    {% if is_editable %}
     <div class="w3-panel w3-center w3-bar-item" style="margin-top: 30px;">
         <a href="{{ url_for('dbms_bp.add_hotel') }}" class="w3-bar-item w3-ripple" title="{{ _('Aggiungi hotel') }}"><i class="fa-solid fa-plus icon28"></a>
     </div>
@@ -178,7 +178,7 @@
         </div>
         {% endif %}
 
-        {% if '_user_id' in session.keys() %}
+        {% if is_editable %}
         <div class="w3-container w3-center" style="margin-top: 60px;">
                 <div class="w3-bar">
                     <a href="{{ url_for('dbms_bp.update_hotel', id=hotel.id) }}" class="w3-bar-item w3-ripple" title="{{ _('Modifica questo albergo') }}"><i class="fa-solid fa-pencil icon28"></i></a>

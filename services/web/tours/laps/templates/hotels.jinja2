@@ -23,7 +23,7 @@
     {% endfor %}
     {% endif %}
 
-    {% if '_user_id' in session.keys() %}
+    {% if is_editable %}
     <div class="w3-panel w3-center w3-bar-item" style="margin-top: 30px">
         <a href="{{ url_for('dbms_bp.add_hotel') }}" class="w3-ripple" title="{{ _('Aggiungi hotel') }}"><i class="fa-solid fa-add icon28"></i></a>
     </div>

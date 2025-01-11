@@ -5,7 +5,7 @@ from flask import (
 from flask.views import View
 from sqlalchemy.exc import OperationalError, ProgrammingError
 from .. import db
-from ..models import Lap, Hotel, Tour, Media
+from ..models import Lap, Hotel, Tour, Media, Users
 from ..utils import make_header, make_short_template
 from flask_babel import _
 
@@ -46,10 +46,21 @@ def get_trip():
     return active_trip.Tour.id
 
 
-# class Index(View):
-#     def dispatch_request(self):
-#         return render_template('index.jinja2')
-#
+def is_editable():
+    if '_user_id' not in session:
+        # no user logged in
+        return False
+
+    user = db.session.get(Users, session['_user_id'])
+    if user.is_admin:
+        # the admin should be able to edit "ALL" tours
+        return True
+
+    trip = db.session.get(Tour, session['trip'])
+    if trip in user.tours:
+        return True
+    else:
+        return False
 
 
 class Laps(View):
@@ -67,7 +78,7 @@ class Laps(View):
             flash(_('Database assente! Prova più tardi'), category="error")
             return render_template('index.jinja2', header=header)
 
-        return render_template("laps.jinja2", laps=laps, stats=get_stats(laps), header=header)
+        return render_template("laps.jinja2", laps=laps, stats=get_stats(laps), header=header, is_editable=is_editable())
 
 
 class Hotels(View):
@@ -88,7 +99,7 @@ class Hotels(View):
             flash(_('Database assente! Prova più tardi'), category="error")
             return render_template('index.jinja2', header=header)
 
-        return render_template("hotels.jinja2", hotels=hotels, hotels_nb=hotels_unbound, splash_page=True, timedelta=timedelta, header=header)
+        return render_template("hotels.jinja2", hotels=hotels, hotels_nb=hotels_unbound, splash_page=True, timedelta=timedelta, header=header, is_editable=is_editable())
 
 
 class SingleLap(View):
@@ -104,7 +115,7 @@ class SingleLap(View):
         prev_lap = db.session.execute(db.select(Lap.id, Lap.start, Lap.destination).where(Lap.destination == lap.start)).fetchone()
         next_lap = db.session.execute(db.select(Lap.id, Lap.start, Lap.destination).where(Lap.start == lap.destination)).fetchone()
 
-        return render_template("lap.jinja2", laps=laps, lap=lap, prev_lap=prev_lap, next_lap=next_lap, stats=None, header=header)
+        return render_template("lap.jinja2", laps=laps, lap=lap, prev_lap=prev_lap, next_lap=next_lap, stats=None, header=header, is_editable=is_editable())
 
 
 class SingleHotel(View):
@@ -122,7 +133,7 @@ class SingleHotel(View):
         hotels_unbound = db.session.execute(db.select(Hotel).where(Hotel.lap_id == None)).all()
 
         return render_template("hotel.jinja2", header=header, hotels=hotels, hotels_nb=hotels_unbound, hotel=hotel,
-                                   timedelta=timedelta)
+                                   timedelta=timedelta, is_editable=is_editable())
 
 
 class SingleLapJS(View):
@@ -132,7 +143,7 @@ class SingleLapJS(View):
         next_lap = db.session.execute(db.select(Lap.id, Lap.start, Lap.destination).where(Lap.start == this_lap.destination)).fetchone()
 
         short_html = make_short_template("lap.jinja2")
-        return render_template(short_html, lap=this_lap, prev_lap=prev_lap, next_lap=next_lap)
+        return render_template(short_html, lap=this_lap, prev_lap=prev_lap, next_lap=next_lap, is_editable=is_editable())
 
 
 class SingleHotelJS(View):
@@ -140,7 +151,7 @@ class SingleHotelJS(View):
         this_hotel = db.session.get(Hotel, id)
 
         short_html = make_short_template("hotel.jinja2")
-        return render_template(short_html, hotel=this_hotel)
+        return render_template(short_html, hotel=this_hotel, is_editable=is_editable())
 
 
 class SingleLapMedia(View):

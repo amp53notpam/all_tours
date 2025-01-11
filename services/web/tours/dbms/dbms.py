@@ -8,10 +8,11 @@ from flask import Blueprint, render_template, redirect, request, url_for, flash,
 from flask.views import View
 from flask_login import login_required
 from flask_babel import _
+from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from werkzeug.utils import secure_filename
-from ..models import Lap, Hotel, Tour, Media
-from .forms import AddLapForm, UpdLapForm, AddHotelForm, UpdHotelForm, LoadMediaForm
+from ..models import Lap, Hotel, Tour, Media, Users
+from .forms import AddTourForm, AddLapForm, UpdLapForm, AddHotelForm, UpdHotelForm, LoadMediaForm
 from .. import db
 from ..utils import make_header
 
@@ -142,6 +143,53 @@ def register_media(id, gpx, media, caption):
         db.session.commit()
     except IntegrityError:
         current_app.logger.warning(f"Tentativo di caricare la foto {media} già caricata per la stessa tappa.")
+
+
+class AddTour(View):
+    methods = ['GET', 'POST']
+    decorators = [login_required]
+
+    def dispatch_request(self):
+        form = AddTourForm()
+
+        if request.method == 'POST':
+            title = request.form.get('title')
+            tour_mode = request.form.get('tour_mode')
+            cover = None
+            if 'tour_cover' in request.files:
+                file = request.files['tour_cover']
+                if file.filename != '' and allowed_file(file.filename):
+                    cover = secure_filename(file.filename)
+                    file.save(join(current_app.config['UPLOAD_FOLDER'], 'images', cover))
+
+            new_tour = Tour(
+                name=title,
+                trip_mode=tour_mode,
+                is_active=False,
+                owner_id=session['_user_id'],
+                carousel_pos=db.session.query(func.max(Tour.carousel_pos)).scalar() + 1
+            )
+
+            db.session.add(new_tour)
+
+            if cover:
+                new_tour.tric_pic = cover
+
+            try:
+                db.session.commit()
+            except IntegrityError:
+                flash(_("Un viaggio con nome %(titolo)s esiste già.", titolo=title))
+            else:
+                user = db.session.get(Users, session['_user_id']).scalar()
+                flash(_("Aggiunto viaggio %(titolo)s.", titolo=title), category="info")
+                current_app.logger.info(f"Aggiunta viaggio {title} da {user.username}")
+                return redirect(url_for("start"))
+
+
+        return render_template("add_tour.jinja2", form=form)
+
+
+
 
 
 class AddLap(View):
@@ -460,6 +508,7 @@ class DeleteHotel(View):
         return redirect(url_for("lap_bp.hotel_dashboard"))
 
 
+dbms_bp.add_url_rule('/trip/add/', view_func=AddTour.as_view("add_tour"))
 dbms_bp.add_url_rule('/lap/add/', view_func=AddLap.as_view("add_lap"))
 dbms_bp.add_url_rule('/lap/update/<int:id>', view_func=UpdLap.as_view("update_lap"))
 dbms_bp.add_url_rule('/lap/update/<int:id>/load_media', view_func=LoadLapMedia.as_view("load_lap_media"))

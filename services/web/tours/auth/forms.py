@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_babel import _, lazy_gettext as _l
 from wtforms import EmailField, PasswordField, SubmitField, BooleanField, SelectField, widgets
+from wtforms.fields.simple import StringField
 from wtforms.widgets import CheckboxInput, ListWidget
 from wtforms.validators import InputRequired, Email
 
@@ -12,7 +13,15 @@ class InputRequired0(InputRequired):
 
 
 class LogInForm(FlaskForm):
-    email = EmailField("", [InputRequired0(message=_l("E-mail non inserita."))])
+    username = StringField("", [InputRequired0(message=_l("Username non inserito."))])
     password = PasswordField('Password', [InputRequired0(message=_l("Password non inserita."))])
     remember = BooleanField(_l('Ricordami'))
     submit = SubmitField('Login')
+
+
+class SignUpForm(FlaskForm):
+    username = StringField("Username", [InputRequired0(message=_l("Username non inserito."))])
+    password = PasswordField('Password', [InputRequired0(message=_l("Password non inserita."))])
+    email = EmailField("E-mail", [InputRequired0(message=_l("E-mail non inserita."))])
+
+    submit = SubmitField(_l('Registrami'))

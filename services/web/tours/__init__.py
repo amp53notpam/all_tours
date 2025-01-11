@@ -68,11 +68,11 @@ def initialize_extensions(app):
     login_manager.login_view = 'auth_bp.login'
     login_manager.init_app(app)
 
-    from .models import Admin
+    from .models import Users
 
     @login_manager.user_loader
     def load_user(user_id):
-        result = db.session.get(Admin, int(user_id))
+        result = db.session.get(Users, int(user_id))
         return result
 
     babel.init_app(app, default_locale='it', locale_selector=get_locale)
@@ -147,13 +147,12 @@ def register_cli_commands(app):
     @app.cli.command('register_admins')
     def register_admins():
         """ Create the database admins"""
-        from .models import Admin
+        from .models import Users
 
         with app.app_context():
-            admins = [{'email': 'angelo@tours.org', 'password': generate_password_hash('aC%2yak*36Z?Jq')},
-                      {'email': 'cammini@tours.org', 'password': generate_password_hash('Santiago2024!')}
+            admins = [{'username': 'tourAdmin', 'password': generate_password_hash('Santiago2024!'), 'email': 'admin@tours.org', 'is_admin': True}
                       ]
-            db.session.bulk_insert_mappings(Admin, admins)
+            db.session.bulk_insert_mappings(Users, admins)
             db.session.commit()
 
     @app.cli.command('register_tours')

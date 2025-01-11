@@ -22,19 +22,16 @@ h1 {
 {% block content %}
 <div style="margin-top: 60px">
     <div class="w3-content w3-display-container" style="max-width: 800px">
+        {% for tour in tours %}
+        {% if tour.Tour.trip_pic %}
         <div class="w3-display-container mySlides" >
-		    <img src="{{ url_for('static', filename='images/santiago.jpg') }}" alt="{{ _("Santiago de Compostela - Cattedrale") }}" style="width: 100%">     {# Santiago de Compostela - Cattedrale #}
+		    <img src="{{ url_for("download_files", filename="images/"+tour.Tour.trip_pic) }}" style="width: 100%">
 		    <div class="w3-display-bottomright w3-container w3-padding-16 w3-black">
-                Santiago de Compostela
+                {{ tour.Tour.pic_caption }}
             </div>
         </div>
-
-        <div class="w3-display-container mySlides">
-		    <img src="{{ url_for('static', filename='images/berlin.jpg') }}" alt="{{ _('Berlino - Porta di Brandeburgo') }}" style="width: 100%">        {# Berlino - Porta di Brandeburgo #}
-            <div class="w3-display-bottomright w3-container w3-padding-16 w3-black">
-                Berlin
-            </div>
-        </div>
+        {% endif %}
+        {% endfor %}
 
         <button class="w3-button w3-display-left w3-black" onclick="plusDivs(-1)">&#10094;</button>
         <button class="w3-button w3-display-right w3-black" onclick="plusDivs(1)">&#10095;</button>

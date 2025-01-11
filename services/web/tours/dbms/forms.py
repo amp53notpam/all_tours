@@ -6,6 +6,13 @@ from wtforms.widgets import CheckboxInput, ListWidget
 from wtforms.validators import DataRequired
 
 
+class AddTourForm(FlaskForm):
+    title = StringField(_l('Titolo del Viaggio'), validators=[DataRequired()])
+    tour_mode = RadioField(_l('Tipo di Viaggio'), choices=[('walking', 'a piedi'), ('bicycling', 'in bicicletta'), ('driving', 'in auto')], default='walking')
+    tour_cover = photos = FileField(_l('Immagine copertina'), validators=[FileAllowed(['jpg', 'jpeg'])])
+    submit = SubmitField('OK')
+
+
 class AddLapForm(FlaskForm):
     date = StringField(_l('Data della tappa'), validators=[DataRequired()])
     start = StringField(_l('Partenza'), validators=[DataRequired()])

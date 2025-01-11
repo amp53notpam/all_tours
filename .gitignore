@@ -31,3 +31,4 @@ s_*.jinja2
 *.pot
 *.mo
 
+token
