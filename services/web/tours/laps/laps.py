@@ -99,7 +99,7 @@ class Hotels(View):
             flash(_('Database assente! Prova più tardi'), category="error")
             return render_template('index.jinja2', header=header)
 
-        return render_template("hotels.jinja2", hotels=hotels, hotels_nb=hotels_unbound, splash_page=True, timedelta=timedelta, header=header, is_editable=is_editable())
+        return render_template("hotels.jinja2", hotels=hotels, hotels_nb=hotels_unbound, splash_page=True, header=header, is_editable=is_editable())
 
 
 class SingleLap(View):
@@ -132,8 +132,7 @@ class SingleHotel(View):
                 Hotel.check_in)).all()
         hotels_unbound = db.session.execute(db.select(Hotel).where(Hotel.lap_id == None)).all()
 
-        return render_template("hotel.jinja2", header=header, hotels=hotels, hotels_nb=hotels_unbound, hotel=hotel,
-                                   timedelta=timedelta, is_editable=is_editable())
+        return render_template("hotel.jinja2", header=header, hotels=hotels, hotels_nb=hotels_unbound, hotel=hotel, is_editable=is_editable())
 
 
 class SingleLapJS(View):
@@ -151,7 +150,7 @@ class SingleHotelJS(View):
         this_hotel = db.session.get(Hotel, id)
 
         short_html = make_short_template("hotel.jinja2")
-        return render_template(short_html, hotel=this_hotel, is_editable=is_editable())
+        return render_template(short_html, hotel=this_hotel, timedelta=timedelta, is_editable=is_editable())
 
 
 class SingleLapMedia(View):
@@ -161,13 +160,13 @@ class SingleLapMedia(View):
         except KeyError:
             lang = 'it'
         header = make_header(lang)
-
+        can_edit = is_editable().__repr__()
         this_lap = db.session.get(Lap, id)
         prev_lap = db.session.execute(db.select(Lap.id, Lap.start, Lap.destination).where(Lap.destination == this_lap.start)).fetchone()
         next_lap = db.session.execute(db.select(Lap.id, Lap.start, Lap.destination).where(Lap.start == this_lap.destination)).fetchone()
         photos = db.session.execute(db.select(Media).where(Media.lap_id == id).order_by(Media.date)).fetchall()
 
-        return render_template("photos.jinja2", header=header, lap=this_lap, prev_lap=prev_lap, next_lap=next_lap, photos=photos)
+        return render_template("photos.jinja2", header=header, lap=this_lap, prev_lap=prev_lap, next_lap=next_lap, photos=photos, is_editable=can_edit)
 
 
 class SingleLapMediaJS(View):

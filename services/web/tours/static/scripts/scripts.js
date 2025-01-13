@@ -163,10 +163,13 @@ function displayPhotos(imageBox, catalog) {
 
     while (nrPic > 0 && catalog.length > 0) {
         const pic = catalog.shift();
-        console.log(pic);
+
         const widthFactor = (pic.width > pic.height) ? 100 : pic.width / pic.height * 100
         const outerDiv = document.createElement("div");
-        outerDiv.setAttribute("class", "w3-card w3-margin-top w3-border w3-border-theme w3-hover-border-theme");
+        picName = pic.src.slice(pic.src.lastIndexOf("/") + 1);
+        picId = pic.src.slice(pic.src.lastIndexOf("/") + 1, pic.src.indexOf("."));
+        picId = picId.replace(/_/g, "-")
+        setAttributes(outerDiv, {id: picId, class: "w3-card w3-margin-top w3-border w3-border-theme w3-hover-border-theme"});
         outerDiv.style.paddingTop = "16px";
         outerDiv.style.paddingLeft = "16px";
         outerDiv.style.paddingRight = "16px";
@@ -197,7 +200,7 @@ function displayPhotos(imageBox, catalog) {
         const caption = document.createElement("p");
         caption.setAttribute("class", "w3-large");
         caption.textContent = pic.caption;
-        if ( pic.lat && pic.long) {
+        if ( pic.lat && pic.long && ! IS_EDITABLE) {
             const mapRef = document.createElement("a");
             setAttributes(mapRef, {target: "_blank", href: pic.map, class: "w3-hover-theme-d3 w3-right"});
             const mapSym = document.createElement("i");
@@ -205,10 +208,21 @@ function displayPhotos(imageBox, catalog) {
             mapRef.appendChild(mapSym);
             caption.appendChild(mapRef);
         }
-        innerDiv.appendChild(caption)
-        outerDiv.appendChild(innerDiv)
-        imageBox.appendChild(outerDiv)
-        nrPic--
+        if (IS_EDITABLE) {
+            const deleteRef = document.createElement("p");
+            deleteRef.setAttribute("class", "w3-right")
+            const deleteSym = document.createElement("i");
+            deleteSym.setAttribute("class", "fa-solid fa-trash-can icon28");
+            deleteSym.dataset.picName = picName;
+            deleteSym.dataset.picId = picId;
+            deleteRef.appendChild(deleteSym);
+            caption.appendChild(deleteRef);
+            deleteRef.addEventListener("click", delete_media);
+        }
+        innerDiv.appendChild(caption);
+        outerDiv.appendChild(innerDiv);
+        imageBox.appendChild(outerDiv);
+        nrPic--;
     };
 
     if (catalog.length > 0) {
@@ -234,6 +248,19 @@ function displayMorePictures(evt) {
     displayPhotos(imageBox, catalog);
 }
 
+async function delete_media(evt) {
+    console.log(evt.target.dataset.picName, evt.target.dataset.picId);
+    const container = document.querySelector(`#${evt.target.dataset.picId}`);
+    console.log(container);
+    const requestURL = DELETE_MEDIA.replace("tbd", `${evt.target.dataset.picName}`);
+
+    const request = new Request(requestURL);
+    const response = await fetch(request);
+    const  result = await response.json();
+
+    container.style.display = "none";
+
+}
 
 const buttons = document.querySelectorAll("button");
 

@@ -9,7 +9,8 @@ from wtforms.validators import DataRequired
 class AddTourForm(FlaskForm):
     title = StringField(_l('Titolo del Viaggio'), validators=[DataRequired()])
     tour_mode = RadioField(_l('Tipo di Viaggio'), choices=[('walking', 'a piedi'), ('bicycling', 'in bicicletta'), ('driving', 'in auto')], default='walking')
-    tour_cover = photos = FileField(_l('Immagine copertina'), validators=[FileAllowed(['jpg', 'jpeg'])])
+    tour_cover = FileField(_l('Immagine copertina'), validators=[FileAllowed(['jpg', 'jpeg'])])
+    caption = StringField(_l('Didascalia'), [validators.length(max=96)])
     submit = SubmitField('OK')
 
 
@@ -32,7 +33,6 @@ class UpdLapForm(FlaskForm):
     descent = IntegerField(_l('Dislivello discesa'))
     duration = StringField(_l('Tempo'))
     gpx = FileField(_l("Traccia gpx (.gpx)"), validators=[FileAllowed(['gpx'])])
-    photos = FileField(_l('Foto'), validators=[FileAllowed(['jpg', 'jpeg', 'mov'])])
     done = BooleanField(_l('OK è fatta!'))
     submit = SubmitField('OK')
 

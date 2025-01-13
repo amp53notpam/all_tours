@@ -53,7 +53,7 @@ RUN mkdir -p ${APP_HOME} && mkdir ${APP_HOME}/logs
 WORKDIR $APP_HOME
 
 # install dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends netcat-openbsd imagemagick && apt-get purge expat
+RUN apt-get update && apt-get install -y --no-install-recommends netcat-openbsd imagemagick libimage-exiftool-perl && apt-get purge expat
 COPY --from=builder /usr/src/app/wheels /wheels
 COPY --from=builder /usr/src/app/requirements.txt .
 RUN pip install --upgrade pip
@@ -73,7 +73,7 @@ USER flasker
 
 EXPOSE 10000
 
-CMD  ["gunicorn", "--workers", "2", "--bind", "0.0.0.0:10000", "wsgi:app", "--timeout", "60", "--access-logfile", "/home/flasker/web/logs/gunicorn-access.log", "--error-logfile", "/home/flasker/web/logs/gunicorn-error.log"]
+CMD  ["gunicorn", "--workers", "2", "--bind", "0.0.0.0:10000", "wsgi:app", "--timeout", "60", "--access-logfile", "/home/flasker/web/logs/gunicorn-access.log", "--error-logfile", "/home/flasker/web/logs/gunicorn-error.log", "--timeout", "60"]
 
 # run entrypoint.sh
 ENTRYPOINT ["/home/flasker/web/entrypoint.sh"]

@@ -1,10 +1,10 @@
 from os import remove
 from os.path import join
-from datetime import datetime, date, time
+from datetime import datetime, date, time, timedelta
 from re import compile
 from subprocess import Popen, PIPE, STDOUT
 from shlex import split
-from flask import Blueprint, render_template, redirect, request, url_for, flash, current_app, session
+from flask import Blueprint, render_template, redirect, request, url_for, flash, current_app, session, jsonify
 from flask.views import View
 from flask_login import login_required
 from flask_babel import _
@@ -99,7 +99,7 @@ def register_media(id, gpx, media, caption):
         media_height = meta['ImageHeight'] if 'ImageHeight' in meta else 0
         media_width = meta['ImageWidth'] if 'ImageWidth' in meta else 0
 
-        Popen(split(f"convert {media_fp} -resize {(lambda x: 1024 / max(x) * 100)([media_height, media_width])} % {media_fp}")).wait()
+        Popen(split(f"convert {media_fp} -resize {(lambda x: 1024 / max(x) * 100)([media_height, media_width])}% {media_fp}")).wait()
 
     p = Popen(split(f"exiftool -s2 -n -imageheight -imagewidth -orientation -rotation -gpslatitude -gpslongitude {media_fp}"), stdout=PIPE, stderr=STDOUT, encoding="utf-8")
     meta, error = p.communicate()
@@ -155,6 +155,7 @@ class AddTour(View):
         if request.method == 'POST':
             title = request.form.get('title')
             tour_mode = request.form.get('tour_mode')
+            caption = request.form.get('caption')
             cover = None
             if 'tour_cover' in request.files:
                 file = request.files['tour_cover']
@@ -173,23 +174,21 @@ class AddTour(View):
             db.session.add(new_tour)
 
             if cover:
-                new_tour.tric_pic = cover
+                new_tour.trip_pic = cover
+            if caption:
+                new_tour.pic_caption = caption
 
             try:
                 db.session.commit()
             except IntegrityError:
                 flash(_("Un viaggio con nome %(titolo)s esiste già.", titolo=title))
             else:
-                user = db.session.get(Users, session['_user_id']).scalar()
+                user = db.session.get(Users, session['_user_id'])
                 flash(_("Aggiunto viaggio %(titolo)s.", titolo=title), category="info")
                 current_app.logger.info(f"Aggiunta viaggio {title} da {user.username}")
                 return redirect(url_for("start"))
 
-
         return render_template("add_tour.jinja2", form=form)
-
-
-
 
 
 class AddLap(View):
@@ -233,9 +232,18 @@ class AddLap(View):
                 new_lap.duration = tempo
             if gpx:
                 new_lap.gpx = gpx
+
             db.session.commit()
             flash(_("Aggiunta tappa %(partenza)s - %(arrivo)s.", partenza=partenza, arrivo=arrivo), category="info")
             current_app.logger.info(f"Aggiunta tappa {partenza} - {arrivo}.")
+
+            lap_id = db.session.execute(db.select(Lap.id).where(Lap.start == partenza).where(Lap.destination == arrivo)).scalar()
+            hotels = db.session.execute(db.select(Hotel).where(Hotel.check_in == data)).scalars()
+            if hotels:
+                for hotel in hotels:
+                    hotel.lap_id = lap_id
+            db.session.commit()
+
             return redirect(url_for("lap_bp.lap_dashboard"))
 
         header = make_header(session['lang'])
@@ -348,6 +356,22 @@ class DeleteLap(View):
         flash(_('Cancellata tappa %(start)s - %(destination)s.', start=lap.start, destination=lap.destination), category='info')
         current_app.logger.info(f"Cancellata tappa {lap.start} - {lap.destination}")
         return redirect(url_for("lap_bp.lap_dashboard"))
+
+
+class DeleteMedia(View):
+    decorators = [login_required]
+
+    def dispatch_request(self, media):
+        md = db.session.execute(db.select(Media).where(Media.media_src == media)).scalar()
+        try:
+            remove(join(current_app.config['UPLOAD_FOLDER'], 'images', media))
+        except FileNotFoundError:
+            pass
+        db.session.delete(md)
+        db.session.commit()
+
+        return jsonify("Done")
+
 
 
 class AddHotel(View):
@@ -490,7 +514,7 @@ class UpdHotel(View):
 
         hotel = db.session.get(Hotel, id)
         header = make_header(session['lang'])
-        return render_template("upd_hotel.jinja2", form=form, hotel=hotel, header=header)
+        return render_template("upd_hotel.jinja2", form=form, hotel=hotel, timedelta=timedelta, header=header)
 
 
 class DeleteHotel(View):
@@ -513,6 +537,7 @@ dbms_bp.add_url_rule('/lap/add/', view_func=AddLap.as_view("add_lap"))
 dbms_bp.add_url_rule('/lap/update/<int:id>', view_func=UpdLap.as_view("update_lap"))
 dbms_bp.add_url_rule('/lap/update/<int:id>/load_media', view_func=LoadLapMedia.as_view("load_lap_media"))
 dbms_bp.add_url_rule('/lap/delete/<int:id>', view_func=DeleteLap.as_view('delete_lap'))
+dbms_bp.add_url_rule('/media/delete/<string:media>', view_func=DeleteMedia.as_view('delete_media'))
 dbms_bp.add_url_rule('/hotel/add/', view_func=AddHotel.as_view("add_hotel"))
 dbms_bp.add_url_rule('/hotel/update/<int:id>', view_func=UpdHotel.as_view("update_hotel"))
 dbms_bp.add_url_rule('/hotel/delete/<int:id>', view_func=DeleteHotel.as_view('delete_hotel'))

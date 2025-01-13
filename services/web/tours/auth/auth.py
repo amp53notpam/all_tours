@@ -35,6 +35,7 @@ class Login(View):
                 flash(_('E-mail o password errate! Riprova...'), category='error')
                 return redirect(url_for('auth_bp.login'))
             login_user(user, remember=remember)
+            session['_username'] = username
             current_app.session_interface.regenerate(session)
             current_app.logger.info(f"Login utente {username}")
             return redirect(url_for('start'))
@@ -90,6 +91,7 @@ class Logout(View):
     def dispatch_request(self):
         current_app.logger.info(f"Logout utente {current_user.username}")
         logout_user()
+        session.pop('_username')
         return redirect(url_for('start'))
 
 

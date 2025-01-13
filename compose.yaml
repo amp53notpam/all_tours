@@ -8,10 +8,11 @@ services:
                 - angelo53/amptours:latest
         container_name: amptours
         command: >-
-                  gunicorn --worker-class gthread --workers 4
+                  gunicorn --worker-class gthread --workers 2
                   --bind 0.0.0.0:10000 wsgi:app
                   --access-logfile /home/flasker/web/logs/gunicorn-access.log
                   --error-logfile /home/flasker/web/logs/gunicorn-error.log
+                  --timeout 60
         ports:
             - 5000:10000
         extra_hosts:
