@@ -8,7 +8,7 @@ from flask_babel import _
 from .models import Tour, Lap
 
 
-def make_header(lang):
+def make_header():
     if 'trip' in session:
         # trip = db.session.execute(db.select(Tour.id).where(Tour.id == session['trip'])).scalar()
         trip = session['trip']

@@ -32,3 +32,4 @@ s_*.jinja2
 *.mo
 
 token
+logs

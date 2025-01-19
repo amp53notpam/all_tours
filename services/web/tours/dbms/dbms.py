@@ -246,7 +246,7 @@ class AddLap(View):
 
             return redirect(url_for("lap_bp.lap_dashboard"))
 
-        header = make_header(session['lang'])
+        header = make_header()
         return render_template("add_lap.jinja2", form=form, header=header)
 
 
@@ -307,7 +307,7 @@ class UpdLap(View):
             return redirect(url_for("lap_bp.lap_dashboard"))
 
         lap = db.session.get(Lap, id)
-        header = make_header(session['lang'])
+        header = make_header()
         return render_template("upd_lap.jinja2", form=form, lap=lap, header=header)
 
 
@@ -339,7 +339,7 @@ class LoadLapMedia(View):
             return redirect(url_for("lap_bp.lap", id=id))
 
         lap = db.session.get(Lap, id)
-        header = make_header(session['lang'])
+        header = make_header()
         return render_template("load_media.jinja2", form=form, lap=lap, header=header)
 
 
@@ -363,15 +363,19 @@ class DeleteMedia(View):
 
     def dispatch_request(self, media):
         md = db.session.execute(db.select(Media).where(Media.media_src == media)).scalar()
+        lap_id = md.lap_id
         try:
             remove(join(current_app.config['UPLOAD_FOLDER'], 'images', media))
         except FileNotFoundError:
             pass
         db.session.delete(md)
         db.session.commit()
+        if not db.session.execute(db.select(func.count(Media.id)).where(Media.lap_id == lap_id)).scalar():
+            lap = db.session.get(Lap, lap_id)
+            lap.has_photos = False
+            db.session.commit()
 
         return jsonify("Done")
-
 
 
 class AddHotel(View):
@@ -446,7 +450,7 @@ class AddHotel(View):
             current_app.logger.info(f"Aggiunto albergo {name} a {town}.")
             return redirect(url_for("lap_bp.hotel_dashboard"))
 
-        header = make_header(session['lang'])
+        header = make_header()
         return render_template("add_hotel.jinja2", form=form, header=header)
 
 
@@ -513,7 +517,7 @@ class UpdHotel(View):
             return redirect(url_for("lap_bp.hotel_dashboard"))
 
         hotel = db.session.get(Hotel, id)
-        header = make_header(session['lang'])
+        header = make_header()
         return render_template("upd_hotel.jinja2", form=form, hotel=hotel, timedelta=timedelta, header=header)
 
 

@@ -3,25 +3,30 @@ from flask_babel import _, lazy_gettext as _l
 from wtforms import EmailField, PasswordField, SubmitField, BooleanField, SelectField, widgets
 from wtforms.fields.simple import StringField
 from wtforms.widgets import CheckboxInput, ListWidget
-from wtforms.validators import InputRequired, Email
-
-
-class InputRequired0(InputRequired):
-    def __init__(self, message=None):
-        super().__init__(message=message)
-        self.field_flags = {"required": False}
+from wtforms.validators import Email, EqualTo
 
 
 class LogInForm(FlaskForm):
-    username = StringField("", [InputRequired0(message=_l("Username non inserito."))])
-    password = PasswordField('Password', [InputRequired0(message=_l("Password non inserita."))])
+    username = StringField("Username" )
+    password = PasswordField('Password')
     remember = BooleanField(_l('Ricordami'))
     submit = SubmitField('Login')
 
 
 class SignUpForm(FlaskForm):
-    username = StringField("Username", [InputRequired0(message=_l("Username non inserito."))])
-    password = PasswordField('Password', [InputRequired0(message=_l("Password non inserita."))])
-    email = EmailField("E-mail", [InputRequired0(message=_l("E-mail non inserita."))])
-
+    username = StringField("Username")
+    password = PasswordField('Password', [EqualTo('vfy_password', message=_l('Le passwords non coincidono'))])
+    vfy_password = PasswordField('Conferma')
+    email = EmailField("E-mail", [Email(message=_l('E-mail non valida'))])
     submit = SubmitField(_l('Registrami'))
+
+
+class LostPasswordForm(FlaskForm):
+    username = StringField("Username")
+    submit = SubmitField('Invia')
+
+
+class ResetPasswordForm(FlaskForm):
+    new_password = PasswordField('Nuova Password', [EqualTo('vfy_password', message=_l('Le passwords non coincidono'))])
+    vfy_password = PasswordField('Conferma')
+    submit = SubmitField('Invia')

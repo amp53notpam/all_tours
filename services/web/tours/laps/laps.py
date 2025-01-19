@@ -65,11 +65,7 @@ def is_editable():
 
 class Laps(View):
     def dispatch_request(self):
-        try:
-            lang = session['lang']
-        except KeyError:
-            lang = 'it'
-        header = make_header(lang)
+        header = make_header()
 
         try:
             trip_id = get_trip()
@@ -83,11 +79,7 @@ class Laps(View):
 
 class Hotels(View):
     def dispatch_request(self):
-        try:
-            lang = session['lang']
-        except KeyError:
-            lang = 'it'
-        header = make_header(lang)
+        header = make_header()
 
         try:
             trip_id = get_trip()
@@ -104,11 +96,7 @@ class Hotels(View):
 
 class SingleLap(View):
     def dispatch_request(self, id):
-        try:
-            lang = session['lang']
-        except KeyError:
-            lang = 'it'
-        header = make_header(lang)
+        header = make_header()
 
         lap = db.session.get(Lap, id)
         laps = db.session.execute(db.select(Lap).where(Lap.tour_id == lap.tour_id).order_by(Lap.date)).all()
@@ -120,11 +108,7 @@ class SingleLap(View):
 
 class SingleHotel(View):
     def dispatch_request(self, id):
-        try:
-            lang = session['lang']
-        except KeyError:
-            lang = 'it'
-        header = make_header(lang)
+        header = make_header()
 
         hotel = db.session.get(Hotel, id)
         hotels = db.session.execute(
@@ -155,11 +139,7 @@ class SingleHotelJS(View):
 
 class SingleLapMedia(View):
     def dispatch_request(self, id):
-        try:
-            lang = session['lang']
-        except KeyError:
-            lang = 'it'
-        header = make_header(lang)
+        header = make_header()
         can_edit = is_editable().__repr__()
         this_lap = db.session.get(Lap, id)
         prev_lap = db.session.execute(db.select(Lap.id, Lap.start, Lap.destination).where(Lap.destination == this_lap.start)).fetchone()

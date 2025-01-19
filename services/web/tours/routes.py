@@ -38,8 +38,8 @@ class Start(View):
 
         if 'lang' not in session:
             session['lang'] = 'it'
-            session['locale'] = "it_IT"
-        setlocale(LC_ALL, f"{session['locale']}.UTF-8")
+            session['locale'] = "it_IT.UTF-8"
+        setlocale(LC_ALL, f"{session['locale']}")
         tours = db.session.execute(db.select(Tour).order_by(Tour.id)).all()
         form.trip.choices = [("", _("Scegli un viaggio"), {"disabled": "disabled"})]
         form.trip.choices.extend([(tour.Tour.id, tour.Tour.name + " " + translations[tour.Tour.trip_mode], dict()) for tour in tours])
@@ -47,7 +47,7 @@ class Start(View):
         form.trip.default = ""
         form.process([])
 
-        header = make_header(session['lang'])
+        header = make_header()
         lang_selector = make_dd_lang(session['lang'])
         tours = tours = db.session.execute(db.select(Tour).order_by(Tour.carousel_pos)).fetchall()
         if 'trip' not in session:

@@ -5,28 +5,84 @@
 {% endblock %}
 
 {% block content %}
-<div class="w3-card-4" style="max-width: 400px; margin: auto; margin-top: 80px">
-    <div class="w3-container">
+<div class="w3-card-4" style="max-width: 480px; margin: auto; margin-top: 80px">
+    <div class="w3-container w3-padding-24">
     <h2 class="w3-theme-d2 w3-center">Login</h2>
     </div>
     <form method="POST">
         {{ form.csrf_token }}
-        <p>
-        {{ form.username(class="w3-input w3-theme-l4", placeholder="Username", style="width: 90%; margin-left: 5%") }}
+        <p class="tooltip">
+        {{ form.username( class="w3-input w3-theme-l4", placeholder="Username", style="width: 90%; margin-left: 5%") }}
+        <span class="w3-monospace tooltiptext_login"></span>
         </p>
-        <p>
-        {{ form.password(class="w3-input w3-theme-l4", placeholder="Password", style="width: 90%; margin-left: 5%") }}
+        <p class="tooltip">
+        {{ form.password(class="w3-input w3-theme-l4", placeholder="Password", style="width:90%; margin-left: 5%") }}
+        <i class="fa-regular fa-eye-slash w3-right" id="toggle-password"></i>
+        <span class="w3-monospace tooltiptext_login"></span>
         </p>
         <p>
         {{ form.remember(class="w3-center w3-theme-l4", style="margin-left: 40%") }} {{ form.remember.label }}
         </p>
-        <p>
-        {{ form.submit(class="w3-button w3-block w3-theme-action w3-hover-theme-d2 w3-ripple w3-center") }}
+        <p class="w3-center">
+        {{ form.submit(class="w3-button w3-theme-action w3-hover-theme-d2 w3-ripple w3-center", style="width: 30%") }}
         </p>
     </form>
     <div class="w3-container">
-    <p class="w3-small">{{ _('oppure') }}<span class="w3-center w3-margin-left"><a href="{{ url_for('auth_bp.signup') }}" class="w3-large w3-ripple w3-hover-theme" style:"vertical-align: baseline;">{{ _('Registrati') }}</a></span><p>
+        <p class="w3-small">{{ _('oppure') }}<span class="w3-center w3-margin-left"><a href="{{ url_for('auth_bp.signup') }}" class="w3-large w3-ripple w3-hover-theme" style="vertical-align: baseline;">{{ _('Registrati') }}</a></span><p>
+    </div>
+    <div class="w3-container">
+    <a href="{{ url_for('auth_bp.lost_passwd') }}" class="w3-small, w3-ripple, w3-hover-theme"><p class="w3-small w3-right">Password dimenticata?</p></a>
     </div>
 </div>
 
+{% endblock %}
+
+{% block scripts %}
+<script>
+const togglePassword = document.querySelector("#toggle-password");
+const password = document.querySelector("#password");
+
+togglePassword.addEventListener("click", () => {
+    const type = password.getAttribute("type") === "password" ? "text" : "password";
+    password.setAttribute("type", type);
+
+    togglePassword.classList.toggle("fa-eye");
+    });
+
+const bg_color = getComputedStyle(document.querySelector(":root"));
+const form = document.querySelector("form");
+form.addEventListener("submit", checkInput);
+
+function resetTooltip(tooltip) {
+    tooltip.textContent = "";
+    tooltip.style.backgroundColor = bg_color.getPropertyValue('--th-l4');
+    tooltip.style.display= "none";
+}
+
+function checkInput(evt) {
+    const username = document.querySelector("#username");
+    const password = document.querySelector("#password");
+
+    let tooltip
+    tooltip = document.querySelector("#username + span");
+    if (! username.value){
+        tooltip.textContent = "{{ _('Username non inserito') }}";
+        tooltip.style.backgroundColor = bg_color.getPropertyValue('--th-l3');
+        tooltip.style.display = "block";
+        evt.preventDefault()
+    } else {
+        resetTooltip(tooltip)
+    }
+
+    tooltip = document.querySelector("#password ~ span");
+    if (! password.value){
+        tooltip.textContent = "{{ _('Password non inserita') }}";
+        tooltip.style.backgroundColor = bg_color.getPropertyValue('--th-l3');
+        tooltip.style.display = "block";
+        evt.preventDefault()
+    } else {
+        resetTooltip(tooltip)
+    }
+}
+</script>
 {% endblock %}

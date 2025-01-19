@@ -15,6 +15,7 @@ from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_session import Session
 from flask_babel import Babel
+from flask_mail import Mail
 from sqlalchemy.orm import DeclarativeBase
 from werkzeug.security import generate_password_hash
 
@@ -28,6 +29,7 @@ migrate = Migrate()
 login_manager = LoginManager()
 sess = Session()
 babel = Babel()
+mail = Mail()
 
 
 def create_app(test_config=None):
@@ -64,6 +66,7 @@ def initialize_extensions(app):
     db.init_app(app)
     migrate.init_app(app, db)
     sess.init_app(app)
+    mail.init_app(app)
 
     login_manager.login_view = 'auth_bp.login'
     login_manager.init_app(app)
