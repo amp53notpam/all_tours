@@ -1,5 +1,6 @@
 from os import environ, path
 from dotenv import load_dotenv
+from datetime import timedelta
 from tours import db
 
 
@@ -28,7 +29,8 @@ class DevelopmentConfig:
 
     # server-side sessions from flask-session
     SESSION_TYPE = "sqlalchemy"
-    SESSION_PERMANENT = False
+    SESSION_PERMANENT = True
+    PERMANENT_SESSION_LIFETIME = timedelta(days=2)
     SESSION_SERIALIZATION_FORMAT = "msgpack"
     SESSION_SQLALCHEMY = db
     SESSION_SQLALCHEMY_TABLE = 'tour_session'

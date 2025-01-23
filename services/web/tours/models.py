@@ -24,11 +24,13 @@ class Tour(db.Model):
     trip_mode: Mapped[TripMode] = mapped_column(Enum("walking", "bicycling", "driving", name="mode_enum", native_enum=True), default="walking")
     name: Mapped[str] = mapped_column(String(64))
     is_active: Mapped[bool] = mapped_column(BOOLEAN, default=False)
+    is_visible: Mapped[Optional[bool]] = mapped_column(BOOLEAN, default=True)
     trip_pic: Mapped[Optional[str]] = mapped_column(String(96))
     pic_caption: Mapped[Optional[str]] = mapped_column(String(128))
     carousel_pos: Mapped[Optional[int]]
     owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     owner: Mapped["Users"] = relationship(back_populates="tours")
+
     __table_args__ = (UniqueConstraint('name', 'trip_mode', name='name_mode_uc'),)
 
     def __repr__(self) -> str:
@@ -71,6 +73,7 @@ class Hotel(db.Model):
     photo: Mapped[Optional[str]] = mapped_column(String(48))
     link: Mapped[Optional[str]]
     lap_id: Mapped[int] = mapped_column(ForeignKey("lap.id", ondelete="set null"), nullable=True)
+    tour_id: Mapped[int] = mapped_column(ForeignKey("tour.id", ondelete="cascade"))
     lap: Mapped["Lap"] = relationship(back_populates="hotels")
 
     def __repr__(self) -> str:

@@ -8,9 +8,8 @@ from .models import Tour, Hotel
 from .forms import SelectTripForm
 from flask.views import View
 from subprocess import Popen, STDOUT, PIPE
-from .utils import make_header, make_dd_lang
+from .utils import make_header, make_dd_lang, is_displayable, translations
 
-translations = {'bicycling': _('in bici'), 'walking': _('a piedi'), 'driving': _('in auto')}
 
 
 class Start(View):
@@ -40,20 +39,26 @@ class Start(View):
             session['lang'] = 'it'
             session['locale'] = "it_IT.UTF-8"
         setlocale(LC_ALL, f"{session['locale']}")
-        tours = db.session.execute(db.select(Tour).order_by(Tour.id)).all()
+        tours = db.session.execute(db.select(Tour).order_by(Tour.id)).scalars()
         form.trip.choices = [("", _("Scegli un viaggio"), {"disabled": "disabled"})]
-        form.trip.choices.extend([(tour.Tour.id, tour.Tour.name + " " + translations[tour.Tour.trip_mode], dict()) for tour in tours])
+        form.trip.choices.extend([(tour.id, tour.name + " " + translations[tour.trip_mode], dict()) for tour in tours if is_displayable(tour)])
         form.trip.choices.append(("add_tour", _("Nuovo Viaggio"), {}))
         form.trip.default = ""
         form.process([])
 
         header = make_header()
         lang_selector = make_dd_lang(session['lang'])
-        tours = tours = db.session.execute(db.select(Tour).order_by(Tour.carousel_pos)).fetchall()
-        if 'trip' not in session:
-            carousel_pos = 1
-        else:
-            carousel_pos = db.session.execute(db.select(Tour.carousel_pos).where(Tour.is_active)).scalar()
+        tours = db.session.execute(db.select(Tour).order_by(Tour.carousel_pos)).fetchall()
+        for tour in tours:
+            tour.Tour.is_displayable = is_displayable(tour.Tour)
+        carousel_pos = 1
+        ts = tours[:]
+        for tour in tours:
+            if tour.Tour.is_displayable:
+                if tour.Tour.is_active:
+                    carousel_pos = ts.index(tour) + 1
+            else:
+                ts.pop(ts.index(tour))
 
         return render_template("index.jinja2", form=form, header=header, lang_selector=lang_selector, tours=tours, carousel_pos=carousel_pos)
 

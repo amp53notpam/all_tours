@@ -86,7 +86,9 @@ class Hotels(View):
             hotels = db.session.execute(
                 db.select(Hotel).join(Lap, Hotel.lap_id == Lap.id).where(Lap.tour_id == trip_id).order_by(
                     Hotel.check_in)).all()
-            hotels_unbound = db.session.execute(db.select(Hotel).where(Hotel.lap_id == None)).all()
+            hotels_unbound = None
+            if session['_user_id'] and int(session['_user_id']) == db.session.execute(db.select(Tour).where(Tour.is_active)).scalar().owner.id:
+                hotels_unbound = db.session.execute(db.select(Hotel).where(Hotel.lap_id == None).where(Hotel.tour_id == trip_id)).all()
         except (OperationalError, ProgrammingError):
             flash(_('Database assente! Prova più tardi'), category="error")
             return render_template('index.jinja2', header=header)

@@ -30,6 +30,9 @@
 		<a id="open_nav" href="javascript: void(0)" class="w3-bar-item w3-button w3-ripple w3-hover-theme w3-hide-medium w3-hide-large"><i class="fa solid fa-bars fa-lg"></i></a>
 		<a href="{{ url_for('start') }}" class="w3-bar-item w3-ripple w3-button w3-hover-theme">Home</a>
 
+        {% if '_user_id' in session and session['tours'] %}
+        <a href="{{ url_for('dbms_bp.tour_mng') }}" class="w3-bar-item w3-button w3-ripple w3-hover-theme w3-hide-small w3-mobile">{{ _('Viaggi') }}</a>
+        {% endif %}
 		{% if 'trip' in session.keys() %}
 		<a href="{{ url_for('lap_bp.lap_dashboard') }}" class="w3-bar-item w3-button w3-ripple w3-hover-theme w3-hide-small w3-mobile">{{ _('Tappe') }}</a>
 		<a href="{{ url_for('lap_bp.hotel_dashboard') }}" class="w3-bar-item w3-button w3-ripple w3-hover-theme w3-hide-small w3-mobile">{{ _('Alberghi') }}</a>

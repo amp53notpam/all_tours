@@ -20,10 +20,11 @@ h1 {
 {% endblock %}
 
 {% block content %}
+
 <div style="margin-top: 60px">
     <div class="w3-content w3-display-container" style="max-width: 800px">
         {% for tour in tours %}
-        {% if tour.Tour.trip_pic %}
+        {% if tour.Tour.trip_pic and tour.Tour.is_displayable %}
         <div class="w3-display-container mySlides" >
 		    <img src="{{ url_for("download_files", filename="images/"+tour.Tour.trip_pic) }}" style="width: 100%">
 		    <div class="w3-display-bottomright w3-container w3-padding-16 w3-black">
@@ -37,7 +38,7 @@ h1 {
         <button class="w3-button w3-display-right w3-black" onclick="plusDivs(1)">&#10095;</button>
 
     </div>
-    <div class="w3-content" style="margin-top: 60px; max-width: 500px">
+    <div class="w3-content" style="margin-top: 60px; max-width: 600px">
     <form method="POST">
     {{ form.csrf_token }}
     <p class="w3-center">

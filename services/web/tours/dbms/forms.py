@@ -1,17 +1,8 @@
 from flask_wtf import FlaskForm
 from flask_babel import lazy_gettext as _l
 from flask_wtf.file import FileField, MultipleFileField, FileRequired, FileAllowed
-from wtforms import StringField, IntegerField, FloatField, SubmitField, URLField, BooleanField, EmailField, TelField, RadioField, validators
-from wtforms.widgets import CheckboxInput, ListWidget
+from wtforms import StringField, IntegerField, FloatField, SubmitField, URLField, BooleanField, EmailField, TelField, RadioField, SelectField, validators
 from wtforms.validators import DataRequired
-
-
-class AddTourForm(FlaskForm):
-    title = StringField(_l('Titolo del Viaggio'), validators=[DataRequired()])
-    tour_mode = RadioField(_l('Tipo di Viaggio'), choices=[('walking', 'a piedi'), ('bicycling', 'in bicicletta'), ('driving', 'in auto')], default='walking')
-    tour_cover = FileField(_l('Immagine copertina'), validators=[FileAllowed(['jpg', 'jpeg'])])
-    caption = StringField(_l('Didascalia'), [validators.length(max=96)])
-    submit = SubmitField('OK')
 
 
 class AddLapForm(FlaskForm):
@@ -72,3 +63,22 @@ class UpdHotelForm(FlaskForm):
     website = URLField(_l("Sito web"))
     reserved = BooleanField(_l('È prenotato'))
     submit = SubmitField('OK')
+
+
+class AddTourForm(FlaskForm):
+    title = StringField(_l('Titolo del Viaggio'), validators=[DataRequired()])
+    tour_mode = RadioField(_l('Tipo di Viaggio'), choices=[('walking', 'a piedi'), ('bicycling', 'in bicicletta'), ('driving', 'in auto')], default='walking')
+    visibility = RadioField(_l('Visibilità'), choices=[('visible', _l('Totale')), ('hidden', _l('Ristretta'))], default='visible')
+    tour_cover = FileField(_l('Immagine copertina'), validators=[FileAllowed(['jpg', 'jpeg'])])
+    caption = StringField(_l('Didascalia'), [validators.length(max=96)])
+    submit = SubmitField('OK')
+
+
+class TourMgmtForm(FlaskForm):
+    tour = SelectField(_l("Viaggio"))
+    visibility = RadioField(_l('Visibilità'), choices=[('visible', _l('Totale')), ('hidden', _l('Ristretta'))])
+    tour_cover = FileField(_l('Immagine copertina'), validators=[FileAllowed(['jpg', 'jpeg'])])
+    caption = StringField(_l('Didascalia'), [validators.length(max=96)])
+    submit = SubmitField('Modifica')
+    submit_del = SubmitField(_l('Cancella'))
+

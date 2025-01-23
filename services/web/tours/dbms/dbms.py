@@ -4,7 +4,8 @@ from datetime import datetime, date, time, timedelta
 from re import compile
 from subprocess import Popen, PIPE, STDOUT
 from shlex import split
-from flask import Blueprint, render_template, redirect, request, url_for, flash, current_app, session, jsonify
+from flask import Blueprint, render_template, redirect, request, url_for, flash, current_app, session, jsonify, \
+    typing as ft
 from flask.views import View
 from flask_login import login_required
 from flask_babel import _
@@ -12,9 +13,9 @@ from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from werkzeug.utils import secure_filename
 from ..models import Lap, Hotel, Tour, Media, Users
-from .forms import AddTourForm, AddLapForm, UpdLapForm, AddHotelForm, UpdHotelForm, LoadMediaForm
+from .forms import AddTourForm, AddLapForm, UpdLapForm, AddHotelForm, UpdHotelForm, LoadMediaForm, TourMgmtForm
 from .. import db
-from ..utils import make_header
+from ..utils import make_header, translations
 
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'webp', 'gpx', 'mp4'}
 
@@ -143,52 +144,6 @@ def register_media(id, gpx, media, caption):
         db.session.commit()
     except IntegrityError:
         current_app.logger.warning(f"Tentativo di caricare la foto {media} già caricata per la stessa tappa.")
-
-
-class AddTour(View):
-    methods = ['GET', 'POST']
-    decorators = [login_required]
-
-    def dispatch_request(self):
-        form = AddTourForm()
-
-        if request.method == 'POST':
-            title = request.form.get('title')
-            tour_mode = request.form.get('tour_mode')
-            caption = request.form.get('caption')
-            cover = None
-            if 'tour_cover' in request.files:
-                file = request.files['tour_cover']
-                if file.filename != '' and allowed_file(file.filename):
-                    cover = secure_filename(file.filename)
-                    file.save(join(current_app.config['UPLOAD_FOLDER'], 'images', cover))
-
-            new_tour = Tour(
-                name=title,
-                trip_mode=tour_mode,
-                is_active=False,
-                owner_id=session['_user_id'],
-                carousel_pos=db.session.query(func.max(Tour.carousel_pos)).scalar() + 1
-            )
-
-            db.session.add(new_tour)
-
-            if cover:
-                new_tour.trip_pic = cover
-            if caption:
-                new_tour.pic_caption = caption
-
-            try:
-                db.session.commit()
-            except IntegrityError:
-                flash(_("Un viaggio con nome %(titolo)s esiste già.", titolo=title))
-            else:
-                user = db.session.get(Users, session['_user_id'])
-                flash(_("Aggiunto viaggio %(titolo)s.", titolo=title), category="info")
-                current_app.logger.info(f"Aggiunta viaggio {title} da {user.username}")
-                return redirect(url_for("start"))
-
-        return render_template("add_tour.jinja2", form=form)
 
 
 class AddLap(View):
@@ -444,6 +399,7 @@ class AddHotel(View):
             new_hotel.reserved = reserved
             if photo:
                 new_hotel.photo = photo
+            new_hotel.tour_id = db.session.execute(db.select(Tour).where(Tour.is_active)).scalar().id
 
             db.session.commit()
             flash(_('Aggiunto albergo %(name)s a %(town)s.', name=name, town=town), category="info")
@@ -536,6 +492,119 @@ class DeleteHotel(View):
         return redirect(url_for("lap_bp.hotel_dashboard"))
 
 
+class AddTour(View):
+    methods = ['GET', 'POST']
+    decorators = [login_required]
+
+    def dispatch_request(self):
+        form = AddTourForm()
+
+        if request.method == 'POST':
+            title = request.form.get('title')
+            tour_mode = request.form.get('tour_mode')
+            visibility = request.form.get('visibility')
+            caption = request.form.get('caption')
+            cover = None
+            if 'tour_cover' in request.files:
+                file = request.files['tour_cover']
+                if file.filename != '' and allowed_file(file.filename):
+                    cover = secure_filename(file.filename)
+                    file.save(join(current_app.config['UPLOAD_FOLDER'], 'images', cover))
+
+            new_tour = Tour(
+                name=title,
+                trip_mode=tour_mode,
+                is_visible = True if visibility == 'visible' else False,
+                is_active=False,
+                owner_id=session['_user_id'],
+                carousel_pos=db.session.query(func.max(Tour.carousel_pos)).scalar() + 1
+            )
+
+            db.session.add(new_tour)
+
+            if cover:
+                new_tour.trip_pic = cover
+            if caption:
+                new_tour.pic_caption = caption
+
+            try:
+                db.session.commit()
+            except IntegrityError:
+                flash(_("Un viaggio con nome %(titolo)s esiste già.", titolo=title))
+            else:
+                user = db.session.get(Users, session['_user_id'])
+                session['tours'] = len(user.tours)
+                flash(_('Aggiunto viaggio "%(titolo)s".', titolo=title), category="info")
+                current_app.logger.info(f"Aggiunta viaggio {title} da {user.username}")
+                return redirect(url_for("start"))
+
+
+
+        return render_template("add_tour.jinja2", form=form)
+
+
+class TourManagement(View):
+    methods = ['GET', 'POST']
+    decorators = [login_required]
+
+    def dispatch_request(self):
+        form = TourMgmtForm()
+
+        if request.method == 'POST':
+            tour = request.form.get("tour")
+            visibility = request.form.get("visibility")
+            caption = request.form.get("caption")
+            cover = None
+            if 'tour_cover' in request.files:
+                file = request.files['tour_cover']
+                if file.filename != '' and allowed_file(file.filename):
+                    cover = secure_filename(file.filename)
+                    file.save(join(current_app.config['UPLOAD_FOLDER'], 'images', cover))
+
+            this_tour = db.session.execute(db.select(Tour).where(Tour.id == tour)).scalar()
+            if visibility:
+                this_tour.is_visible = True if visibility == 'visible' else False
+            if cover:
+                this_tour.trip_pic = cover
+            if caption:
+                this_tour.caption = caption
+
+            db.session.commit()
+
+            return redirect(url_for("start"))
+
+        user = db.session.get(Users, session['_user_id'])
+
+        form.tour.choices = [("", _("Scegli un viaggio"), {"disabled": "disabled"})]
+        form.tour.choices.extend([(tour.id, tour.name + " " + translations[tour.trip_mode], dict()) for tour in user.tours])
+        form.tour.default = ""
+        form.process([])
+
+        print(url_for('dbms_bp.delete_tour'))
+
+        header = make_header()
+        return render_template('manage_tour.jinja2', form=form, header=header)
+
+
+class TourDelete(View):
+    methods = ['POST']
+    decorators = [login_required]
+
+    def dispatch_request(self):
+        form = TourMgmtForm()
+
+        tour = db.session.get(Tour, request.form.get("tour"))
+        db.session.delete(tour)
+        db.session.commit()
+        flash(_('Cancellato viaggio %(tour)s.', tour=tour.name + " " + translations[tour.trip_mode]), category="info")
+        current_app.logger.info(f"Cancellato albergo {tour.name} {translations[tour.trip_mode]}.")
+        session['tours'] -= 1
+        if session['trip'] == tour:
+            session.pop('trip')
+
+        return redirect(url_for("start"))
+
+
 dbms_bp.add_url_rule('/trip/add/', view_func=AddTour.as_view("add_tour"))
 dbms_bp.add_url_rule('/lap/add/', view_func=AddLap.as_view("add_lap"))
 dbms_bp.add_url_rule('/lap/update/<int:id>', view_func=UpdLap.as_view("update_lap"))
@@ -545,3 +614,5 @@ dbms_bp.add_url_rule('/media/delete/<string:media>', view_func=DeleteMedia.as_vi
 dbms_bp.add_url_rule('/hotel/add/', view_func=AddHotel.as_view("add_hotel"))
 dbms_bp.add_url_rule('/hotel/update/<int:id>', view_func=UpdHotel.as_view("update_hotel"))
 dbms_bp.add_url_rule('/hotel/delete/<int:id>', view_func=DeleteHotel.as_view('delete_hotel'))
+dbms_bp.add_url_rule('/tour', view_func=TourManagement.as_view('tour_mng'))
+dbms_bp.add_url_rule('/tour/delete', view_func=TourDelete.as_view('delete_tour'))

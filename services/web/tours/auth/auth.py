@@ -5,8 +5,9 @@ from flask_babel import _
 from flask_mail import Message
 from werkzeug.security import check_password_hash, generate_password_hash
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import func
 from wtforms.validators import ValidationError
-from ..models import Users
+from ..models import Users, Tour
 from .forms import LogInForm, SignUpForm, ResetPasswordForm, LostPasswordForm
 from .. import db, mail
 from ..utils import make_header
@@ -47,6 +48,10 @@ class Login(View):
                 return redirect(url_for('auth_bp.login'))
             login_user(user, remember=remember)
             session['_username'] = username
+            if user.is_admin:
+                session['tours'] = db.session.execute(db.select(func.count(Tour.id))).scalar()
+            else:
+                session['tours'] = len(user.tours)
             current_app.session_interface.regenerate(session)
             current_app.logger.info(f"Login utente {username}")
             return redirect(url_for('start'))
@@ -114,6 +119,9 @@ class Logout(View):
         current_app.logger.info(f"Logout utente {current_user.username}")
         logout_user()
         session.pop('_username')
+        session.pop('tours')
+        if not db.session.get(Tour, session['trip']).is_visible:
+            session.pop('trip')
         return redirect(url_for('start'))
 
 
