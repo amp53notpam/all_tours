@@ -24,7 +24,6 @@ def upgrade():
 
     with op.batch_alter_table('tour', schema=None) as batch_op:
         batch_op.add_column(sa.Column('is_visible', sa.BOOLEAN(), nullable=True))
-    
 
     # ### end Alembic commands ###
     connection = op.get_bind()
@@ -32,14 +31,13 @@ def upgrade():
     for i in result:
         op.execute(f"update hotel set tour_id={i} where id in (select hotel.id from hotel join lap on hotel.lap_id = lap.id where lap.tour_id = {i})")
     op.execute("update hotel set tour_id = (select max(id) from tour) where tour_id is null")
-    
+
     op.execute("UPDATE tour SET is_visible = True")
 
-    
     with op.batch_alter_table('hotel', schema=None) as batch_op:
         batch_op.alter_column('tour_id',
-               existing_type=sa.INTEGER(),
-               nullable=False)
+                              existing_type=sa.INTEGER(),
+                              nullable=False)
 
 
 def downgrade():

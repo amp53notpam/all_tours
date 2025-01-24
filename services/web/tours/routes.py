@@ -11,7 +11,6 @@ from subprocess import Popen, STDOUT, PIPE
 from .utils import make_header, make_dd_lang, is_displayable, translations
 
 
-
 class Start(View):
     methods = ['GET', 'POST']
 

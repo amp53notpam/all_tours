@@ -514,7 +514,7 @@ class AddTour(View):
             new_tour = Tour(
                 name=title,
                 trip_mode=tour_mode,
-                is_visible = True if visibility == 'visible' else False,
+                is_visible=True if visibility == 'visible' else False,
                 is_active=False,
                 owner_id=session['_user_id'],
                 carousel_pos=db.session.query(func.max(Tour.carousel_pos)).scalar() + 1
@@ -537,8 +537,6 @@ class AddTour(View):
                 flash(_('Aggiunto viaggio "%(titolo)s".', titolo=title), category="info")
                 current_app.logger.info(f"Aggiunta viaggio {title} da {user.username}")
                 return redirect(url_for("start"))
-
-
 
         return render_template("add_tour.jinja2", form=form)
 
@@ -591,15 +589,13 @@ class TourDelete(View):
     decorators = [login_required]
 
     def dispatch_request(self):
-        form = TourMgmtForm()
-
         tour = db.session.get(Tour, request.form.get("tour"))
         db.session.delete(tour)
         db.session.commit()
         flash(_('Cancellato viaggio %(tour)s.', tour=tour.name + " " + translations[tour.trip_mode]), category="info")
         current_app.logger.info(f"Cancellato albergo {tour.name} {translations[tour.trip_mode]}.")
         session['tours'] -= 1
-        if session['trip'] == tour:
+        if 'trip' in session.keys() and session['trip'] == tour.id:
             session.pop('trip')
 
         return redirect(url_for("start"))

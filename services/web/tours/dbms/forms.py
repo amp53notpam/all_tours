@@ -81,4 +81,3 @@ class TourMgmtForm(FlaskForm):
     caption = StringField(_l('Didascalia'), [validators.length(max=96)])
     submit = SubmitField('Modifica')
     submit_del = SubmitField(_l('Cancella'))
-

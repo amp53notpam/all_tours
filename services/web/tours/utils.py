@@ -9,6 +9,7 @@ from .models import Tour, Lap, Users
 
 translations = {'bicycling': _('in bici'), 'walking': _('a piedi'), 'driving': _('in auto')}
 
+
 def make_header():
     if 'trip' in session:
         # trip = db.session.execute(db.select(Tour.id).where(Tour.id == session['trip'])).scalar()
@@ -80,4 +81,3 @@ def is_displayable(tour):
                 return True
             else:
                 return False
-

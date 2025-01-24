@@ -7,7 +7,7 @@ from wtforms.validators import Email, EqualTo
 
 
 class LogInForm(FlaskForm):
-    username = StringField("Username" )
+    username = StringField("Username")
     password = PasswordField('Password')
     remember = BooleanField(_l('Ricordami'))
     submit = SubmitField('Login')

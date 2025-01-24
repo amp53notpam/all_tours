@@ -36,7 +36,7 @@ class DevelopmentConfig:
     SESSION_SQLALCHEMY_TABLE = 'tour_session'
 
     # SMTP
-    MAIL_SERVER ="out.virgilio.it"
+    MAIL_SERVER = "out.virgilio.it"
     MAIL_PORT = 465
     MAIL_USERNAME = "apozzi53@virgilio.it"
     MAIL_PASSWORD = "aC2yak36ZJq+"

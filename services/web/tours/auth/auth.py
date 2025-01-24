@@ -24,11 +24,12 @@ def send_mail(recipient, user):
     msg = Message()
     msg.subject = 'Reset password'
     msg.sender = ['angelo', 'apozzi53@virgilio.it']
-    msg.recipients =[recipient]
+    msg.recipients = [recipient]
     url = f"https://foreverwalk.ddns.net{url_for('auth_bp.reset_password', user=user)}"
     msg.html = render_template('message.jinja2', url=url)
 
     mail.send(msg)
+
 
 class Login(View):
     methods = ['GET', 'POST']
@@ -81,7 +82,7 @@ class SignUp(View):
             elif not email:
                 error = _('Il campo "e-mail" è obbligatorio')
 
-            if password != passwd :
+            if password != passwd:
                 error = _('Le password non coincidono')
 
             if not error:
@@ -120,7 +121,7 @@ class Logout(View):
         logout_user()
         session.pop('_username')
         session.pop('tours')
-        if not db.session.get(Tour, session['trip']).is_visible:
+        if 'trip' in session and not db.session.get(Tour, session['trip']).is_visible:
             session.pop('trip')
         return redirect(url_for('start'))
 
@@ -158,8 +159,6 @@ class ResetPassword(View):
 
         if form.validate_on_submit():
             password = request.form.get('new_password')
-            passwd = request.form.get('vfy_password')
-
             user = db.session.get(Users, user)
             user.password = generate_password_hash(password)
             db.session.commit()
