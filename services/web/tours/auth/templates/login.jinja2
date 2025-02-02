@@ -5,10 +5,11 @@
 {% endblock %}
 
 {% block content %}
-<div class="w3-card-4" style="max-width: 480px; margin: auto; margin-top: 80px">
+<div class="w3-card-4 w3-padding-large" style="max-width: 480px; margin: auto; margin-top: 80px">
     <div class="w3-container w3-padding-24">
-    <h2 class="w3-theme-d2 w3-center">Login</h2>
+        <h2 class="w3-theme-d2 w3-center">Login</h2>
     </div>
+
     <form method="POST">
         {{ form.csrf_token }}
         <p class="tooltip">
@@ -49,13 +50,11 @@ togglePassword.addEventListener("click", () => {
     togglePassword.classList.toggle("fa-eye");
     });
 
-const bg_color = getComputedStyle(document.querySelector(":root"));
 const form = document.querySelector("form");
 form.addEventListener("submit", checkInput);
 
 function resetTooltip(tooltip) {
     tooltip.textContent = "";
-    tooltip.style.backgroundColor = bg_color.getPropertyValue('--th-l4');
     tooltip.style.display= "none";
 }
 
@@ -66,18 +65,17 @@ function checkInput(evt) {
     let tooltip
     tooltip = document.querySelector("#username + span");
     if (! username.value){
-        tooltip.textContent = "{{ _('Username non inserito') }}";
-        tooltip.style.backgroundColor = bg_color.getPropertyValue('--th-l3');
+        tooltip.textContent = "{{ _('Inserire lo username') }}";
         tooltip.style.display = "block";
         evt.preventDefault()
+        return
     } else {
         resetTooltip(tooltip)
     }
 
     tooltip = document.querySelector("#password ~ span");
     if (! password.value){
-        tooltip.textContent = "{{ _('Password non inserita') }}";
-        tooltip.style.backgroundColor = bg_color.getPropertyValue('--th-l3');
+        tooltip.textContent = "{{ _('Inserire la password') }}";
         tooltip.style.display = "block";
         evt.preventDefault()
     } else {

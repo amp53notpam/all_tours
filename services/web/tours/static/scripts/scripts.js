@@ -77,10 +77,16 @@ async function openLap(evt) {
     const htmlLap = await response.text();
     console.log(htmlLap)
 
+    if (! htmlLap) {
+        window.location.reload();
+        return
+    }
+
     const lap = document.createElement('div')
     setAttributes(lap, {id: "lap", class: "w3-container w3-center tappa"})
     lap.style.display = 'block'
     lap.innerHTML = htmlLap
+
 
     display.appendChild(lap);
     const info_prev = document.querySelector("#info_prev");

@@ -1,8 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_babel import _, lazy_gettext as _l
-from wtforms import EmailField, PasswordField, SubmitField, BooleanField, SelectField, widgets
+from wtforms import EmailField, PasswordField, SubmitField, BooleanField
 from wtforms.fields.simple import StringField
-from wtforms.widgets import CheckboxInput, ListWidget
 from wtforms.validators import Email, EqualTo
 
 

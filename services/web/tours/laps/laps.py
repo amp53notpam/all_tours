@@ -1,6 +1,6 @@
 from datetime import date, timedelta
 from flask import (
-    Blueprint, flash, render_template, current_app, url_for, jsonify, session, typing as ft
+    Blueprint, flash, render_template, current_app, url_for, jsonify, session, redirect
 )
 from flask.views import View
 from sqlalchemy.exc import OperationalError, ProgrammingError
@@ -124,6 +124,8 @@ class SingleHotel(View):
 class SingleLapJS(View):
     def dispatch_request(self, id):
         this_lap = db.session.get(Lap, id)
+        if this_lap is None:
+            return ""
         prev_lap = db.session.execute(db.select(Lap.id, Lap.start, Lap.destination).where(Lap.destination == this_lap.start)).fetchone()
         next_lap = db.session.execute(db.select(Lap.id, Lap.start, Lap.destination).where(Lap.start == this_lap.destination)).fetchone()
 

@@ -5,7 +5,7 @@ from . import db
 from sqlalchemy import func
 from flask import session, current_app
 from flask_babel import _
-from .models import Tour, Lap, Users
+from .models import Tour, Lap, Users, Hotel
 
 translations = {'bicycling': _('in bici'), 'walking': _('a piedi'), 'driving': _('in auto')}
 

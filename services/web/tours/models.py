@@ -52,8 +52,10 @@ class Lap(db.Model):
     tour_id: Mapped[int] = mapped_column(ForeignKey("tour.id"))
     hotels: Mapped[List["Hotel"]] = relationship(back_populates="lap")
 
+    __table_args__ = (UniqueConstraint('tour_id', 'date', name='tour_lap_at_date_uc'),)
+
     def __repr__(self) -> str:
-        return f"{_('Tappa')}: {self.start}-{self.destination}  {_('Giorno')}: {self.date}"
+        return f"{_('Tappa')}: {self.start}-{self.destination}  {_('Giorno')}: {self.date}."
 
 
 class Hotel(db.Model):
