@@ -7,7 +7,6 @@ from flask.views import View
 from sqlalchemy.exc import OperationalError, ProgrammingError
 from .. import db
 from ..models import Lap, Hotel, Tour, Media
-from ..utils import make_header, make_short_template
 
 map_bp = Blueprint('map_bp', __name__,
                    url_prefix="/maps",
@@ -19,11 +18,6 @@ map_bp = Blueprint('map_bp', __name__,
 @map_bp.context_processor
 def add_upload_path():
     return dict(upload_path=current_app.config['UPLOAD_FOLDER'])
-
-
-def get_trip():
-    active_trip = db.session.execute(db.select(Tour).where(Tour.is_active)).fetchone()
-    return active_trip.Tour.id
 
 
 class HotelMap(View):

@@ -23,7 +23,6 @@ class Tour(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     trip_mode: Mapped[TripMode] = mapped_column(Enum("walking", "bicycling", "driving", name="mode_enum", native_enum=True), default="walking")
     name: Mapped[str] = mapped_column(String(64))
-    is_active: Mapped[bool] = mapped_column(BOOLEAN, default=False)
     is_visible: Mapped[Optional[bool]] = mapped_column(BOOLEAN, default=True)
     trip_pic: Mapped[Optional[str]] = mapped_column(String(96))
     pic_caption: Mapped[Optional[str]] = mapped_column(String(128))

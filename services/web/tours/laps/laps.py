@@ -6,7 +6,7 @@ from flask.views import View
 from sqlalchemy.exc import OperationalError, ProgrammingError
 from .. import db
 from ..models import Lap, Hotel, Tour, Media, Users
-from ..utils import make_header, make_short_template
+from ..utils import make_header, make_short_template, get_trip
 from flask_babel import _
 
 lap_bp = Blueprint('lap_bp', __name__,
@@ -39,11 +39,6 @@ def get_stats(laps):
             pass
 
     return dict([('total_km', round(km_tot, 2)), ('done_km', round(km_done, 2)), ('left_km', km_tot - km_done), ('num_tappe', tappe_tot), ('tappe_fatte', tappe_fatte), ('tappe_da_fare', tappe_tot - tappe_fatte)])
-
-
-def get_trip():
-    active_trip = db.session.execute(db.select(Tour).where(Tour.is_active)).fetchone()
-    return active_trip.Tour.id
 
 
 def is_editable():
@@ -87,7 +82,7 @@ class Hotels(View):
                 db.select(Hotel).join(Lap, Hotel.lap_id == Lap.id).where(Lap.tour_id == trip_id).order_by(
                     Hotel.check_in)).all()
             hotels_unbound = None
-            if '_user_id' in session and int(session['_user_id']) == db.session.execute(db.select(Tour).where(Tour.is_active)).scalar().owner.id:
+            if '_user_id' in session and int(session['_user_id']) == db.session.execute(db.select(Tour).where(Tour.id == trip_id)).scalar().owner.id:
                 hotels_unbound = db.session.execute(db.select(Hotel).where(Hotel.lap_id == None).where(Hotel.tour_id == trip_id)).all()
         except (OperationalError, ProgrammingError):
             flash(_('Database assente! Prova più tardi'), category="error")

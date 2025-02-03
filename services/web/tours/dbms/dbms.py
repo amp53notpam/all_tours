@@ -14,7 +14,7 @@ from werkzeug.utils import secure_filename
 from ..models import Lap, Hotel, Tour, Media, Users
 from .forms import AddTourForm, AddLapForm, UpdLapForm, AddHotelForm, UpdHotelForm, LoadMediaForm, TourMgmtForm
 from .. import db
-from ..utils import make_header, translations
+from ..utils import make_header, translations, get_trip
 
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'webp', 'gpx', 'mp4'}
 
@@ -50,11 +50,6 @@ def to_datetime_time(time_str):
     a = time_str.split(":")
     a = [f"0{x}" if len(x) == 1 else x for x in a]
     return time.fromisoformat(''.join(a))
-
-
-def get_trip():
-    active_trip = db.session.execute(db.select(Tour).where(Tour.is_active)).scalar()
-    return active_trip.id
 
 
 def update_all_dates(laps, new_date, old_date):
@@ -153,10 +148,10 @@ def register_media(id, gpx, media, caption):
 
 
 def check_lap_date(date):
-    tour = db.session.execute(db.select(Tour).where(Tour.is_active)).scalar()
-    laps = db.session.execute(db.select(Lap).where(Lap.tour_id == tour.id).order_by(Lap.date)).scalars()
+    tour_id = get_trip()
+    laps = db.session.execute(db.select(Lap).where(Lap.tour_id == tour_id).order_by(Lap.date)).scalars()
     for lap in laps:
-        hotels = db.session.execute(db.select(Hotel).where(Hotel.tour_id == tour.id).order_by(Hotel.check_in)).scalars()
+        hotels = db.session.execute(db.select(Hotel).where(Hotel.tour_id == tour_id).order_by(Hotel.check_in)).scalars()
         for hotel in hotels:
             ckin = hotel.check_in
             ckout = hotel.check_out
@@ -393,6 +388,8 @@ class AddHotel(View):
         form = AddHotelForm()
         header = make_header()
 
+        tour_id = get_trip()
+
         if request.method == 'POST':
             lap_id = request.form.get('lap')
             name = request.form.get('name')
@@ -418,7 +415,6 @@ class AddHotel(View):
                               category="warning")
 
             lap = db.session.get(Lap, lap_id)
-            tour_id = db.session.execute(db.select(Tour).where(Tour.is_active)).scalar().id
             # save to database
             new_hotel = Hotel(
                 name=name,
@@ -435,9 +431,7 @@ class AddHotel(View):
                 check_hotel_date(new_hotel.check_in, new_hotel.check_out)
             except DateOverlappingError as e:
                 flash(e.msg, category="error")
-                laps = db.session.execute(db.select(Lap).where(
-                    Lap.tour_id == db.session.execute(db.select(Tour).where(Tour.is_active)).scalar().id).order_by(
-                    Lap.date)).scalars()
+                laps = db.session.execute(db.select(Lap).where(Lap.tour_id == tour_id).order_by(Lap.date)).scalars()
                 # form.lap.choices = [("", _("Scegli la tappa"), {"disabled": "disabled"})]
                 form.lap.choices = ([(lap.id, f"{lap.start} - {lap.destination}", dict()) for lap in laps])
                 form.lap.choices.extend([("", "--------", {"disabled": "disabled"})])
@@ -469,7 +463,7 @@ class AddHotel(View):
             current_app.logger.info(f"Aggiunto albergo {name} a {town}.")
             return redirect(url_for("lap_bp.hotel_dashboard"))
 
-        laps = db.session.execute(db.select(Lap).where(Lap.tour_id == db.session.execute(db.select(Tour).where(Tour.is_active)).scalar().id).order_by(Lap.date)).scalars()
+        laps = db.session.execute(db.select(Lap).where(Lap.tour_id == tour_id).order_by(Lap.date)).scalars()
         # form.lap.choices = [("", _("Scegli la tappa"), {"disabled": "disabled"})]
         form.lap.choices = [(lap.id, f"{lap.start} - {lap.destination}", dict()) for lap in laps]
         form.lap.choices.extend([("", "--------", {"disabled": "disabled"})])
@@ -486,6 +480,8 @@ class UpdHotel(View):
     def dispatch_request(self, id):
         form = UpdHotelForm()
         header = make_header()
+
+        tour_id = get_trip()
 
         if request.method == 'POST':
             lap_id = request.form.get('lap')
@@ -517,8 +513,7 @@ class UpdHotel(View):
                 check_hotel_date(hotel.check_in, hotel.check_out)
             except DateOverlappingError as e:
                 flash(e.msg, category="error")
-                laps = db.session.execute(db.select(Lap).where(
-                    Lap.tour_id == db.session.execute(db.select(Tour).where(Tour.is_active)).scalar().id).order_by(Lap.date)).scalars()
+                laps = db.session.execute(db.select(Lap).where(Lap.tour_id == tour_id).order_by(Lap.date)).scalars()
                 form.lap.choices = [(lap.id, f"{lap.start} - {lap.destination}", dict()) for lap in laps]
                 form.lap.default = f"{hotel.lap_id}"
                 form.process([])
@@ -549,9 +544,7 @@ class UpdHotel(View):
             return redirect(url_for("lap_bp.hotel_dashboard"))
 
         hotel = db.session.get(Hotel, id)
-        laps = db.session.execute(db.select(Lap).where(
-            Lap.tour_id == db.session.execute(db.select(Tour).where(Tour.is_active)).scalar().id).order_by(
-            Lap.date)).scalars()
+        laps = db.session.execute(db.select(Lap).where(Lap.tour_id == tour_id).order_by(Lap.date)).scalars()
         form.lap.choices = [(lap.id, f"{lap.start} - {lap.destination}", dict()) for lap in laps]
         form.lap.default = f"{hotel.lap_id}"
         form.process([])
@@ -600,7 +593,6 @@ class AddTour(View):
                 name=title,
                 trip_mode=tour_mode,
                 is_visible=True if visibility == 'visible' else False,
-                is_active=False,
                 owner_id=session['_user_id'],
                 carousel_pos=db.session.query(func.max(Tour.carousel_pos)).scalar() + 1
             )

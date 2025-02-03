@@ -5,7 +5,7 @@ from . import db
 from sqlalchemy import func
 from flask import session, current_app
 from flask_babel import _
-from .models import Tour, Lap, Users, Hotel
+from .models import Tour, Lap, Users
 
 translations = {'bicycling': _('in bici'), 'walking': _('a piedi'), 'driving': _('in auto')}
 
@@ -81,3 +81,7 @@ def is_displayable(tour):
                 return True
             else:
                 return False
+
+def get_trip():
+    active_trip = db.session.execute(db.select(Tour).where(Tour.id == int(session['trip']))).scalar()
+    return active_trip.id

@@ -22,14 +22,14 @@ class Start(View):
             trip = request.form.get('trip')
             if trip:
                 if trip != 'add_tour':
-                    active_trip = db.session.execute(db.select(Tour).where(Tour.is_active)).fetchone()
-                    if active_trip:
-                        active_trip.Tour.is_active = False
-                        db.session.commit()
-                    trip = int(trip)
-                    next_active = db.session.execute(db.select(Tour).where(Tour.id == trip)).fetchone()
-                    next_active.Tour.is_active = True
-                    db.session.commit()
+                    # active_trip = db.session.execute(db.select(Tour).where(Tour.is_active)).fetchone()
+                    # if active_trip:
+                    #     active_trip.Tour.is_active = False
+                    #     db.session.commit()
+                    # trip = int(trip)
+                    # next_active = db.session.execute(db.select(Tour).where(Tour.id == trip)).fetchone()
+                    # next_active.Tour.is_active = True
+                    # db.session.commit()
                     session['trip'] = trip
                 else:
                     return redirect(url_for('dbms_bp.add_tour'))
@@ -54,7 +54,7 @@ class Start(View):
         ts = tours[:]
         for tour in tours:
             if tour.Tour.is_displayable:
-                if tour.Tour.is_active:
+                if 'trip' in session and tour.Tour.id == int(session['trip']):
                     carousel_pos = ts.index(tour) + 1
             else:
                 ts.pop(ts.index(tour))
