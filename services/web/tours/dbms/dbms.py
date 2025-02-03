@@ -62,7 +62,7 @@ def update_all_dates(laps, new_date, old_date):
     if delta_t.days < 0:
         if db.session.execute(db.select(Lap).where(Lap.date.between(new_date, old_date - timedelta(days=1))).order_by(Lap.date)).all():
             raise DateOverlappingError(_("Non ci sono abbastanza giorni liberi per spostare la tappa indietro nel tempo"))
-        hotel = db.session.execute(db.select(Hotel).where(Hotel.check_out.between(new_date+timedelta(days=1), old_date)).order_by(Hotel.check_out)).all()
+        hotel = db.session.execute(db.select(Hotel).where(Hotel.check_out.between(new_date + timedelta(days=1), old_date)).order_by(Hotel.check_out)).all()
         if hotel:
             raise DateOverlappingError(_(f'La data di check out dell\'albergo "{hotel[0].Hotel.name}" è incompatibile con la nuova data'))
     for lap in laps:
@@ -157,7 +157,6 @@ def check_lap_date(date):
     laps = db.session.execute(db.select(Lap).where(Lap.tour_id == tour.id).order_by(Lap.date)).scalars()
     for lap in laps:
         hotels = db.session.execute(db.select(Hotel).where(Hotel.tour_id == tour.id).order_by(Hotel.check_in)).scalars()
-        error = ''
         for hotel in hotels:
             ckin = hotel.check_in
             ckout = hotel.check_out
@@ -172,7 +171,6 @@ def check_hotel_date(check_in, check_out):
     laps = " / ".join([f"{lap.start}-{lap.destination}" for lap in laps])
     if laps:
         raise DateOverlappingError(_(f'La durata del soggiorno si sovrappone alle tappe "{laps}"'))
-
 
 
 class DateOverlappingError(Exception):
@@ -207,7 +205,6 @@ class AddLap(View):
                     else:
                         flash(_('Il file "%(file)s" non è una traccia gpx ed è stato ignorato', file=file.filename),
                               category="warning")
-
 
             trip_id = get_trip()
             try:
@@ -550,7 +547,6 @@ class UpdHotel(View):
             flash(_('Hotel %(hotel)s aggiornato.', hotel=hotel.name), category="info")
             current_app.logger.info(f"Aggiornato hotel {hotel.name}.")
             return redirect(url_for("lap_bp.hotel_dashboard"))
-
 
         hotel = db.session.get(Hotel, id)
         laps = db.session.execute(db.select(Lap).where(

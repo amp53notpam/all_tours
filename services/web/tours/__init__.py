@@ -152,4 +152,3 @@ def register_cli_commands(app):
                       ]
             db.session.bulk_insert_mappings(Users, admins)
             db.session.commit()
-

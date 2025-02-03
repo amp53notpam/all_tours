@@ -13,27 +13,71 @@
         </div>
     </div>
 
-  <form method="POST" enctype="multipart/form-data">
-    {{ form.csrf_token }}
-    <div class="w3-container">
-        <div class="w3-row">
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.csrf_token }}
+
+        {# foto/video #}
+        <div class="w3-container w3-row form-group" style="margin-bottom: 10px">
             <div class="w3-col m4 w3-mobile">
-              <p class="w3-left-align wbold form_label">{{ form.media_file.label(class="w3-theme-l4 required") }}</p>
+                {{ form.media_file.label(class="w3-theme-l4 w3-left-align wbold form_label") }}
             </div>
             <div class="w3-col m8 w3-mobile">
-              <p class="w3-left-align">{{ form.media_file(class="w3-input w3-theme-l4") }}</p>
+                {{ form.media_file(class="w3-left-align w3-input w3-theme-l4", accept=".jpg,.jpeg") }}
             </div>
+        </div>
 
+        {# didascalia #}
+        <div class="w3-container w3-row form-group" style="margin-bottom: 10px">
             <div class="w3-col m4 w3-mobile">
-                <p class="w3-left-align wbold form_label">{{ form.caption.label(class="w3-theme-l4") }}</p>
+                {{ form.caption.label(class="w3-theme-l4 w3-left-align wbold form_label") }}
             </div>
-            <div class="w3-col m8 w3-mobile">
-                <p class="w3-left-align">{{ form.caption(class="w3-input w3-theme-l4") }}</p>
+            <div class="w3-col m8 w3-mobile tooltip">
+                {{ form.caption(class="w3-left-align w3-input w3-theme-l4") }}
+                <span class="w3-monospace tooltiptext"></span>
             </div>
+        </div>
 
-            {{ form.submit(class="w3-button w3-block w3-theme-action w3-hover-theme-d2 w3-ripple w3-center") }}
-        </p>
+        {# submit #}
+        <div style="margin-bottom: 20px; margin-top:50px;">
+            <p class="w3-center">
+                {{ form.submit(class="w3-center w3-button w3-theme-action w3-hover-theme-d2 w3-ripple w3-center", style="width: 30%") }}
+            </p>
+        </div>
+
     </div>
   </form>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const form = document.querySelector("form");
+const caption = document.querySelector("#caption");
+
+form.addEventListener("submit", examineForm);
+
+function examineForm(evt) {
+    if (! is_valid()) {
+        evt.preventDefault();
+    }
+}
+
+function is_valid() {
+    const tooltip = document.querySelector("#caption ~ [class~=tooltiptext]");
+    if (caption.value.length > 32){
+        tooltip.textContent = "{{ _('Didascalia troppo lunga: max. 32 caratteri.') }}";
+        tooltip.style.display = "block";
+        return false
+    } else {
+        resetTooltip(tooltip);
+    }
+    return true;
+}
+
+function resetTooltip(tooltip) {
+    tooltip.textContent = "";
+    tooltip.style.display= "none";
+}
+
+</script>
 {% endblock %}

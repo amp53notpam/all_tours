@@ -40,7 +40,7 @@ class Start(View):
         else:
             setlocale(LC_ALL, f"{session['locale']}")
         tours = db.session.execute(db.select(Tour).order_by(Tour.id)).scalars()
-        form.trip.choices =[(tour.id, tour.name + " " + translations[tour.trip_mode], dict()) for tour in tours if is_displayable(tour)]
+        form.trip.choices = [(tour.id, tour.name + " " + translations[tour.trip_mode], dict()) for tour in tours if is_displayable(tour)]
         form.trip.choices.extend([("", _("Scegli un viaggio"), {"disabled": "disabled"}), ("add_tour", _("Nuovo Viaggio"), {})])
         form.trip.default = ""
         form.process([])

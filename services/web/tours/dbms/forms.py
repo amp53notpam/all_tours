@@ -30,7 +30,7 @@ class UpdLapForm(FlaskForm):
 
 class LoadMediaForm(FlaskForm):
     media_file = FileField(_l('File'), validators=[FileAllowed(['jpg', 'jpeg', 'mov', 'mp4'])])
-    caption = StringField(_l('Didascalia'), [validators.length(max=128)])
+    caption = StringField(_l('Didascalia'))
     submit = SubmitField('OK')
 
 
@@ -80,6 +80,6 @@ class TourMgmtForm(FlaskForm):
     tour = SelectField(_l("Viaggio"))
     visibility = RadioField(_l('Visibilità'), choices=[('visible', _l('Totale')), ('hidden', _l('Ristretta'))])
     tour_cover = FileField(_l('Copertina'), validators=[FileAllowed(['jpg', 'jpeg'])])
-    caption = StringField(_l('Didascalia'), [validators.length(max=96)])
+    caption = StringField(_l('Didascalia'))
     submit = SubmitField('Modifica')
     submit_del = SubmitField(_l('Cancella'))

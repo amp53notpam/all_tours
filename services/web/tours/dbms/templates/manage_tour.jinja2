@@ -86,6 +86,9 @@
 {% block scripts %}
 <script>
 const form = document.querySelector("form");
+const tour = document.querySelector("#tour");
+const caption = document.querySelector("#caption");
+
 form.addEventListener("submit", examineForm);
 document.querySelector('#sure').addEventListener("click", beCautious);
 document.querySelector("#no").addEventListener("click", (evt) => {
@@ -119,8 +122,6 @@ function beCautious(evt) {
     }
 }
 
-const bg_color = getComputedStyle(document.querySelector(":root"));
-
 function examineForm(evt) {
     if (! is_valid()) {
         evt.preventDefault();
@@ -128,21 +129,28 @@ function examineForm(evt) {
 }
 
 function is_valid() {
-     const tooltip = document.querySelector("#tour ~ span");
+    let tooltip = document.querySelector("#tour ~ [class~=tooltiptext]");
     if (! tour.value){
-        tooltip.textContent = "{{ _('Viaggio non selezionato') }}";
-        tooltip.style.backgroundColor = bg_color.getPropertyValue('--th-l3');
+        tooltip.textContent = "{{ _('Selezionare un viaggio') }}";
         tooltip.style.display = "block";
         return false;
     } else {
         resetTooltip(tooltip);
-        return true;
     }
+
+    tooltip = document.querySelector("#caption ~ [class~=tooltiptext]");
+    if (caption.value.length > 32){
+        tooltip.textContent = "{{ _('Didascalia troppo lunga: max. 32 caratteri.') }}";
+        tooltip.style.display = "block";
+        return false
+    } else {
+        resetTooltip(tooltip);
+    }
+    return true;
 }
 
 function resetTooltip(tooltip) {
     tooltip.textContent = "";
-    tooltip.style.backgroundColor = bg_color.getPropertyValue('--th-l4');
     tooltip.style.display= "none";
 }
 

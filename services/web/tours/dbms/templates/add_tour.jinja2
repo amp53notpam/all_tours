@@ -102,8 +102,8 @@ function checkInput(evt) {
     }
 
     tooltip = document.querySelector("#caption ~ [class~=tooltiptext]");
-    if (caption.value.length > 64){
-        tooltip.textContent = "{{ _('Didascalia troppo lunga: max. 64 caratteri.') }}";
+    if (caption.value.length > 32){
+        tooltip.textContent = "{{ _('Didascalia troppo lunga: max. 32 caratteri.') }}";
         tooltip.style.display = "block";
         evt.preventDefault();
         return;
