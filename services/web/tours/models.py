@@ -64,8 +64,8 @@ class Hotel(db.Model):
     town: Mapped[str] = mapped_column(String(32))
     lat: Mapped[Optional[float]] = mapped_column(FLOAT, default=0)
     long: Mapped[Optional[float]] = mapped_column(FLOAT, default=0)
-    phone: Mapped[Optional[str]] = mapped_column(String(16))
-    href_phone: Mapped[Optional[str]] = mapped_column(String(16))
+    # phone: Mapped[Optional[str]] = mapped_column(String(16))
+    # href_phone: Mapped[Optional[str]] = mapped_column(String(16))
     email: Mapped[Optional[str]] = mapped_column(String(32))
     check_in: Mapped[Optional[date]] = mapped_column(DATE)
     check_out: Mapped[Optional[date]] = mapped_column(DATE)
@@ -76,6 +76,7 @@ class Hotel(db.Model):
     lap_id: Mapped[int] = mapped_column(ForeignKey("lap.id", ondelete="set null"), nullable=True)
     tour_id: Mapped[int] = mapped_column(ForeignKey("tour.id", ondelete="cascade"))
     lap: Mapped["Lap"] = relationship(back_populates="hotels")
+    phones: Mapped[List["PhoneNumber"]] = relationship(back_populates="hotel")
 
     def __repr__(self) -> str:
         return f"{_('Albergo')}: {self.name} - {self.town}"
@@ -108,3 +109,14 @@ class Media(db.Model):
 
     def __repr__(self) -> str:
         return f"{_('Foto')} {self.media_src[: -4]}"
+
+
+class PhoneNumber(db.Model):
+    id: Mapped[int] = mapped_column(primary_key=True)
+    phone: Mapped[Optional[str]] = mapped_column(String(16))
+    href_phone: Mapped[Optional[str]] = mapped_column(String(16), unique=True)
+    hotel_id: Mapped[int] = mapped_column(ForeignKey("hotel.id", ondelete="cascade"))
+    hotel: Mapped["Hotel"] = relationship(back_populates="phones")
+
+    def __repr__(self) -> str:
+        return f"{_('Telefono')} {self.href_phone} - {self.hotel.name}"

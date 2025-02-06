@@ -80,13 +80,15 @@
             </div>
         </div>
 
-        {% if hotel.phone %}
+        {% if hotel.phones %}
         <div class="row w3-row">
             <div class="w3-container w3-third 3w-mobile">
-                <p class="w3-left-align wbold">{{ _('Telefono') }}>:</p>
+                <p class="w3-left-align wbold">{{ _('Telefono') }}:</p>
             </div>
             <div class="w3-container w3-twothird w3-mobile">
-                <p class="w3-left-align"><a href="tel:{{ hotel.href_phone }}">{{ hotel.phone }}</a></p>
+                {% for phone in hotel.phones %}
+                <p class="w3-left-align"><a href="tel:{{ phone.href_phone }}">{{ phone.phone }}</a></p>
+                {% endfor %}
             </div>
         </div>
         {% endif %}

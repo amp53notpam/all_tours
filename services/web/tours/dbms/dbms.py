@@ -1,7 +1,7 @@
 from os import remove
 from os.path import join
 from datetime import datetime, date, time, timedelta
-from re import compile
+from re import compile, sub, search
 from subprocess import Popen, PIPE, STDOUT
 from shlex import split
 from flask import Blueprint, render_template, redirect, request, url_for, flash, current_app, session, jsonify
@@ -11,7 +11,7 @@ from flask_babel import _
 from sqlalchemy import func, desc
 from sqlalchemy.exc import IntegrityError
 from werkzeug.utils import secure_filename
-from ..models import Lap, Hotel, Tour, Media, Users
+from ..models import Lap, Hotel, Tour, Media, Users, PhoneNumber
 from .forms import AddTourForm, AddLapForm, UpdLapForm, AddHotelForm, UpdHotelForm, LoadMediaForm, TourMgmtForm
 from .. import db
 from ..utils import make_header, translations, get_trip
@@ -166,6 +166,27 @@ def check_hotel_date(check_in, check_out):
     laps = " / ".join([f"{lap.start}-{lap.destination}" for lap in laps])
     if laps:
         raise DateOverlappingError(_(f'La durata del soggiorno si sovrappone alle tappe "{laps}"'))
+
+
+def do_phone_mngmt(hotel, act, phone):
+    phones = hotel.phones
+    href_phone = sub(' ', '', phone)
+    if act == 'add':
+        new_phone = PhoneNumber(
+            phone=phone,
+            href_phone=href_phone,
+            hotel_id=hotel.id
+        )
+        for phone in phones:
+            if phone.href_phone == new_phone.href_phone:
+                # the phone number is already in the database, so return without do anything
+                return
+        db.session.add(new_phone)
+    else:
+        for phone in phones:
+            if search(href_phone, phone.href_phone):
+                db.session.delete(phone)
+                break
 
 
 class DateOverlappingError(Exception):
@@ -486,6 +507,7 @@ class UpdHotel(View):
         if request.method == 'POST':
             lap_id = request.form.get('lap')
             stay = request.form.get('stay')
+            phone_action = request.form.get('phone_action')
             phone = request.form.get('phone')
             email = request.form.get('email')
             latitude = request.form.get('geo_lat')
@@ -521,8 +543,7 @@ class UpdHotel(View):
                 return render_template("upd_hotel.jinja2", form=form, hotel=hotel, timedelta=(hotel.check_out - hotel.check_in).days, header=header)
 
             if phone:
-                hotel.phone = phone
-                hotel.href_phone = ''.join(phone.split())
+                do_phone_mngmt(hotel, phone_action, phone)
             if email:
                 hotel.email = email
             if latitude and longitude:

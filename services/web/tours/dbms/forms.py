@@ -55,7 +55,8 @@ class UpdHotelForm(FlaskForm):
     lap = SelectField(_l('Tappa'))
     stay = IntegerField(_l('Giorni di soggiorno'))
     email = EmailField("E-mail")
-    phone = TelField(_l('Telefono'))
+    phone = TelField(_l())
+    phone_action = RadioField(_l('Telefono'), choices=[('add', _l('Aggiungi')), ('delete', _l('Cancella'))], default='add')
     geo_lat = FloatField("Lat. & Long.")
     geo_long = FloatField()
     price = FloatField(_l('Costo'))
@@ -68,7 +69,7 @@ class UpdHotelForm(FlaskForm):
 class AddTourForm(FlaskForm):
     # title = StringField(_l('Titolo del Viaggio'), validators=[DataRequired()])
     title = StringField(_l('Titolo del Viaggio'))
-    tour_mode = RadioField(_l('Tipo di Viaggio'), choices=[('walking', 'a piedi'), ('bicycling', 'in bicicletta'), ('driving', 'in auto')], default='walking')
+    tour_mode = RadioField(_l('Tipo di Viaggio'), choices=[('walking', _l('a piedi')), ('bicycling', _l('in bicicletta')), ('driving', _l('in auto'))], default='walking')
     visibility = RadioField(_l('Visibilità'), choices=[('visible', _l('Totale')), ('hidden', _l('Ristretta'))], default='visible')
     tour_cover = FileField(_l('Copertina'), validators=[FileAllowed(['jpg', 'jpeg'])])
     # caption = StringField(_l('Didascalia'), [validators.length(max=96)])
