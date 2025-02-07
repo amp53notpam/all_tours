@@ -18,9 +18,6 @@ class DevelopmentConfig:
 
     # Database
     SQLALCHEMY_DATABASE_URI = environ.get("DATABASE_URL", "sqlite://")
-    SQLALCHEMY_BINDS = {
-        'db_sec': environ.get("DATABASE_SEC_URL")
-    }
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = False
 

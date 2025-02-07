@@ -25,7 +25,7 @@ packaging
 psycopg2-binary
 python-dotenv
 pytz
-SQLAlchemy==2.0.36
+SQLAlchemy
 typing_extensions
 Werkzeug
 WTForms

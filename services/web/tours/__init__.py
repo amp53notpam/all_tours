@@ -11,11 +11,11 @@ from flask_login import LoginManager
 from flask_session import Session
 from flask_babel import Babel
 from flask_mail import Mail
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass
 from werkzeug.security import generate_password_hash
 
 
-class Base(DeclarativeBase):
+class Base(DeclarativeBase, MappedAsDataclass):
     pass
 
 
@@ -70,8 +70,7 @@ def initialize_extensions(app):
 
     @login_manager.user_loader
     def load_user(user_id):
-        result = db.session.get(Users, int(user_id))
-        return result
+        return db.session.get(Users, int(user_id))
 
     babel.init_app(app, default_locale='it', locale_selector=get_locale)
 
