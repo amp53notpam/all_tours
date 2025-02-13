@@ -89,7 +89,11 @@
                 <p class="w3-left-align wbold">{{ _('Tempo') }}:</p>
             </div>
             <div class="w3-container w3-twothird w3-mobile">
+                {% if lap.duration.second %}
                 <p class="w3-left-align">{{ lap.duration.strftime("%H:%M:%S") }}</p>
+                {% else %}
+                <p class="w3-left-align">{{ lap.duration.strftime("%H:%M") }}</p>
+                {% endif %}
             </div>
         </div>
         {% endif %}
@@ -168,7 +172,7 @@
         </div>
         {% endif %}
 
-        {% if lap.has_photos %}
+        {% if lap.photos %}
         <div class="w3-content w3-theme w3-hover-theme Xref">
             <a href={{ url_for("lap_bp.lap_media", id=lap.id) }} class="a-no-decoration">{{ _('Foto') }}</a>
         </div>

@@ -11,11 +11,11 @@ from flask_login import LoginManager
 from flask_session import Session
 from flask_babel import Babel
 from flask_mail import Mail
-from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass
+from sqlalchemy.orm import DeclarativeBase
 from werkzeug.security import generate_password_hash
 
 
-class Base(DeclarativeBase, MappedAsDataclass):
+class Base(DeclarativeBase):
     pass
 
 

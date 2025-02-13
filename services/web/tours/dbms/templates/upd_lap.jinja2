@@ -62,7 +62,11 @@
                 {{ form.duration.label(class="w3-theme-l4 w3-left-align wbold form_label") }}
             </div>
             <div class="w3-col m8 w3-mobile">
+                {% if lap.done %}
                 {{ form.duration(class="w3-left-align w3-input w3-theme-l4", step="1") }}
+                {% else %}
+                {{ form.duration(class="w3-left-align w3-input w3-theme-l4") }}
+                {% endif %}
             </div>
         </div>
 
@@ -76,6 +80,17 @@
             </div>
         </div>
 
+        {# tappa fatta #}
+        <div class="w3-container" style="margin-bottom: 10px">
+            <p>
+            {% if lap.done %}
+                {{ form.done(checked='checked', class="w3-theme-l4 w3-center", style="margin-left: 40%") }} {{ form.done.label }}
+            {% else %}
+                {{ form.done(class="w3-theme-l4 w3-center", style="margin-left: 40%") }} {{ form.done.label }}
+            {% endif %}
+            </p>
+        </div>
+
         {# submit #}
         <div style="margin-bottom: 20px; margin-top:50px;">
             <p class="w3-center">
@@ -85,4 +100,21 @@
 
   </form>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const duration = document.querySelector("#duration")
+const done = document.querySelector("#done")
+
+done.addEventListener("change", updateDurationField)
+
+function updateDurationField() {
+    if (done.checked) {
+        duration.step = 1
+    } else {
+        duration.step = 60
+    }
+}
+</script>
 {% endblock %}

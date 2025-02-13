@@ -81,14 +81,14 @@ class Hotels(View):
             hotels = db.session.execute(
                 db.select(Hotel).join(Lap, Hotel.lap_id == Lap.id).where(Lap.tour_id == trip_id).order_by(
                     Hotel.check_in)).all()
-            hotels_unbound = None
-            if '_user_id' in session and int(session['_user_id']) == db.session.execute(db.select(Tour).where(Tour.id == trip_id)).scalar().owner.id:
-                hotels_unbound = db.session.execute(db.select(Hotel).where(Hotel.lap_id == None).where(Hotel.tour_id == trip_id)).all()
+            # hotels_unbound = None
+            # if '_user_id' in session and int(session['_user_id']) == db.session.execute(db.select(Tour).where(Tour.id == trip_id)).scalar().owner.id:
+            #     hotels_unbound = db.session.execute(db.select(Hotel).where(Hotel.lap_id == None).where(Hotel.tour_id == trip_id)).all()
         except (OperationalError, ProgrammingError):
             flash(_('Database assente! Prova più tardi'), category="error")
             return render_template('index.jinja2', header=header)
 
-        return render_template("hotels.jinja2", hotels=hotels, hotels_nb=hotels_unbound, splash_page=True, header=header, is_editable=is_editable())
+        return render_template("hotels.jinja2", hotels=hotels, hotels_nb=None, splash_page=True, header=header, is_editable=is_editable())
 
 
 class SingleLap(View):

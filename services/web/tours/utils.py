@@ -13,11 +13,15 @@ translations = {'bicycling': _('in bici'), 'walking': _('a piedi'), 'driving': _
 def make_header():
     if 'trip' in session:
         # trip = db.session.execute(db.select(Tour.id).where(Tour.id == session['trip'])).scalar()
-        trip = session['trip']
-        start = db.session.execute(db.select(Lap.start, Lap.date).where(
-            Lap.date == db.session.execute(db.select(func.min(Lap.date)).where(Lap.tour_id == trip)).scalar())).fetchone()
-        end = db.session.execute(db.select(Lap.destination, Lap.date).where(
-            Lap.date == db.session.execute(db.select(func.max(Lap.date)).where(Lap.tour_id == trip)).scalar())).fetchone()
+        trip = int(session['trip'])
+        start = db.session.execute(db.select(Lap.start, Lap.date).
+                                   where(Lap.tour_id == trip).
+                                   where(Lap.date == db.session.execute(db.select(func.min(Lap.date)).where(Lap.tour_id == trip)).scalar())
+                                   ).fetchone()
+        end = db.session.execute(db.select(Lap.destination, Lap.date).
+                                 where(Lap.tour_id == trip).
+                                 where(Lap.date == db.session.execute(db.select(func.max(Lap.date)).where(Lap.tour_id == trip)).scalar())
+                                 ).fetchone()
         if start and end:
             header = f"""
                 <h2>{start.start} - {end.destination}</h2>

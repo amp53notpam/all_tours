@@ -35,7 +35,7 @@ FROM python:3.12.8-slim-bookworm
 
 # install system dependencies
 RUN apt-get update && apt-get install -y locales bind9-dnsutils && rm -r /var/lib/apt/lists/*
-RUN echo "it_IT.UTF-8 UTF-8" >> /etc/locale.gen && dpkg-reconfigure --frontend=noninteractive locales
+RUN sed -Ei 's/^#[[:blank:]]*(it_IT[.]U.*)/\1/' /etc/locale.gen && sed -Ei 's/^#[[:blank:]]*(en_GB[.]U.*)/\1/' /etc/locale.gen && dpkg-reconfigure --frontend=noninteractive locales
 
 
 # create the user "flasker"
