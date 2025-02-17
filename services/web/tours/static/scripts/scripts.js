@@ -174,7 +174,7 @@ function displayPhotos(imageBox, catalog) {
         const outerDiv = document.createElement("div");
         picName = pic.src.slice(pic.src.lastIndexOf("/") + 1);
         picId = pic.src.slice(pic.src.lastIndexOf("/") + 1, pic.src.indexOf("."));
-        picId = picId.replace(/_/g, "-")
+        picId = "PIC-" + picId.replace(/_/g, "-")
         setAttributes(outerDiv, {id: picId, class: "w3-card w3-margin-top w3-border w3-border-theme w3-hover-border-theme"});
         outerDiv.style.paddingTop = "16px";
         outerDiv.style.paddingLeft = "16px";
@@ -206,17 +206,9 @@ function displayPhotos(imageBox, catalog) {
         const caption = document.createElement("p");
         caption.setAttribute("class", "w3-large");
         caption.textContent = pic.caption;
-        if ( pic.lat && pic.long && ! IS_EDITABLE) {
-            const mapRef = document.createElement("a");
-            setAttributes(mapRef, {target: "_blank", href: pic.map, class: "w3-hover-theme-d3 w3-right"});
-            const mapSym = document.createElement("i");
-            mapSym.setAttribute("class", "fa-solid fa-map-location-dot icon28");
-            mapRef.appendChild(mapSym);
-            caption.appendChild(mapRef);
-        }
         if (IS_EDITABLE) {
-            const deleteRef = document.createElement("p");
-            deleteRef.setAttribute("class", "w3-right")
+            const deleteRef = document.createElement("a");
+            setAttributes(deleteRef, {href: "#", class: "w3-hover-theme-d3 w3-margin-left w3-right"});
             const deleteSym = document.createElement("i");
             deleteSym.setAttribute("class", "fa-solid fa-trash-can icon28");
             deleteSym.dataset.picName = picName;
@@ -224,6 +216,15 @@ function displayPhotos(imageBox, catalog) {
             deleteRef.appendChild(deleteSym);
             caption.appendChild(deleteRef);
             deleteRef.addEventListener("click", delete_media);
+        }
+
+        if ( pic.lat && pic.long) {
+            const mapRef = document.createElement("a");
+            setAttributes(mapRef, {target: "_blank", href: pic.map, class: "w3-hover-theme-d3 w3-right"});
+            const mapSym = document.createElement("i");
+            mapSym.setAttribute("class", "fa-solid fa-map-location-dot icon28");
+            mapRef.appendChild(mapSym);
+            caption.appendChild(mapRef);
         }
         innerDiv.appendChild(caption);
         outerDiv.appendChild(innerDiv);

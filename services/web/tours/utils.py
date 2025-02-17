@@ -88,5 +88,5 @@ def is_displayable(tour):
 
 
 def get_trip():
-    active_trip = db.session.execute(db.select(Tour).where(Tour.id == int(session['trip']))).scalar()
-    return active_trip.id
+    return db.session.execute(db.select(Tour).where(Tour.id == int(session['trip']))).scalar()
+

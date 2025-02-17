@@ -75,8 +75,8 @@ def add_geo_tag(media, track):
         Popen(split(f"exiftool -delete_original! {media}"), stdout=PIPE, stderr=STDOUT).wait()
 
 
-def register_media(id, gpx, media, caption):
-    track = join(current_app.config['UPLOAD_FOLDER'], 'tracks', gpx) if gpx else gpx
+def register_media(lap, media, caption):
+    track = join(current_app.config['UPLOAD_FOLDER'], 'tracks', lap.gpx) if lap.gpx else None
     media_dir = join(current_app.config['UPLOAD_FOLDER'], 'images')
     media_fp = join(media_dir, media)
 
@@ -110,6 +110,7 @@ def register_media(id, gpx, media, caption):
     # orientation = meta['Orientation'] if 'Orientation' in meta else 0
     latitude = float(meta['GPSLatitude']) if 'GPSLatitude' in meta else None
     longitude = float(meta['GPSLongitude']) if 'GPSLongitude' in meta else None
+    orientation = 0
     if 'Orientation' in meta:
         orientation = int(meta['Orientation'])
     elif 'Rotation' in meta:
@@ -120,7 +121,7 @@ def register_media(id, gpx, media, caption):
     db_media = db.session.execute(db.select(Media).where(Media.media_src == media)).fetchone()
     if db_media is None or db_media.Media.lap_id != id:
         new_picture = Media(
-            lap_id=id,
+            lap=lap,
             media_src=media,
             media_width=media_width,
             media_height=media_height,
@@ -148,8 +149,8 @@ def register_media(id, gpx, media, caption):
 
 
 def check_lap_date(date):
-    tour_id = get_trip()
-    laps = db.session.execute(db.select(Lap).where(Lap.tour_id == tour_id).order_by(Lap.date)).scalars()
+    tour= get_trip()
+    laps = db.session.execute(db.select(Lap).where(Lap.tour_id == tour.id).order_by(Lap.date)).scalars()
     for lap in laps:
         hotels = db.session.execute(db.select(Hotel).where(Hotel.lap_id == lap.id).order_by(Hotel.check_in)).scalars()
         for hotel in hotels:
@@ -184,7 +185,7 @@ def do_phone_mngmt(hotel, act, phone):
         db.session.add(new_phone)
     else:
         for phone in phones:
-            if search(href_phone, phone.href_phone):
+            if href_phone == phone.href_phone:
                 db.session.delete(phone)
                 break
 
@@ -192,7 +193,10 @@ def do_phone_mngmt(hotel, act, phone):
 def delete_lap(lap):
     # delete the relevant track file
     if lap.gpx:
-        remove(join(current_app.config['UPLOAD_FOLDER'], 'tracks', lap.gpx))
+        try:
+            remove(join(current_app.config['UPLOAD_FOLDER'], 'tracks', lap.gpx))
+        except FileNotFoundError:
+            pass
     for hotel in lap.hotels:
         delete_hotel(hotel)
     for media in lap.photos:
@@ -204,7 +208,10 @@ def delete_lap(lap):
 def delete_hotel(hotel):
     if hotel.photo:
         # delete the hotel's photo
-        remove(join(current_app.config['UPLOAD_FOLDER'], 'images', hotel.photo))
+        try:
+            remove(join(current_app.config['UPLOAD_FOLDER'], 'images', hotel.photo))
+        except FileNotFoundError:
+            pass
     for phone in hotel.phones:
         db.session.delete(phone)
     db.session.delete(hotel)
@@ -249,16 +256,20 @@ class AddTour(View):
                 trip_mode=tour_mode,
                 is_visible=True if visibility == 'visible' else False,
                 owner_id=session['_user_id'],
-                carousel_pos=db.session.query(func.max(Tour.carousel_pos)).scalar() + 1
             )
 
-            db.session.add(new_tour)
+            carousel_pos = db.session.query(func.max(Tour.carousel_pos)).scalar()
+            if carousel_pos:
+                new_tour.carousel_pos = carousel_pos + 1
+            else:
+                new_tour.carousel_pos = 1
 
             if cover:
                 new_tour.trip_pic = cover
             if caption:
                 new_tour.pic_caption = caption
 
+            db.session.add(new_tour)
             try:
                 db.session.commit()
             except IntegrityError:
@@ -301,7 +312,7 @@ class AddLap(View):
                         flash(_('Il file "%(file)s" non è una traccia gpx ed è stato ignorato', file=file.filename),
                               category="warning")
 
-            trip_id = get_trip()
+            tour = get_trip()
             try:
                 check_lap_date(data)
             except DateOverlappingError as e:
@@ -313,9 +324,8 @@ class AddLap(View):
                 date=data,
                 start=partenza,
                 destination=arrivo,
-                tour_id=trip_id,
+                tour=tour,
             )
-            db.session.add(new_lap)
             new_lap.distance = distanza if distanza else 0
             if salita:
                 new_lap.ascent = salita
@@ -325,6 +335,8 @@ class AddLap(View):
                 new_lap.duration = tempo
             if gpx:
                 new_lap.gpx = gpx
+
+            db.session.add(new_lap)
             try:
                 db.session.commit()
             except IntegrityError:
@@ -333,11 +345,11 @@ class AddLap(View):
                 flash(_("Aggiunta tappa %(partenza)s - %(arrivo)s.", partenza=partenza, arrivo=arrivo), category="info")
                 current_app.logger.info(f"Aggiunta tappa {partenza} - {arrivo}.")
 
-                lap_id = db.session.execute(db.select(Lap.id).where(Lap.start == partenza).where(Lap.destination == arrivo)).scalar()
-                hotels = db.session.execute(db.select(Hotel).where(Hotel.check_in == data)).scalars()
-                if hotels:
-                    for hotel in hotels:
-                        hotel.lap_id = lap_id
+                # lap_id = db.session.execute(db.select(Lap.id).where(Lap.start == partenza).where(Lap.destination == arrivo)).scalar()
+                # hotels = db.session.execute(db.select(Hotel).where(Hotel.check_in == data)).scalars()
+                # if hotels:
+                #     for hotel in hotels:
+                #         hotel.lap_id = lap_id
                 db.session.commit()
 
             return redirect(url_for("lap_bp.lap_dashboard"))
@@ -353,7 +365,7 @@ class AddHotel(View):
         form = AddHotelForm()
         header = make_header()
 
-        tour_id = get_trip()
+        tour = get_trip()
 
         if request.method == 'POST':
             lap_id = request.form.get('lap')
@@ -385,17 +397,17 @@ class AddHotel(View):
                 name=name,
                 address=address,
                 town=town,
+                lap=lap
             )
 
-            new_hotel.lap_id = lap_id
             new_hotel.check_in = lap.date
-            new_hotel.check_out = new_hotel.check_in + timedelta(days=int(stay))
+            new_hotel.check_out = lap.date + timedelta(days=int(stay))
 
             try:
                 check_hotel_date(new_hotel.check_in, new_hotel.check_out)
             except DateOverlappingError as e:
                 flash(e.msg, category="error")
-                laps = db.session.execute(db.select(Lap).where(Lap.tour_id == tour_id).order_by(Lap.date)).scalars()
+                laps = db.session.execute(db.select(Lap).where(Lap.tour_id == tour.id).order_by(Lap.date)).scalars()
                 # form.lap.choices = [("", _("Scegli la tappa"), {"disabled": "disabled"})]
                 form.lap.choices = ([(lap.id, f"{lap.start} - {lap.destination}", dict()) for lap in laps])
                 form.lap.choices.extend([("", "--------", {"disabled": "disabled"})])
@@ -429,9 +441,9 @@ class AddHotel(View):
             current_app.logger.info(f"Aggiunto albergo {name} a {town}.")
             return redirect(url_for("lap_bp.hotel_dashboard"))
 
-        laps = db.session.execute(db.select(Lap).where(Lap.tour_id == tour_id).order_by(Lap.date)).scalars()
+        # laps = db.session.execute(db.select(Lap).where(Lap.tour_id == tour.id).order_by(Lap.date)).scalars()
         # form.lap.choices = [("", _("Scegli la tappa"), {"disabled": "disabled"})]
-        form.lap.choices = [(lap.id, f"{lap.start} - {lap.destination}", dict()) for lap in laps]
+        form.lap.choices = [(lap.id, f"{lap.start} - {lap.destination}", dict()) for lap in tour.laps]
         form.lap.choices.extend([("", "--------", {"disabled": "disabled"})])
         form.lap.default = ""
         form.process([])
@@ -463,7 +475,7 @@ class TourManagement(View):
             if cover:
                 this_tour.trip_pic = cover
             if caption:
-                this_tour.caption = caption
+                this_tour.pic_caption = caption
 
             db.session.commit()
 
@@ -564,7 +576,7 @@ class LoadLapMedia(View):
 
             lap = db.session.get(Lap, id)
             try:
-                register_media(lap.id, lap.gpx, media_file, caption)
+                register_media(lap, media_file, caption)
             except ZeroDivisionError:
                 flash(_(f"Il file {media_file} potrebbe essere corrotto"), category='error')
 
@@ -583,7 +595,7 @@ class UpdHotel(View):
         form = UpdHotelForm()
         header = make_header()
 
-        tour_id = get_trip()
+        tour = get_trip()
 
         if request.method == 'POST':
             lap_id = request.form.get('lap')
@@ -646,8 +658,8 @@ class UpdHotel(View):
             return redirect(url_for("lap_bp.hotel_dashboard"))
 
         hotel = db.session.get(Hotel, id)
-        laps = db.session.execute(db.select(Lap).where(Lap.tour_id == tour_id).order_by(Lap.date)).scalars()
-        form.lap.choices = [(lap.id, f"{lap.start} - {lap.destination}", dict()) for lap in laps]
+        # laps = db.session.execute(db.select(Lap).where(Lap.tour_id == tour.id).order_by(Lap.date)).scalars()
+        form.lap.choices = [(lap.id, f"{lap.start} - {lap.destination}", dict()) for lap in tour.laps]
         form.lap.default = f"{hotel.lap_id}"
         form.process([])
 
@@ -700,7 +712,7 @@ class DeleteMedia(View):
 class DeleteHotel(View):
     decorators = [login_required]
 
-    def dispatch_request(self, id, answ=True):
+    def dispatch_request(self, id):
         hotel = db.session.get(Hotel, id)
 
         if hotel:

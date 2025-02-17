@@ -29,6 +29,7 @@ class Tour(db.Model):
     carousel_pos: Mapped[Optional[int]]
     owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     owner: Mapped["Users"] = relationship(back_populates="tours")
+    laps: Mapped[List["Lap"]] = relationship(back_populates="tour", order_by="Lap.date")
 
     __table_args__ = (UniqueConstraint('name', 'trip_mode', name='name_mode_uc'),)
 
@@ -45,11 +46,13 @@ class Lap(db.Model):
     distance: Mapped[Optional[float]] = mapped_column(FLOAT, default=0)
     ascent: Mapped[Optional[int]]
     descent: Mapped[Optional[int]]
-    gpx: Mapped[Optional[str]] = mapped_column(String(48))
+    gpx: Mapped[Optional[str]] = mapped_column(String(64))
     done: Mapped[Optional[bool]] = mapped_column(BOOLEAN, default=False)
     tour_id: Mapped[int] = mapped_column(ForeignKey("tour.id"))
+    tour: Mapped["Tour"] = relationship(back_populates="laps", uselist=False)
+
     hotels: Mapped[List["Hotel"]] = relationship(back_populates="lap")
-    photos: Mapped[List["Media"]] = relationship(back_populates="lap")
+    photos: Mapped[List["Media"]] = relationship(back_populates="lap", order_by="Media.date")
 
     __table_args__ = (UniqueConstraint('tour_id', 'date', name='tour_lap_at_date_uc'),)
 
@@ -71,7 +74,7 @@ class Hotel(db.Model):
     link: Mapped[Optional[str]]
     lat: Mapped[Optional[float]]
     long: Mapped[Optional[float]]
-    lap_id: Mapped[int] = mapped_column(ForeignKey("lap.id", ondelete="cascade"))
+    lap_id: Mapped[int] = mapped_column(ForeignKey("lap.id"))
     lap: Mapped["Lap"] = relationship(back_populates="hotels", uselist=False)
     phones: Mapped[List["PhoneNumber"]] = relationship(back_populates="hotel")
 
@@ -101,7 +104,7 @@ class Media(db.Model):
     lat: Mapped[Optional[float]] = mapped_column(FLOAT)
     long: Mapped[Optional[float]] = mapped_column(FLOAT)
     caption: Mapped[Optional[str]] = mapped_column(String(128))
-    lap_id: Mapped[int] = mapped_column(ForeignKey("lap.id", ondelete="cascade"), nullable=True)
+    lap_id: Mapped[int] = mapped_column(ForeignKey("lap.id"))
     lap: Mapped["Lap"] = relationship(back_populates="photos", uselist=False)
 
     __table_args__ = (UniqueConstraint('lap_id', 'media_src', name='lap_media_uc'), )

@@ -71,9 +71,11 @@
                 <p id="yes" class="w3-bar-item w3-button w3-theme-action w3-hover-theme-d2 w3-ripple w3-right">{{ _('SI') }}</a>
             </div>
         </div>
+
         <div style="display: none">
             {{ form.submit_del }}
         </div>
+
     </form>
 
     <div class="w3-center" style="margin-bottom: 20px; margin-top: 50px;">
@@ -90,7 +92,8 @@ const tour = document.querySelector("#tour");
 const caption = document.querySelector("#caption");
 
 form.addEventListener("submit", examineForm);
-document.querySelector('#sure').addEventListener("click", beCautious);
+const sure = document.querySelector('#sure')
+sure.addEventListener("click", beCautious);
 document.querySelector("#no").addEventListener("click", (evt) => {
                                             document.querySelector("#danger").style.display = "none";
                                            });
@@ -105,6 +108,7 @@ document.querySelector("#yes").addEventListener("click", (evt) => {
 function beCautious(evt) {
     if (is_valid()) {
         document.querySelector("#danger").style.display = "block";
+        sure.style.display = "none";
         const tour_id = document.querySelector('#tour').value;
         const opts = document.querySelector('#tour').options;
         let tour

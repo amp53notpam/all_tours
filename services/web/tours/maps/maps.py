@@ -47,5 +47,5 @@ class PhotoMap(View):
 
 
 map_bp.add_url_rule('/lap/<int:id>', view_func=LapMap.as_view('lap_map'))
-map_bp.add_url_rule('/albergi/<float:lat>/<float:long>', view_func=HotelMap.as_view('hotel_map'))
-map_bp.add_url_rule('/foto/<float:lat>/<float:long>', view_func=PhotoMap.as_view('photo_map'))
+map_bp.add_url_rule('/hotel/<float:lat>/<float:long>', view_func=HotelMap.as_view('hotel_map'))
+map_bp.add_url_rule('/media/<float:lat>/<float:long>', view_func=PhotoMap.as_view('photo_map'))

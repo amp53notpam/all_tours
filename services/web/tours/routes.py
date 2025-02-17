@@ -19,7 +19,7 @@ class Start(View):
         form = SelectTripForm()
 
         if request.method == 'POST':
-            trip = request.form.get('trip')
+            trip = int(request.form.get('trip'))
             if trip:
                 if trip != 'add_tour':
                     # active_trip = db.session.execute(db.select(Tour).where(Tour.is_active)).fetchone()

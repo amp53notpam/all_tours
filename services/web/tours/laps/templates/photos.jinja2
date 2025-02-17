@@ -49,7 +49,7 @@ id="album" data-lap-id="{{ lap.id }}"
 <script>
     const SCRIPT_ROOT = {{ url_for("lap_bp.lap_media_js", id=-1)|tojson }};
     const DELETE_MEDIA = {{ url_for("dbms_bp.delete_media", media="tbd")|tojson }};
-    {% if is_editable == 'True' %}
+    {% if is_editable %}
     const IS_EDITABLE = true;
     {% else %}
     const IS_EDITABLE = false;

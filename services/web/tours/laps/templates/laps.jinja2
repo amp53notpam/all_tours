@@ -14,7 +14,7 @@
 <div id="sidebar" class="w3-sidebar w3-bar-block w3-collapse w3-card w3-animate-zoom w3-theme-l3" style="width: 25%; overflow: auto">
     <h5 class="w3-bar-item w3-theme-d4">{{ _('Tappe') }}</h5>
     {% for lap in laps %}
-    <button id="btn_{{ lap.Lap.id }}" class="w3-bar-item w3-button w3-ripple w3-hover-theme tablink"  data-lap-id="{{ lap.Lap.id }}">{{ lap.Lap.start }} - {{ lap.Lap.destination }}</button>
+    <button id="btn_{{ lap.id }}" class="w3-bar-item w3-button w3-ripple w3-hover-theme tablink"  data-lap-id="{{ lap.id }}">{{ lap.start }} - {{ lap.destination }}</button>
     {% endfor %}
 
     {% if is_editable %}

@@ -116,6 +116,7 @@ const style = {
   }),
 };
 
+{% if track %}
 const gpxLayer = new ol.layer.Vector({
     source: new ol.source.Vector({
         url: {{ url_for("download_files", filename="tracks/"+track)|tojson }},
@@ -125,6 +126,7 @@ const gpxLayer = new ol.layer.Vector({
         return style[feature.getGeometry().getType()];
     },
 });
+{% endif %}
 
 const iconStyle = new ol.style.Style({
     image: new ol.style.Icon({
@@ -138,7 +140,9 @@ const iconStyle = new ol.style.Style({
 const map = new ol.Map({
   layers: [
     tileLayer,
+    {% if track %}
     gpxLayer
+    {% endif %}
   ],
   controls: ol.control.defaults.defaults({attribution: false}).extend([attribution]),
   target: 'map',

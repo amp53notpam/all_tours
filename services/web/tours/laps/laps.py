@@ -27,18 +27,37 @@ def get_stats(laps):
     tappe_fatte = 0
     tappe_tot = 0
     for lap in laps:
-        if lap.Lap.distance:
-            km_tot += lap.Lap.distance
+        if lap.distance:
+            km_tot += lap.distance
         tappe_tot += 1
         try:
-            if lap.Lap.date < date.today() or lap.Lap.done:
-                if lap.Lap.distance:
-                    km_done += lap.Lap.distance
+            if lap.done:
+                if lap.distance:
+                    km_done += lap.distance
                 tappe_fatte += 1
         except AttributeError:
             pass
 
     return dict([('total_km', round(km_tot, 2)), ('done_km', round(km_done, 2)), ('left_km', km_tot - km_done), ('num_tappe', tappe_tot), ('tappe_fatte', tappe_fatte), ('tappe_da_fare', tappe_tot - tappe_fatte)])
+
+
+def get_laps_prev_next(lap):
+    tour = get_trip()
+    laps = tour.laps
+
+    lap_idx = laps.index(lap)
+
+    if lap_idx != 0:
+        prev_lap = laps[lap_idx - 1]
+    else:
+        prev_lap = None
+
+    try:
+        next_lap = laps[lap_idx + 1]
+    except IndexError:
+        next_lap = None
+
+    return laps, prev_lap, next_lap
 
 
 def is_editable():
@@ -63,8 +82,8 @@ class Laps(View):
         header = make_header()
 
         try:
-            trip_id = get_trip()
-            laps = db.session.execute(db.select(Lap).where(Lap.tour_id == trip_id).order_by(Lap.date)).all()
+            tour = get_trip()
+            laps = tour.laps
         except (OperationalError, ProgrammingError):
             flash(_('Database assente! Prova più tardi'), category="error")
             return render_template('index.jinja2', header=header)
@@ -77,7 +96,7 @@ class Hotels(View):
         header = make_header()
 
         try:
-            trip_id = get_trip()
+            trip_id = get_trip().id
             hotels = db.session.execute(
                 db.select(Hotel).join(Lap, Hotel.lap_id == Lap.id).where(Lap.tour_id == trip_id).order_by(
                     Hotel.check_in)).all()
@@ -94,11 +113,8 @@ class Hotels(View):
 class SingleLap(View):
     def dispatch_request(self, id):
         header = make_header()
-
         lap = db.session.get(Lap, id)
-        laps = db.session.execute(db.select(Lap).where(Lap.tour_id == lap.tour_id).order_by(Lap.date)).all()
-        prev_lap = db.session.execute(db.select(Lap.id, Lap.start, Lap.destination).where(Lap.destination == lap.start)).fetchone()
-        next_lap = db.session.execute(db.select(Lap.id, Lap.start, Lap.destination).where(Lap.start == lap.destination)).fetchone()
+        laps, prev_lap, next_lap = get_laps_prev_next(lap)
 
         return render_template("lap.jinja2", laps=laps, lap=lap, prev_lap=prev_lap, next_lap=next_lap, stats=None, header=header, is_editable=is_editable())
 
@@ -121,8 +137,10 @@ class SingleLapJS(View):
         this_lap = db.session.get(Lap, id)
         if this_lap is None:
             return ""
-        prev_lap = db.session.execute(db.select(Lap.id, Lap.start, Lap.destination).where(Lap.destination == this_lap.start)).fetchone()
-        next_lap = db.session.execute(db.select(Lap.id, Lap.start, Lap.destination).where(Lap.start == this_lap.destination)).fetchone()
+
+        x, prev_lap, next_lap = get_laps_prev_next(this_lap)
+        # prev_lap = db.session.execute(db.select(Lap.id, Lap.start, Lap.destination).where(Lap.destination == this_lap.start)).fetchone()
+        # next_lap = db.session.execute(db.select(Lap.id, Lap.start, Lap.destination).where(Lap.start == this_lap.destination)).fetchone()
 
         short_html = make_short_template("lap.jinja2")
         return render_template(short_html, lap=this_lap, prev_lap=prev_lap, next_lap=next_lap, is_editable=is_editable())
@@ -139,10 +157,11 @@ class SingleHotelJS(View):
 class SingleLapMedia(View):
     def dispatch_request(self, id):
         header = make_header()
-        can_edit = is_editable().__repr__()
+        can_edit = is_editable()
         this_lap = db.session.get(Lap, id)
-        prev_lap = db.session.execute(db.select(Lap.id, Lap.start, Lap.destination).where(Lap.destination == this_lap.start)).fetchone()
-        next_lap = db.session.execute(db.select(Lap.id, Lap.start, Lap.destination).where(Lap.start == this_lap.destination)).fetchone()
+        x, prev_lap, next_lap = get_laps_prev_next(this_lap)
+        # prev_lap = db.session.execute(db.select(Lap.id, Lap.start, Lap.destination).where(Lap.destination == this_lap.start)).fetchone()
+        # next_lap = db.session.execute(db.select(Lap.id, Lap.start, Lap.destination).where(Lap.start == this_lap.destination)).fetchone()
         photos = db.session.execute(db.select(Media).where(Media.lap_id == id).order_by(Media.date)).fetchall()
 
         return render_template("photos.jinja2", header=header, lap=this_lap, prev_lap=prev_lap, next_lap=next_lap, photos=photos, is_editable=can_edit)
@@ -150,19 +169,21 @@ class SingleLapMedia(View):
 
 class SingleLapMediaJS(View):
     def dispatch_request(self, id):
-        medias = db.session.execute(db.select(Media).where(Media.lap_id == id).order_by(Media.date)).fetchall()
+        lap = db.session.get(Lap, id)
+        medias = lap.photos
+        # medias = db.session.execute(db.select(Media).where(Media.lap_id == id).order_by(Media.date)).fetchall()
 
         data = []
         for media in medias:
-            foto = {"src": url_for("download_files", filename="images/" + media.Media.media_src),
-                    "width": media.Media.media_width,
-                    "height": media.Media.media_height,
-                    "type": media.Media.media_type,
-                    "date": media.Media.date,
-                    "caption": media.Media.caption,
-                    "lat": media.Media.lat,
-                    "long": media.Media.long,
-                    "map": url_for("map_bp.photo_map", lat=media.Media.lat, long=media.Media.long) if media.Media.lat else None
+            foto = {"src": url_for("download_files", filename="images/" + media.media_src),
+                    "width": media.media_width,
+                    "height": media.media_height,
+                    "type": media.media_type,
+                    "date": media.date,
+                    "caption": media.caption,
+                    "lat": media.lat,
+                    "long": media.long,
+                    "map": url_for("map_bp.photo_map", lat=media.lat, long=media.long) if media.lat else None
                     }
             data.append(foto)
 
