@@ -3,7 +3,7 @@
 ###########
 
 # pull the official base image
-FROM python:3.12.8-slim-bookworm AS builder
+FROM python:3.13.2-slim-bookworm AS builder
 
 # set the work directory
 WORKDIR /usr/src/app
@@ -31,7 +31,7 @@ RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requir
 #########
 
 # pull official base image for python
-FROM python:3.12.8-slim-bookworm
+FROM python:3.13.2-slim-bookworm
 
 # install system dependencies
 RUN apt-get update && apt-get install -y locales bind9-dnsutils && rm -r /var/lib/apt/lists/*
