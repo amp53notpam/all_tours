@@ -16,7 +16,7 @@ services:
         ports:
             - 5000:10000
         extra_hosts:
-            - "host.docker.internal:host-gateway"
+            - "host.container.internal:host-gateway"
         volumes:
             - upld_vol:/home/flasker/web/uploaded
         env_file:
@@ -27,8 +27,8 @@ services:
 volumes:
     upld_vol:
 
-networks:
-    ntw_1:
-        name: bridge
-        external: true
-
+#networks:
+#    ntw_1:
+#        name: bridge
+#        external: true
+#
