@@ -24,8 +24,8 @@ def upgrade():
 
     with op.batch_alter_table('media', schema=None) as batch_op:
         batch_op.alter_column('lap_id',
-               existing_type=sa.INTEGER(),
-               nullable=False)
+                              existing_type=sa.INTEGER(),
+                              nullable=False)
         batch_op.drop_constraint('media_lap_id_fkey', type_='foreignkey')
         batch_op.create_foreign_key(None, 'lap', ['lap_id'], ['id'])
 
@@ -38,8 +38,8 @@ def downgrade():
         batch_op.drop_constraint(None, type_='foreignkey')
         batch_op.create_foreign_key('media_lap_id_fkey', 'lap', ['lap_id'], ['id'], ondelete='CASCADE')
         batch_op.alter_column('lap_id',
-               existing_type=sa.INTEGER(),
-               nullable=True)
+                              existing_type=sa.INTEGER(),
+                              nullable=True)
 
     with op.batch_alter_table('hotel', schema=None) as batch_op:
         batch_op.drop_constraint(None, type_='foreignkey')

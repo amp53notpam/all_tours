@@ -89,4 +89,3 @@ def is_displayable(tour):
 
 def get_trip():
     return db.session.execute(db.select(Tour).where(Tour.id == int(session['trip']))).scalar()
-

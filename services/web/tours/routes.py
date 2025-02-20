@@ -19,7 +19,7 @@ class Start(View):
         form = SelectTripForm()
 
         if request.method == 'POST':
-            trip = int(request.form.get('trip'))
+            trip = request.form.get('trip')
             if trip:
                 if trip != 'add_tour':
                     # active_trip = db.session.execute(db.select(Tour).where(Tour.is_active)).fetchone()
@@ -30,7 +30,7 @@ class Start(View):
                     # next_active = db.session.execute(db.select(Tour).where(Tour.id == trip)).fetchone()
                     # next_active.Tour.is_active = True
                     # db.session.commit()
-                    session['trip'] = trip
+                    session['trip'] = int(trip)
                 else:
                     return redirect(url_for('dbms_bp.add_tour'))
 

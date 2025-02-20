@@ -54,10 +54,11 @@ def to_datetime_time(time_str):
 
 def update_all_dates(laps, new_date, old_date):
     delta_t = new_date - old_date
+    tour = db.session.get(Tour, session['trip'])
     if delta_t.days < 0:
-        if db.session.execute(db.select(Lap).where(Lap.date.between(new_date, old_date - timedelta(days=1))).order_by(Lap.date)).all():
+        if db.session.execute(db.select(Lap).where(Lap.date.between(new_date, old_date - timedelta(days=1))).where(Lap.tour_id == tour.id).order_by(Lap.date)).all():
             raise DateOverlappingError(_("Non ci sono abbastanza giorni liberi per spostare la tappa indietro nel tempo"))
-        hotel = db.session.execute(db.select(Hotel).where(Hotel.check_out.between(new_date + timedelta(days=1), old_date)).order_by(Hotel.check_out)).all()
+        hotel = db.session.execute(db.select(Hotel).where(Hotel.check_out.between(new_date + timedelta(days=1), old_date)).where(Hotel.lap in tour.laps).order_by(Hotel.check_out)).all()
         if hotel:
             raise DateOverlappingError(_(f'La data di check out dell\'albergo "{hotel[0].Hotel.name}" è incompatibile con la nuova data'))
     for lap in laps:
@@ -149,7 +150,7 @@ def register_media(lap, media, caption):
 
 
 def check_lap_date(date):
-    tour= get_trip()
+    tour = get_trip()
     laps = db.session.execute(db.select(Lap).where(Lap.tour_id == tour.id).order_by(Lap.date)).scalars()
     for lap in laps:
         hotels = db.session.execute(db.select(Hotel).where(Hotel.lap_id == lap.id).order_by(Hotel.check_in)).scalars()
@@ -628,7 +629,7 @@ class UpdHotel(View):
                 check_hotel_date(hotel.check_in, hotel.check_out)
             except DateOverlappingError as e:
                 flash(e.msg, category="error")
-                laps = db.session.execute(db.select(Lap).where(Lap.tour_id == tour_id).order_by(Lap.date)).scalars()
+                laps = db.session.execute(db.select(Lap).where(Lap.tour_id == tour.id).order_by(Lap.date)).scalars()
                 form.lap.choices = [(lap.id, f"{lap.start} - {lap.destination}", dict()) for lap in laps]
                 form.lap.default = f"{hotel.lap_id}"
                 form.process([])
