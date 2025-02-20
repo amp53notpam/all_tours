@@ -2,7 +2,7 @@ services:
     web:
         build:
             context: ./services/web
-            dockerfile: Dockerfile
+            dockerfile: Containerfile
             tags: 
                 - amptours:latest
                 - angelo53/amptours:latest
