@@ -65,7 +65,7 @@ class Hotel(db.Model):
     name: Mapped[str] = mapped_column(String(48))
     address: Mapped[str] = mapped_column(String(48))
     town: Mapped[str] = mapped_column(String(32))
-    email: Mapped[Optional[str]] = mapped_column(String(32))
+    email: Mapped[Optional[str]] = mapped_column(String(48))
     check_in: Mapped[Optional[date]]
     check_out: Mapped[Optional[date]]
     reserved: Mapped[Optional[bool]] = mapped_column(BOOLEAN, default=False)
@@ -115,7 +115,7 @@ class Media(db.Model):
 
 class PhoneNumber(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
-    phone: Mapped[Optional[str]] = mapped_column(String(16))
+    phone: Mapped[Optional[str]] = mapped_column(String(24))
     href_phone: Mapped[Optional[str]] = mapped_column(String(16), unique=True)
     hotel_id: Mapped[int] = mapped_column(ForeignKey("hotel.id"))
     hotel: Mapped["Hotel"] = relationship(back_populates="phones", uselist=False)

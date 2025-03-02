@@ -2,10 +2,10 @@ services:
     web:
         build:
             context: ./services/web
-            dockerfile: Containerfile
+            dockerfile: Dockerfile
             tags: 
+                - amptours:latest
                 - angelo53/amptours:latest
-        image: ghcr.io/amp53notpam/amptours
         container_name: amptours
         command: >-
                   gunicorn --worker-class gthread --workers 2
@@ -16,11 +16,9 @@ services:
         ports:
             - 5000:10000
         extra_hosts:
-            - "host.container.internal:host-gateway"
+            - "host.docker.internal:host-gateway"
         volumes:
             - upld_vol:/home/flasker/web/uploaded
-        networks:
-            - ntw
         env_file:
             - ./.env.pg
         environment:
@@ -30,4 +28,7 @@ volumes:
     upld_vol:
 
 networks:
-    ntw:
+    ntw_1:
+        name: bridge
+        external: true
+

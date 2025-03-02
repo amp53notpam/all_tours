@@ -173,7 +173,7 @@ map.addEventListener('click', (evt) => {
      if (map.hasFeatureAtPixel(evt.pixel) === true) {
          const coordinate = evt.coordinate;
 
-         content.innerHTML = '<p class="w3-medium w3-center">{{ popup }}</p>';
+         content.innerHTML = "<p class='w3-medium w3-center'>{{ popup }}</p>";
          overlay.setOffset([0,0]);
          overlay.setPosition(coordinate);
      }
@@ -188,7 +188,7 @@ function checkSize() {
 map.on('change:size', checkSize);
 checkSize();
 
-content.innerHTML = '<p class="w3-medium w3-center">{{ popup }}</p>';
+content.innerHTML = "<p class='w3-medium w3-center'>{{ popup }}</p>";
 overlay.setPosition(ol.proj.fromLonLat([{{ long }}, {{ lat }}]));
 
 </script>
