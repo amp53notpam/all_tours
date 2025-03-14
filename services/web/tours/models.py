@@ -62,7 +62,7 @@ class Lap(db.Model):
 
 class Hotel(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(48))
+    name: Mapped[str] = mapped_column(String(64))
     address: Mapped[str] = mapped_column(String(48))
     town: Mapped[str] = mapped_column(String(32))
     email: Mapped[Optional[str]] = mapped_column(String(48))

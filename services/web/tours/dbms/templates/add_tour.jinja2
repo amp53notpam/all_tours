@@ -1,5 +1,7 @@
 {% extends 'layout.jinja2' %}
 
+{% block title %}{{ _('Nuovo viaggio') }}{% endblock %}
+
 {% block header %}
 {{ header if header is not none else super() }}
 {% endblock %}

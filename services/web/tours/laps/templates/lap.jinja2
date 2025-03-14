@@ -36,7 +36,7 @@
     {# $Begin #}
     <header>
         <div class="w3-display-container" style="height: 200px;">
-            <h3 class="w3-display-middle">{{ lap.start }} - {{ lap.destination }}</h3>
+            <h3 class="w3-display-middle">{{ lap.start }} - {{ lap.destination }} {% if lap.done %}<i  class="fa-solid fa-check done"></i>{% endif %}</h3>
         </div>
     </header>
 
@@ -86,7 +86,7 @@
         {% if lap.duration %}
         <div class="row w3-row">
             <div class="w3-container w3-third w3-mobile">
-                <p class="w3-left-align wbold">{{ _('Tempo') }}:</p>
+                <p class="w3-left-align wbold">{{ _('Tempo') }}{% if not lap.done %} {{ _(' stimato') }}{% endif %}:</p>
             </div>
             <div class="w3-container w3-twothird w3-mobile">
                 {% if lap.duration.second %}
@@ -101,7 +101,7 @@
         {% if lap.distance and lap.duration %}
         <div class="row w3-row">
             <div class="w3-container w3-third w3-mobile">
-                <p class="w3-left-align wbold">{{ _('Media prevista') }}:</p>
+                <p class="w3-left-align wbold">{{ _('Media') }}{% if not lap.done %} {{ _(' prevista') }}{% endif %}:</p>
             </div>
             <div class="w3-container w3-twothird w3-mobile">
                 {% set media = lap.distance * 1000 / ( lap.duration.hour * 3600 + lap.duration.minute *60 + lap.duration.second) * 3.6 %}
@@ -109,19 +109,6 @@
             </div>
         </div>
         {% endif %}
-
-        <div class="row w3-row">
-            <div class="w3-container w3-third w3-mobile">
-                <p class="w3-left-align wbold">{{ _('Fatta') }}:</p>
-            </div>
-            <div class="w3-container w3-twothird w3-mobile">
-                {% if lap.done %}
-                    <p class="w3-left-align"><i  class="fa-solid fa-check done"></i></p>
-                {% else %}
-                    <p></p>
-                {% endif %}
-            </div>
-        </div>
 
         {% if lap.gpx %}
         <div class="row w3-row">
@@ -171,6 +158,21 @@
             </div>
         </div>
         {% endif %}
+
+        {#
+        <div class="row w3-row">
+            <div class="w3-container w3-third w3-mobile">
+                <p class="w3-left-align wbold">{{ _('Fatta') }}:</p>
+            </div>
+            <div class="w3-container w3-twothird w3-mobile">
+                {% if lap.done %}
+                    <p class="w3-left-align"><i  class="fa-solid fa-check done"></i></p>
+                {% else %}
+                    <p></p>
+                {% endif %}
+            </div>
+        </div>
+        #}
 
         {% if lap.photos %}
         <div class="w3-content w3-theme w3-hover-theme Xref">

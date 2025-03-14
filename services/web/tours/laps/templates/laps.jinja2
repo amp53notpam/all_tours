@@ -57,24 +57,44 @@
                 </div>
             </div>
 
-            {% if stats['tappe_fatte'] %}
             <div class="row w3-row">
                 <div class="w3-container w3-third w3-mobile">
-                    <p class="w3-left-align wbold">{{ _('Tappe fatte') }}:</p>
+                    <p class="w3-left-align wbold">{{ _('Salita') }}:</p>
                 </div>
                 <div class="w3-container w3-twothird w3-mobile">
-                    <p class="w3-left-align">{{ stats['tappe_fatte'] }}</p>
+                    <p class="w3-left-align">{{ stats['tot_ascent'] }} m.</p>
                 </div>
             </div>
 
             <div class="row w3-row">
                 <div class="w3-container w3-third w3-mobile">
-                    <p class="w3-left-align wbold">{{ _('Kilometri percorsi') }}:</p>
+                    <p class="w3-left-align wbold">{{ _('Discese') }}:</p>
                 </div>
                 <div class="w3-container w3-twothird w3-mobile">
-                    <p class="w3-left-align">{{ stats['done_km'] }}</p>
+                    <p class="w3-left-align">{{ stats['tot_descent'] }} m.</p>
                 </div>
             </div>
+
+            {% if stats['tappe_fatte'] %}
+                {% if stats['tappe_fatte'] < stats['num_tappe'] %}
+                <div class="row w3-row">
+                    <div class="w3-container w3-third w3-mobile">
+                        <p class="w3-left-align wbold">{{ _('Tappe fatte') }}:</p>
+                    </div>
+                    <div class="w3-container w3-twothird w3-mobile">
+                        <p class="w3-left-align">{{ stats['tappe_fatte'] }}</p>
+                    </div>
+                </div>
+
+                <div class="row w3-row">
+                    <div class="w3-container w3-third w3-mobile">
+                        <p class="w3-left-align wbold">{{ _('Kilometri percorsi') }}:</p>
+                    </div>
+                    <div class="w3-container w3-twothird w3-mobile">
+                        <p class="w3-left-align">{{ stats['done_km'] }}</p>
+                    </div>
+                </div>
+                {% endif %}
             {% endif %}
         </article>
 

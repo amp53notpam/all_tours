@@ -23,12 +23,19 @@ def add_upload_path():
 
 def get_stats(laps):
     km_tot = 0
+    ascent_tot = 0
+    descent_tot = 0
+    tappe_tot = 0
+
     km_done = 0
     tappe_fatte = 0
-    tappe_tot = 0
     for lap in laps:
         if lap.distance:
             km_tot += lap.distance
+        if lap.ascent:
+            ascent_tot += lap.ascent
+        if lap.descent:
+            descent_tot += lap.descent
         tappe_tot += 1
         try:
             if lap.done:
@@ -38,7 +45,8 @@ def get_stats(laps):
         except AttributeError:
             pass
 
-    return dict([('total_km', round(km_tot, 2)), ('done_km', round(km_done, 2)), ('left_km', km_tot - km_done), ('num_tappe', tappe_tot), ('tappe_fatte', tappe_fatte), ('tappe_da_fare', tappe_tot - tappe_fatte)])
+    # return dict([('total_km', round(km_tot, 2)), ('done_km', round(km_done, 2)), ('left_km', km_tot - km_done), ('num_tappe', tappe_tot), ('tappe_fatte', tappe_fatte), ('tappe_da_fare', tappe_tot - tappe_fatte)])
+    return dict([('total_km', round(km_tot, 2)), ('done_km', round(km_done, 2)), ('num_tappe', tappe_tot), ('tappe_fatte', tappe_fatte), ('tot_ascent', ascent_tot), ('tot_descent', descent_tot)])
 
 
 def get_laps_prev_next(lap):
