@@ -7,7 +7,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import func
 from wtforms.validators import ValidationError
-from ..models import Users, Tour
+from ..models import User, Tour
 from .forms import LogInForm, SignUpForm, ResetPasswordForm, LostPasswordForm
 from .. import db, mail
 from ..utils import make_header
@@ -42,7 +42,7 @@ class Login(View):
             password = request.form.get('password')
             remember = True if request.form.get('remember') else False
 
-            user = db.session.execute(db.select(Users).where(Users.username == username)).scalar()
+            user = db.session.execute(db.select(User).where(User.username == username)).scalar()
 
             if not user or not check_password_hash(user.password, password):
                 flash(_('E-mail o password errate! Riprova...'), category='error')
@@ -86,7 +86,7 @@ class SignUp(View):
                 error = _('Le password non coincidono')
 
             if not error:
-                new_user = Users(
+                new_user = User(
                     username=username,
                     password=generate_password_hash(password),
                     email=email
@@ -136,7 +136,7 @@ class LostPassword(View):
 
         if form.validate_on_submit():
             username = request.form.get('username')
-            user = db.session.execute(db.select(Users).where(Users.username == username)).scalar()
+            user = db.session.execute(db.select(User).where(User.username == username)).scalar()
             if not user:
                 flash(_('Utente sconosciuto'), category='warning')
                 return render_template("lost_password.jinja2", form=form, header=header)
@@ -159,7 +159,7 @@ class ResetPassword(View):
 
         if form.validate_on_submit():
             password = request.form.get('new_password')
-            user = db.session.get(Users, user)
+            user = db.session.get(User, user)
             user.password = generate_password_hash(password)
             db.session.commit()
 

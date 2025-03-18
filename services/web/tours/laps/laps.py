@@ -5,7 +5,7 @@ from flask import (
 from flask.views import View
 from sqlalchemy.exc import OperationalError, ProgrammingError
 from .. import db
-from ..models import Lap, Hotel, Tour, Media, Users
+from ..models import Lap, Hotel, Tour, Media, User
 from ..utils import make_header, make_short_template, get_trip
 from flask_babel import _
 
@@ -73,7 +73,7 @@ def is_editable():
         # no user logged in
         return False
 
-    user = db.session.get(Users, session['_user_id'])
+    user = db.session.get(User, session['_user_id'])
     if user.is_admin:
         # the admin should be able to edit "ALL" tours
         return True

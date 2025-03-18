@@ -1,7 +1,7 @@
 from os import remove
 from os.path import join
 from datetime import datetime, date, time, timedelta
-from re import compile, sub, search
+from re import compile, sub
 from subprocess import Popen, PIPE, STDOUT
 from shlex import split
 from flask import Blueprint, render_template, redirect, request, url_for, flash, current_app, session, jsonify
@@ -11,7 +11,7 @@ from flask_babel import _
 from sqlalchemy import func, desc
 from sqlalchemy.exc import IntegrityError
 from werkzeug.utils import secure_filename
-from ..models import Lap, Hotel, Tour, Media, Users, PhoneNumber
+from ..models import Lap, Hotel, Tour, Media, User, PhoneNumber
 from .forms import AddTourForm, AddLapForm, UpdLapForm, AddHotelForm, UpdHotelForm, LoadMediaForm, TourMgmtForm
 from .. import db
 from ..utils import make_header, translations, get_trip
@@ -173,23 +173,24 @@ def check_hotel_date(check_in, check_out):
 def do_phone_mngmt(hotel, act, phone):
     phones = hotel.phones
     href_phone = sub(' ', '', phone)
+    phone_obj = db.session.execute(db.select(PhoneNumber).where(PhoneNumber.href_phone == href_phone)).scalar()
     if act == 'add':
-        new_phone = PhoneNumber(
-            phone=phone,
-            href_phone=href_phone,
-            hotel_id=hotel.id
-        )
-        for phone in phones:
-            if phone.href_phone == new_phone.href_phone:
-                # the phone number is already in the database, so return without do anything
-                return
-        db.session.add(new_phone)
+        if not phone_obj:
+            phone_obj = PhoneNumber(
+                phone=phone,
+                href_phone=href_phone
+            )
+            db.session.add(phone_obj)
+        if phone_obj not in phones:
+            phones.append(phone_obj)
     else:
-        for phone in phones:
-            if href_phone == phone.href_phone:
-                db.session.delete(phone)
-                break
-
+        if not phone_obj:
+            # The telephone number does not exist in the db: nothing to do
+            return
+        if phone_obj in phones:
+            phones.remove(phone_obj)
+        if not phone_obj.hotel:
+            db.session.delete(phone_obj)
 
 def delete_lap(lap):
     # delete the relevant track file
@@ -276,7 +277,7 @@ class AddTour(View):
             except IntegrityError:
                 flash(_("Un viaggio con nome %(titolo)s esiste già.", titolo=title))
             else:
-                user = db.session.get(Users, session['_user_id'])
+                user = db.session.get(User, session['_user_id'])
                 session['tours'] = len(user.tours)
                 flash(_('Aggiunto viaggio "%(titolo)s".', titolo=title), category="info")
                 current_app.logger.info(f"Aggiunta viaggio {title} da {user.username}")
@@ -374,7 +375,11 @@ class AddHotel(View):
             address = request.form.get('address')
             town = request.form.get('town')
             stay = request.form.get('stay')
-            phone = request.form.get('phone')
+            phones = []
+            phones.append(request.form.get('phone_1'))
+            phones.append(request.form.get('phone_2'))
+            phones.append(request.form.get('phone_3'))
+            phones = [p for p in phones if p]
             email = request.form.get('email')
             latitude = request.form.get('geo_lat')
             longitude = request.form.get('geo_long')
@@ -417,11 +422,12 @@ class AddHotel(View):
 
                 return render_template("add_hotel.jinja2", form=form, header=header)
 
-            if phone:
-                new_hotel.phones = [PhoneNumber(phone=phone,
-                                                href_phone=sub(' ', '', phone)
-                                                )
-                                    ]
+            for phone in phones:
+                new_hotel.phones.append(PhoneNumber(phone=phone,
+                                                    href_phone=sub(' ', '', phone)
+                                                    )
+                                        )
+
             if email:
                 new_hotel.email = email
             if latitude and longitude:
@@ -482,7 +488,7 @@ class TourManagement(View):
 
             return redirect(url_for("start"))
 
-        user = db.session.get(Users, session['_user_id'])
+        user = db.session.get(User, session['_user_id'])
 
         form.tour.choices = [(tour.id, tour.name + " " + translations[tour.trip_mode], dict()) for tour in user.tours]
         form.tour.choices.extend([("", "--------", {"disabled": "disabled"})])

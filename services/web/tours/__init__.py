@@ -1,5 +1,4 @@
 import os
-from datetime import datetime, time
 import logging
 from logging.handlers import RotatingFileHandler
 from click import echo
@@ -66,11 +65,11 @@ def initialize_extensions(app):
     login_manager.login_view = 'auth_bp.login'
     login_manager.init_app(app)
 
-    from .models import Users
+    from .models import User
 
     @login_manager.user_loader
     def load_user(user_id):
-        return db.session.get(Users, int(user_id))
+        return db.session.get(User, int(user_id))
 
     babel.init_app(app, default_locale='it', locale_selector=get_locale)
 
@@ -144,10 +143,10 @@ def register_cli_commands(app):
     @app.cli.command('register_admins')
     def register_admins():
         """ Create the database admins"""
-        from .models import Users
+        from .models import User
 
         with app.app_context():
             admins = [{'username': 'tourAdmin', 'password': generate_password_hash('Santiago2024!'), 'email': 'admin@tours.org', 'is_admin': True}
                       ]
-            db.session.bulk_insert_mappings(Users, admins)
+            db.session.bulk_insert_mappings(User, admins)
             db.session.commit()

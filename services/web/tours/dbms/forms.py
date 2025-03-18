@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_babel import lazy_gettext as _l
 from flask_wtf.file import FileField, MultipleFileField, FileRequired, FileAllowed
-from wtforms import StringField, IntegerField, FloatField, SubmitField, URLField, BooleanField, EmailField, TelField, RadioField, SelectField, DateField, TimeField, validators
+from wtforms import StringField, IntegerField, FloatField, SubmitField, URLField, BooleanField, EmailField, TelField, RadioField, SelectField, DateField, TimeField
 from wtforms.validators import DataRequired, Email
 
 
@@ -43,7 +43,9 @@ class AddHotelForm(FlaskForm):
     geo_lat = FloatField("Lat. & Long.")
     geo_long = FloatField()
     email = EmailField("E-mail", validators=[Email(message=_l('E-mail non valida'))])
-    phone = TelField(_l('Telefono'))
+    phone_1 = TelField(_l('Telefono'))
+    phone_2 = TelField(_l('Telefono'))
+    phone_3 = TelField(_l('Telefono'))
     price = FloatField(_l('Costo'))
     photo = FileField(_l("Foto dell'albergo"), validators=[FileAllowed(['webp', 'jpg', 'jpeg'])])
     website = URLField(_l("Sito web"))

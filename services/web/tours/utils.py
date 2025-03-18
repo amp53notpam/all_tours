@@ -5,7 +5,7 @@ from . import db
 from sqlalchemy import func
 from flask import session, current_app
 from flask_babel import _
-from .models import Tour, Lap, Users
+from .models import Tour, Lap, User
 
 translations = {'bicycling': _('in bici'), 'walking': _('a piedi'), 'driving': _('in auto')}
 
@@ -80,7 +80,7 @@ def is_displayable(tour):
         if '_user_id' not in session:
             return False
         else:
-            user = db.session.get(Users, session['_user_id'])
+            user = db.session.get(User, session['_user_id'])
             if tour in user.tours or user.is_admin:
                 return True
             else:
