@@ -56,7 +56,7 @@ class AddHotelForm(FlaskForm):
 class UpdHotelForm(FlaskForm):
     lap = SelectField(_l('Tappa'))
     stay = IntegerField(_l('Giorni di soggiorno'))
-    email = EmailField("E-mail")
+    email = EmailField("E-mail", validators=[Email(message=_l('E-mail non valida'))])
     phone = TelField(_l())
     phone_action = RadioField(_l('Telefono'), choices=[('add', _l('Aggiungi')), ('delete', _l('Cancella'))], default='add')
     geo_lat = FloatField("Lat. & Long.")

@@ -192,6 +192,7 @@ def do_phone_mngmt(hotel, act, phone):
         if not phone_obj.hotel:
             db.session.delete(phone_obj)
 
+
 def delete_lap(lap):
     # delete the relevant track file
     if lap.gpx:
