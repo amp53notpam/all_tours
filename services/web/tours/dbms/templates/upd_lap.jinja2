@@ -34,7 +34,7 @@
                 {{ form.distance.label(class="w3-theme-l4 w3-left-align wbold form_label") }}
             </div>
             <div class="w3-col m8 w3-mobile">
-                {{ form.distance(class="w3-left-align w3-input w3-theme-l4") }}
+                {{ form.distance(class="w3-left-align w3-input w3-theme-l4", value=lap.distance if lap.distance) }}
             </div>
         </div>
 
@@ -59,7 +59,7 @@
         </div>
 
         {# tempo #}
-        <div class="w3-container w3-row form-group" style="margin-bottom: 10px">
+        <div id="tempo" class="w3-container w3-row form-group" style="margin-bottom: 10px">
             <div class="w3-col m4 w3-mobile">
                 {{ form.duration.label(class="w3-theme-l4 w3-left-align wbold form_label") }}
             </div>
@@ -71,6 +71,17 @@
                 {% endif %}
             </div>
         </div>
+
+        {# media #}
+        <div id="media" class="w3-container w3-row form-group" style="margin-bottom: 10px">
+            <div class="w3-col m4 w3-mobile">
+                {{ form.average_speed.label(class="w3-theme-l4 w3-left-align wbold form_label") }}
+            </div>
+            <div class="w3-col m8 w3-mobile">
+                {{ form.average_speed(class="w3-left-align w3-input w3-theme-l4") }}
+            </div>
+        </div>
+
 
         {# traccia gpx #}
         <div class="w3-container w3-row form-group" style="margin-bottom: 10px">
@@ -106,17 +117,60 @@
 
 {% block scripts %}
 <script>
-const duration = document.querySelector("#duration")
-const done = document.querySelector("#done")
+const distance = document.querySelector("#distance");
+const duration = document.querySelector("#duration");
+const average_speed = document.querySelector("#average_speed");
+const tempo = document.querySelector("#tempo");
+const media = document.querySelector("#media");
+const done = document.querySelector("#done");
 
-done.addEventListener("change", updateDurationField)
+if (! distance.value) {
+    tempo.style.display = "none";
+    media.style.display = "none";
+}
+
+distance.addEventListener("change", (evt) => {
+    if (distance.value) {
+        tempo.style.display = "block";
+        media.style.display = "block";
+    } else {
+        tempo.style.display = "none";
+        media.style.display = "none";
+    }
+})
+
+duration.addEventListener("change", (evt) => {
+    const t = duration.value.split(":")
+    const hr = t[0]
+    const min = t[1]
+    const sec = t.length > 2 ? t[2] : "00";
+
+    average_speed.value = (distance.value * 3600 / (hr * 3600 + min * 60 + sec * 1)).toFixed(2);
+})
+
+average_speed.addEventListener("change", (evt) => {
+    const t = Math.floor(distance.value * 3600 / average_speed.value);
+    const hr = `${Math.floor(t / 3600)}`.padStart(2, "0");
+    const min = `${Math.floor(t % 3600 / 60)}`.padStart(2, "0");
+    duration.value = `${hr}:${min}`;
+
+    if (duration.step == 1) {
+        const sec = `${Math.floor(t % 60)}`.padStart(2, "0");
+        duration.value = `${hr}:${min}:${sec}`;
+    } else {
+        duration.value = `${hr}:${min}`;
+    }
+})
+
+done.addEventListener("change", updateDurationField);
 
 function updateDurationField() {
     if (done.checked) {
-        duration.step = 1
+        duration.step = 1;
     } else {
-        duration.step = 60
+        duration.step = 60;
     }
 }
+
 </script>
 {% endblock %}

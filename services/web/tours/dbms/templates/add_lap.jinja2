@@ -79,12 +79,22 @@
         </div>
 
         {# tempo #}
-        <div class="w3-container w3-row form-group" style="margin-bottom: 10px">
+        <div id="tempo" class="w3-container w3-row form-group" style="margin-bottom: 10px; display: none">
             <div class="w3-col m4 w3-mobile">
                 {{ form.duration.label(class="w3-theme-l4 w3-left-align wbold form_label") }}
             </div>
             <div class="w3-col m8 w3-mobile">
                 {{ form.duration(class="w3-left-align w3-input w3-theme-l4") }}
+            </div>
+        </div>
+
+        {# media #}
+        <div id="media" class="w3-container w3-row form-group" style="margin-bottom: 10px; display: none">
+            <div class="w3-col m4 w3-mobile">
+                {{ form.average_speed.label(class="w3-theme-l4 w3-left-align wbold form_label") }}
+            </div>
+            <div class="w3-col m8 w3-mobile">
+                {{ form.average_speed(class="w3-left-align w3-input w3-theme-l4") }}
             </div>
         </div>
 
@@ -115,6 +125,37 @@ const form = document.querySelector("form");
 const date = document.querySelector("#date");
 const start = document.querySelector("#start");
 const destination = document.querySelector("#destination");
+const distance = document.querySelector("#distance");
+const duration = document.querySelector("#duration");
+const average_speed = document.querySelector("#average_speed");
+const tempo = document.querySelector("#tempo");
+const media = document.querySelector("#media");
+
+distance.addEventListener("change", (evt) => {
+    if (distance.value) {
+        tempo.style.display = "block";
+        media.style.display = "block";
+    } else {
+        tempo.style.display = "none";
+        media.style.display = "none";
+    }
+})
+
+duration.addEventListener("change", (evt) => {
+    const t = duration.value.split(":")
+    const hr = t[0]
+    const min = t[1]
+    const sec = t.length > 2 ? t[2] : "00";
+
+    average_speed.value = (distance.value * 3600 / (hr * 3600 + min * 60 + sec * 1)).toFixed(2);
+})
+
+average_speed.addEventListener("change", (evt) => {
+    const t = Math.floor(distance.value * 3600 / average_speed.value);
+    const hr = `${Math.floor(t / 3600)}`.padStart(2, "0");
+    const min = `${Math.floor(t % 3600 / 60)}`.padStart(2, "0");
+    duration.value = `${hr}:${min}`;
+})
 
 form.addEventListener("submit", checkInput);
 

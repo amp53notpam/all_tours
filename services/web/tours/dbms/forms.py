@@ -13,6 +13,7 @@ class AddLapForm(FlaskForm):
     ascent = IntegerField(_l('Dislivello salita'))
     descent = IntegerField(_l('Dislivello discesa'))
     duration = TimeField(_l('Tempo previsto'))
+    average_speed = FloatField(_l('Media'))
     gpx = FileField(_l("Traccia gpx (.gpx)"), validators=[FileAllowed(['gpx'])])
     submit = SubmitField('OK')
 
@@ -23,6 +24,7 @@ class UpdLapForm(FlaskForm):
     ascent = IntegerField(_l('Dislivello salita'))
     descent = IntegerField(_l('Dislivello discesa'))
     duration = TimeField(_l('Tempo'))
+    average_speed = FloatField(_l('Media'))
     gpx = FileField(_l("Traccia gpx (.gpx)"), validators=[FileAllowed(['gpx'])])
     done = BooleanField(_l('OK è fatta!'))
     submit = SubmitField('OK')
@@ -55,6 +57,7 @@ class AddHotelForm(FlaskForm):
 
 class UpdHotelForm(FlaskForm):
     lap = SelectField(_l('Tappa'))
+    address = StringField(_l('Indirizzo'))
     stay = IntegerField(_l('Giorni di soggiorno'))
     email = EmailField("E-mail", validators=[Email(message=_l('E-mail non valida'))])
     phone = TelField(_l())

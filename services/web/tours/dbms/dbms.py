@@ -607,6 +607,7 @@ class UpdHotel(View):
 
         if request.method == 'POST':
             lap_id = request.form.get('lap')
+            address = request.form.get('address')
             stay = request.form.get('stay')
             phone_action = request.form.get('phone_action')
             phone = request.form.get('phone')
@@ -643,6 +644,8 @@ class UpdHotel(View):
 
                 return render_template("upd_hotel.jinja2", form=form, hotel=hotel, timedelta=(hotel.check_out - hotel.check_in).days, header=header)
 
+            if address:
+                hotel.address = address
             if phone:
                 do_phone_mngmt(hotel, phone_action, phone)
             if email:

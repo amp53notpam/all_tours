@@ -63,7 +63,7 @@ class Lap(db.Model):
     start: Mapped[str] = mapped_column(String(32))
     destination: Mapped[str] = mapped_column(String(32))
     duration: Mapped[time | None]
-    distance: Mapped[float | None] = mapped_column(FLOAT, default=0)
+    distance: Mapped[float | None] = mapped_column(FLOAT)
     ascent: Mapped[int | None]
     descent: Mapped[int | None]
     gpx: Mapped[str | None] = mapped_column(String(64))
