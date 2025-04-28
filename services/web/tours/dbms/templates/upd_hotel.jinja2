@@ -150,7 +150,7 @@
 {% block scripts %}
 <script>
 let error = "";
-{% for err in form.email.errors %}error += "{{ err }}, "{% endfor %}
+{% for err in form.email.errors %}error += "{{ _(err) }}, "{% endfor %}
 if (error) {
     tooltip = document.querySelector("#email ~ [class~=tooltiptext]");
     tooltip.textContent = error.slice(0, -2)

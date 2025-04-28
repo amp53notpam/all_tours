@@ -36,12 +36,13 @@ class DevelopmentConfig:
     MAIL_SERVER = "out.virgilio.it"
     MAIL_PORT = 465
     MAIL_USERNAME = "apozzi53@virgilio.it"
-    MAIL_PASSWORD = "aC2yak36ZJq+"
+    MAIL_PASSWORD = "aC2yak36ZJ!"
     MAIL_USE_TLS = False
     MAIL_USE_SSL = True
     MAIL_SUPPRESS_SEND = False
 
     # internationalization
+    BABEL_DEFAULT_LOCALE = 'it'
     LANGUAGES = ['it', 'en']
 
 

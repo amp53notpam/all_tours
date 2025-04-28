@@ -21,7 +21,7 @@ def add_upload_path():
 
 
 class HotelMap(View):
-    def dispatch_request(self, lat, long):
+    def dispatch_request(self, lat=None, long=None):
         hotel = db.session.execute(db.select(Hotel).where(Hotel.lat == lat and Hotel.long == long)).scalar()
         gpx = db.session.get(Lap, hotel.lap_id).gpx
 
@@ -29,14 +29,14 @@ class HotelMap(View):
 
 
 class LapMap(View):
-    def dispatch_request(self, id):
+    def dispatch_request(self, id=None):
         lap = db.session.get(Lap, id)
 
         return render_template("map_lap.jinja2", lap=lap, track=lap.gpx)
 
 
 class PhotoMap(View):
-    def dispatch_request(self, lat, long):
+    def dispatch_request(self, lat=None, long=None):
         media = db.session.execute(db.select(Media).where(Media.lat == lat and Media.long == long)).scalar()
         media_url = url_for('download_files', filename='images/' + media.media_src)
         popup = f'<a target="_blank" href={media_url}><img src={media_url} style="width: 100px;"></a>'

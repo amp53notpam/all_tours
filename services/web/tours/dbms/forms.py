@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from flask_babel import lazy_gettext as _l
+from flask_babel import _, lazy_gettext as _l
 from flask_wtf.file import FileField, MultipleFileField, FileRequired, FileAllowed
 from wtforms import StringField, IntegerField, FloatField, SubmitField, URLField, BooleanField, EmailField, TelField, RadioField, SelectField, DateField, TimeField
 from wtforms.validators import DataRequired, Email
@@ -60,7 +60,7 @@ class UpdHotelForm(FlaskForm):
     address = StringField(_l('Indirizzo'))
     stay = IntegerField(_l('Giorni di soggiorno'))
     email = EmailField("E-mail", validators=[Email(message=_l('E-mail non valida'))])
-    phone = TelField(_l())
+    phone = TelField()
     phone_action = RadioField(_l('Telefono'), choices=[('add', _l('Aggiungi')), ('delete', _l('Cancella'))], default='add')
     geo_lat = FloatField("Lat. & Long.")
     geo_long = FloatField()
@@ -72,12 +72,10 @@ class UpdHotelForm(FlaskForm):
 
 
 class AddTourForm(FlaskForm):
-    # title = StringField(_l('Titolo del Viaggio'), validators=[DataRequired()])
     title = StringField(_l('Titolo del Viaggio'))
     tour_mode = RadioField(_l('Tipo di Viaggio'), choices=[('walking', _l('a piedi')), ('bicycling', _l('in bicicletta')), ('driving', _l('in auto'))], default='walking')
     visibility = RadioField(_l('Visibilità'), choices=[('visible', _l('Totale')), ('hidden', _l('Ristretta'))], default='visible')
     tour_cover = FileField(_l('Copertina'), validators=[FileAllowed(['jpg', 'jpeg'])])
-    # caption = StringField(_l('Didascalia'), [validators.length(max=96)])
     caption = StringField(_l('Didascalia'))
     submit = SubmitField('OK')
 
@@ -87,5 +85,5 @@ class TourMgmtForm(FlaskForm):
     visibility = RadioField(_l('Visibilità'), choices=[('visible', _l('Totale')), ('hidden', _l('Ristretta'))])
     tour_cover = FileField(_l('Copertina'), validators=[FileAllowed(['jpg', 'jpeg'])])
     caption = StringField(_l('Didascalia'))
-    submit = SubmitField('Modifica')
+    submit = SubmitField(_l('Modifica'))
     submit_del = SubmitField(_l('Cancella'))

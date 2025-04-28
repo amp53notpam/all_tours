@@ -15,17 +15,17 @@ class LogInForm(FlaskForm):
 class SignUpForm(FlaskForm):
     username = StringField("Username")
     password = PasswordField('Password', [EqualTo('vfy_password', message=_l('Le passwords non coincidono'))])
-    vfy_password = PasswordField('Conferma')
+    vfy_password = PasswordField(_l('Conferma'))
     email = EmailField("E-mail", [Email(message=_l('E-mail non valida'))])
     submit = SubmitField(_l('Registrami'))
 
 
 class LostPasswordForm(FlaskForm):
     username = StringField("Username")
-    submit = SubmitField('Invia')
+    submit = SubmitField(_l('Invia'))
 
 
 class ResetPasswordForm(FlaskForm):
-    new_password = PasswordField('Nuova Password', [EqualTo('vfy_password', message=_l('Le passwords non coincidono'))])
-    vfy_password = PasswordField('Conferma')
-    submit = SubmitField('Invia')
+    new_password = PasswordField(_l('Nuova Password'), [EqualTo('vfy_password', message=_l('Le passwords non coincidono'))])
+    vfy_password = PasswordField(_l('Conferma'))
+    submit = SubmitField(_l('Invia'))

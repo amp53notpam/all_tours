@@ -4,10 +4,10 @@ from re import search
 from . import db
 from sqlalchemy import func
 from flask import session, current_app
-from flask_babel import _
+from flask_babel import _, lazy_gettext as _l
 from .models import Tour, Lap, User
 
-translations = {'bicycling': _('in bici'), 'walking': _('a piedi'), 'driving': _('in auto')}
+translations = {'bicycling': _l('in bici'), 'walking': _l('a piedi'), 'driving': _l('in auto')}
 
 
 def make_header():
@@ -53,6 +53,7 @@ def make_dd_lang(lang):
 
 
 def make_short_template(full_template):
+    templates_dir = None
     for root, dirs, files in walk(current_app.root_path):
         if full_template in files:
             templates_dir = root

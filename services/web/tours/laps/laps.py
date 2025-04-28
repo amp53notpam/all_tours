@@ -119,7 +119,7 @@ class Hotels(View):
 
 
 class SingleLap(View):
-    def dispatch_request(self, id):
+    def dispatch_request(self, id=None):
         header = make_header()
         lap = db.session.get(Lap, id)
         laps, prev_lap, next_lap = get_laps_prev_next(lap)
@@ -128,7 +128,7 @@ class SingleLap(View):
 
 
 class SingleHotel(View):
-    def dispatch_request(self, id):
+    def dispatch_request(self, id=None):
         header = make_header()
 
         hotel = db.session.get(Hotel, id)
@@ -141,7 +141,7 @@ class SingleHotel(View):
 
 
 class SingleLapJS(View):
-    def dispatch_request(self, id):
+    def dispatch_request(self, id=None):
         this_lap = db.session.get(Lap, id)
         if this_lap is None:
             return ""
@@ -155,7 +155,7 @@ class SingleLapJS(View):
 
 
 class SingleHotelJS(View):
-    def dispatch_request(self, id):
+    def dispatch_request(self, id=None):
         this_hotel = db.session.get(Hotel, id)
 
         short_html = make_short_template("hotel.jinja2")
@@ -163,7 +163,7 @@ class SingleHotelJS(View):
 
 
 class SingleLapMedia(View):
-    def dispatch_request(self, id):
+    def dispatch_request(self, id=None):
         header = make_header()
         can_edit = is_editable()
         this_lap = db.session.get(Lap, id)
@@ -176,7 +176,7 @@ class SingleLapMedia(View):
 
 
 class SingleLapMediaJS(View):
-    def dispatch_request(self, id):
+    def dispatch_request(self, id=None):
         lap = db.session.get(Lap, id)
         medias = lap.photos
         # medias = db.session.execute(db.select(Media).where(Media.lap_id == id).order_by(Media.date)).fetchall()

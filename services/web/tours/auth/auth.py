@@ -6,10 +6,9 @@ from flask_mail import Message
 from werkzeug.security import check_password_hash, generate_password_hash
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import func
-from wtforms.validators import ValidationError
 from ..models import User, Tour
 from .forms import LogInForm, SignUpForm, ResetPasswordForm, LostPasswordForm
-from .. import db, mail
+from .. import db, mail, get_locale
 from ..utils import make_header
 
 
@@ -26,7 +25,7 @@ def send_mail(recipient, user):
     msg.sender = ['angelo', 'apozzi53@virgilio.it']
     msg.recipients = [recipient]
     url = f"https://foreverwalk.ddns.net{url_for('auth_bp.reset_password', user=user)}"
-    msg.html = render_template('message.jinja2', url=url)
+    msg.html = render_template('message.jinja2', current_locale=get_locale(), url=url)
 
     mail.send(msg)
 

@@ -77,7 +77,7 @@ class Lap(db.Model):
     __table_args__ = (UniqueConstraint('tour_id', 'date', name='tour_lap_at_date_uc'),)
 
     def __repr__(self) -> str:
-        return f"{_('Tappa')}: {self.start}-{self.destination}  {_('Giorno')}: {self.date}."
+        return f"{self.start}-{self.destination}  {self.date}."
 
 
 class Media(db.Model):
@@ -98,7 +98,7 @@ class Media(db.Model):
     __table_args__ = (UniqueConstraint('lap_id', 'media_src', name='lap_media_uc'), )
 
     def __repr__(self) -> str:
-        return f"{_('Foto')} {self.media_src[: -4]}"
+        return f"{self.media_src[: -4]}"
 
 
 association_table = Table(
@@ -128,7 +128,7 @@ class Hotel(db.Model):
     phones: Mapped[List[PhoneNumber]] = relationship(secondary=association_table, back_populates="hotel")
 
     def __repr__(self) -> str:
-        return f"{_('Albergo')}: {self.name} - {self.town}"
+        return f"{self.name} - {self.town}"
 
 
 class PhoneNumber(db.Model):
@@ -140,4 +140,4 @@ class PhoneNumber(db.Model):
     hotel: Mapped[List[Hotel]] = relationship(secondary=association_table, back_populates="phones")
 
     def __repr__(self) -> str:
-        return f"{_('Telefono')} {self.href_phone}"
+        return f"Tel: {self.href_phone}"

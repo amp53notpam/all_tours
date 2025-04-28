@@ -124,7 +124,7 @@ function beCautious(evt) {
             }
         }
         const msg = document.querySelector('#what-danger')
-        msg.textContent = `La cancellazione del viaggio "${tour}" comporta la cancellazione dei dati relative alle tappe e agli alberghi del viaggio. Sei sicuro di voler continuare?`;
+        msg.textContent = {{ _('La cancellazione del viaggio "%(tour)s" comporta la cancellazione dei dati relative alle tappe e agli alberghi del viaggio. Sei sicuro di voler continuare?', tour=tour) }};
     }
 }
 

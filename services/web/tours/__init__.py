@@ -47,9 +47,9 @@ def create_app(test_config=None):
 
 
 def get_locale():
-    try:
-        return session.get("lang", "it")
-    except RuntimeError:
+    if session:
+        return session.get("lang")
+    else:
         return "it"
 
 
@@ -113,19 +113,19 @@ def configure_logging(app):
     # Remove the default logger configured by Flask
     app.logger.removeHandler(default_handler)
 
-    app.logger.info('Starting the Flask Berlin Tour App...')
+    app.logger.info("Starting app Tour ...")
 
 
 def configure_upload_area(app):
     try:
         os.mkdir(f"{app.config['UPLOAD_FOLDER']}/tracks")
-        app.logger.info("Creato sub-folder 'tracks' in 'uploaded")
+        app.logger.info("Created sub-folder 'tracks' in 'uploaded")
     except FileExistsError:
         pass
 
     try:
         os.mkdir(f"{app.config['UPLOAD_FOLDER']}/images")
-        app.logger.info("Creato sub-folder 'images' in 'uploaded")
+        app.logger.info("Created sub-folder 'images' in 'uploaded")
     except FileExistsError:
         pass
 
@@ -138,7 +138,7 @@ def register_cli_commands(app):
         with app.app_context():
             db.drop_all()
             db.create_all()
-            echo('Database created')
+            app.logger.info('Database created...')
 
     @app.cli.command('register_admins')
     def register_admins():

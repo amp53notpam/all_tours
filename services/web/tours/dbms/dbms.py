@@ -60,7 +60,7 @@ def update_all_dates(laps, new_date, old_date):
             raise DateOverlappingError(_("Non ci sono abbastanza giorni liberi per spostare la tappa indietro nel tempo"))
         hotel = db.session.execute(db.select(Hotel).where(Hotel.check_out.between(new_date + timedelta(days=1), old_date)).where(Hotel.lap in tour.laps).order_by(Hotel.check_out)).all()
         if hotel:
-            raise DateOverlappingError(_(f'La data di check out dell\'albergo "{hotel[0].Hotel.name}" è incompatibile con la nuova data'))
+            raise DateOverlappingError(_("La data di check out dall\'albergo %(hotel)s è incompatibile con la nuova data", hotel=hotel[0].Hotel.name))
     for lap in laps:
         lap.date += delta_t
         for hotel in lap.hotels:
@@ -143,10 +143,7 @@ def register_media(lap, media, caption):
         if caption:
             db_media.Media.caption = caption
 
-    try:
-        db.session.commit()
-    except IntegrityError:
-        current_app.logger.warning(f"Tentativo di caricare la foto {media} già caricata per la stessa tappa.")
+    db.session.commit()
 
 
 def check_lap_date(date):
@@ -281,7 +278,7 @@ class AddTour(View):
                 user = db.session.get(User, session['_user_id'])
                 session['tours'] = len(user.tours)
                 flash(_('Aggiunto viaggio "%(titolo)s".', titolo=title), category="info")
-                current_app.logger.info(f"Aggiunta viaggio {title} da {user.username}")
+                current_app.logger.info(f"Added tour {title} by {user.username}")
                 return redirect(url_for("start"))
 
         return render_template("add_tour.jinja2", form=form)
@@ -346,13 +343,8 @@ class AddLap(View):
                 flash(_('In questo viaggio è gia definita una tappa alla stessa data'), category="error")
             else:
                 flash(_("Aggiunta tappa %(partenza)s - %(arrivo)s.", partenza=partenza, arrivo=arrivo), category="info")
-                current_app.logger.info(f"Aggiunta tappa {partenza} - {arrivo}.")
+                current_app.logger.info(f"Added lap {partenza} - {arrivo}.")
 
-                # lap_id = db.session.execute(db.select(Lap.id).where(Lap.start == partenza).where(Lap.destination == arrivo)).scalar()
-                # hotels = db.session.execute(db.select(Hotel).where(Hotel.check_in == data)).scalars()
-                # if hotels:
-                #     for hotel in hotels:
-                #         hotel.lap_id = lap_id
                 db.session.commit()
 
             return redirect(url_for("lap_bp.lap_dashboard"))
@@ -446,7 +438,7 @@ class AddHotel(View):
             db.session.add(new_hotel)
             db.session.commit()
             flash(_('Aggiunto albergo %(name)s a %(town)s.', name=name, town=town), category="info")
-            current_app.logger.info(f"Aggiunto albergo {name} a {town}.")
+            current_app.logger.info(f"Added hotel {name} in {town}.")
             return redirect(url_for("lap_bp.hotel_dashboard"))
 
         # laps = db.session.execute(db.select(Lap).where(Lap.tour_id == tour.id).order_by(Lap.date)).scalars()
@@ -504,7 +496,7 @@ class UpdLap(View):
     methods = ['GET', 'POST']
     decorators = [login_required]
 
-    def dispatch_request(self, id):
+    def dispatch_request(self, id=None):
         form = UpdLapForm()
         header = make_header()
 
@@ -541,10 +533,6 @@ class UpdLap(View):
                     flash(e.msg, category="error")
                     return render_template("upd_lap.jinja2", form=form, lap=lap, header=header)
 
-                # lap.date = data
-                # for hotel in lap.hotels:
-                #     hotel.check_in += delta_t
-                #     hotel.check_out += delta_t
             if distanza:
                 lap.distance = distanza
             if salita:
@@ -559,7 +547,7 @@ class UpdLap(View):
             db.session.commit()
 
             flash(_('Tappa %(start)s - %(destination)s aggiornata.', start=lap.start, destination=lap.destination), category='info')
-            current_app.logger.info(f"Aggiornata tappa {lap.start} - {lap.destination}.")
+            current_app.logger.info(f"Updated lap {lap.start} - {lap.destination}.")
             return redirect(url_for("lap_bp.lap_dashboard"))
 
         lap = db.session.get(Lap, id)
@@ -570,7 +558,7 @@ class LoadLapMedia(View):
     methods = ['GET', 'POST']
     decorators = [login_required]
 
-    def dispatch_request(self, id):
+    def dispatch_request(self, id=None):
         form = LoadMediaForm()
 
         if request.method == 'POST':
@@ -586,8 +574,9 @@ class LoadLapMedia(View):
             try:
                 register_media(lap, media_file, caption)
             except ZeroDivisionError:
-                flash(_(f"Il file {media_file} potrebbe essere corrotto"), category='error')
-
+                flash(_("Il file %(m_file)s potrebbe essere corrotto", mfile=media_file), category='error')
+            except IntegrityError:
+                current_app.logger.warning(f"The picture {media_file} has been already loaded.")
             return redirect(url_for("lap_bp.lap", id=id))
 
         lap = db.session.get(Lap, id)
@@ -599,7 +588,7 @@ class UpdHotel(View):
     methods = ['GET', 'POST']
     decorators = [login_required]
 
-    def dispatch_request(self, id):
+    def dispatch_request(self, id=None):
         form = UpdHotelForm()
         header = make_header()
 
@@ -665,11 +654,10 @@ class UpdHotel(View):
 
             db.session.commit()
             flash(_('Hotel %(hotel)s aggiornato.', hotel=hotel.name), category="info")
-            current_app.logger.info(f"Aggiornato hotel {hotel.name}.")
+            current_app.logger.info(f"Updated hotel {hotel.name}.")
             return redirect(url_for("lap_bp.hotel_dashboard"))
 
         hotel = db.session.get(Hotel, id)
-        # laps = db.session.execute(db.select(Lap).where(Lap.tour_id == tour.id).order_by(Lap.date)).scalars()
         form.lap.choices = [(lap.id, f"{lap.start} - {lap.destination}", dict()) for lap in tour.laps]
         form.lap.default = f"{hotel.lap_id}"
         form.process([])
@@ -690,7 +678,7 @@ class DeleteTour(View):
             db.session.delete(tour)
             db.session.commit()
             flash(_('Cancellato viaggio %(tour)s.', tour=tour.name + " " + translations[tour.trip_mode]), category="info")
-            current_app.logger.info(f"Cancellato albergo {tour.name} {translations[tour.trip_mode]}.")
+            current_app.logger.info(f"Deleted tour {tour.name} {translations[tour.trip_mode]}.")
             session['tours'] -= 1
             if 'trip' in session.keys() and session['trip'] == tour.id:
                 session.pop('trip')
@@ -701,12 +689,12 @@ class DeleteTour(View):
 class DeleteLap(View):
     decorators = [login_required]
 
-    def dispatch_request(self, id):
+    def dispatch_request(self, id=None):
         lap = db.session.get(Lap, id)
         if lap:
             delete_lap(lap)
             flash(_('Cancellata tappa %(start)s - %(destination)s.', start=lap.start, destination=lap.destination), category='info')
-            current_app.logger.info(f"Cancellata tappa {lap.start} - {lap.destination}")
+            current_app.logger.info(f"Deleted lap {lap.start} - {lap.destination}")
 
         return redirect(url_for("lap_bp.lap_dashboard"))
 
@@ -714,7 +702,7 @@ class DeleteLap(View):
 class DeleteMedia(View):
     decorators = [login_required]
 
-    def dispatch_request(self, media):
+    def dispatch_request(self, media=None):
         md = db.session.execute(db.select(Media).where(Media.media_src == media)).scalar()
         delete_media(md)
         return jsonify("Done")
@@ -723,13 +711,13 @@ class DeleteMedia(View):
 class DeleteHotel(View):
     decorators = [login_required]
 
-    def dispatch_request(self, id):
+    def dispatch_request(self, id=None):
         hotel = db.session.get(Hotel, id)
 
         if hotel:
             delete_hotel(hotel)
             flash(_('Cancellato albergo %(hotel)s.', hotel=hotel.name), category="info")
-            current_app.logger.info(f"Cancellato albergo {hotel.name}.")
+            current_app.logger.info(f"Deleted hotel {hotel.name}.")
 
         return redirect(url_for("lap_bp.hotel_dashboard"))
 
