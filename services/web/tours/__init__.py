@@ -136,7 +136,6 @@ def register_cli_commands(app):
     def create_db():
         """Create the database. """
         with app.app_context():
-            db.drop_all()
             db.create_all()
             app.logger.info('Database created...')
 

@@ -22,7 +22,7 @@ services:
         networks:
             - ntw
         env_file:
-            - ./.env.pg
+            - ./.env.pg.render
         environment:
             - FLASK_ENV=production
 

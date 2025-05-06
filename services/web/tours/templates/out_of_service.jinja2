@@ -1,0 +1,15 @@
+{% extends 'layout.jinja2' %}
+
+
+{% block header %}
+{{ header if header is not none else super() }}
+{% endblock %}
+
+{% block content %}
+<div class="w3-panel w3-pale-red w3-leftbar w3-rightbar">
+    <p>Sito momentaneamente indisponibile. Per favore riprovare più tardi</p>
+</div>
+<div class="w3-panel w3-pale-red w3-leftbar w3-rightbar">
+    <p>Site temporarily out of service. Please try again later</p>
+</div>
+{% endblock %}

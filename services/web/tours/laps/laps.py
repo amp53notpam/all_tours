@@ -198,7 +198,6 @@ class SingleLapMediaJS(View):
         return jsonify(data)
 
 
-# lap_bp.add_url_rule('/', view_func=Index.as_view('index'))
 lap_bp.add_url_rule('/tappe', view_func=Laps.as_view('lap_dashboard'))
 lap_bp.add_url_rule('/tappe/<int:id>', view_func=SingleLap.as_view('lap'))
 lap_bp.add_url_rule('/tappe/<int:id>/js', view_func=SingleLapJS.as_view('lapJS'))

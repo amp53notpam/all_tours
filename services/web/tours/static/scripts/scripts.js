@@ -37,6 +37,18 @@ function dropDown() {
     }
 }
 
+function dropDownUtils() {
+    const menu = document.querySelector("#dd_menu_utils");
+    const caret = document.querySelector("#dd_caret_utils");
+    if (menu.className.indexOf("w3-show") == -1) {
+        menu.className += " w3-show";
+        caret.className = caret.className.replace("fa-caret-down", "fa-caret-up");
+    } else {
+        menu.className = menu.className.replace(" w3-show", "");
+        caret.className = caret.className.replace("fa-caret-up", "fa-caret-down");
+    }
+}
+
 function setAttributes(el, attrs) {
     Object.keys(attrs).forEach(key => el.setAttribute(key, attrs[key]));
 }
@@ -298,8 +310,16 @@ if (dd_btn) {
     dd_btn.addEventListener("click", dropDown);
 };
 
+const dd_btn_utils = document.querySelector("#dd_btn_utils");
+if (dd_btn_utils) {
+    dd_btn_utils.addEventListener("click", dropDownUtils);
+}
+
 const ddButtons = document.querySelectorAll("button[data-lang]");
 ddButtons.forEach((ddButton) => ddButton.addEventListener("click", selectLanguage));
+
+const ddButtonsUtils = document.querySelectorAll(".utils");
+ddButtonsUtils.forEach((ddButtonUtil) => ddButtonUtil.addEventListener("click", dropDownUtils));
 
 const openNav = document.querySelector("#open_nav")
 if  (openNav) {

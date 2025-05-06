@@ -37,6 +37,17 @@
 		<a href="{{ url_for('lap_bp.lap_dashboard') }}" class="w3-bar-item w3-button w3-ripple w3-hover-theme w3-hide-small w3-mobile">{{ _('Tappe') }}</a>
 		<a href="{{ url_for('lap_bp.hotel_dashboard') }}" class="w3-bar-item w3-button w3-ripple w3-hover-theme w3-hide-small w3-mobile">{{ _('Alberghi') }}</a>
 		{% endif %}
+		{% if '_user_id' in session and session['_username'] == 'tourAdmin' %}
+        <div class='w3-dropdown-click'>
+            <button  id="dd_btn_utils" class="w3-button w3-theme w3-hover-theme w3-ripple">Utilities <i id="dd_caret_utils" class="fa-solid fa-caret-down"></i></button>
+            <div id="dd_menu_utils" class="w3-dropdown-content w3-bar-block w3-border w3-card-4 w3-border-theme">
+                <a href="{{ url_for('init_db') }}" class="w3-bar-item w3-button w3-theme-l2 w3-hover-theme utils">{{ _('Crea db') }}</a>
+                <a href="{{ url_for('download_db_backup') }}" class="w3-bar-item w3-button w3-theme-l2 w3-hover-theme utils">{{ _('Backup database') }}</a>
+                <a href="{{ url_for('download_user_files') }}" class="w3-bar-item w3-button w3-theme-l2 w3-hover-theme utils">{{ _('Backup file utente') }}</a>
+                <a href="{{ url_for('upload_user_files') }}" class="w3-bar-item w3-button w3-theme-l2 w3-hover-theme utils">{{ _('Ripristino file utente') }}</a>
+            </div>
+        </div>
+		{% endif %}
 
 		{% if '_user_id' in session.keys() %}
 		<a href="{{ url_for('auth_bp.logout') }}" class="w3-right w3-bar-item w3-ripple w3-button w3-hover-theme w3-hide-small" title="logout"><i class="fa-solid fa-arrow-right-from-bracket fa-lg"></i></a>

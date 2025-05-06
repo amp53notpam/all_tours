@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-04-28 18:46+0200\n"
+"POT-Creation-Date: 2025-05-04 09:40+0200\n"
 "PO-Revision-Date: 2025-04-28 11:37+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -18,23 +18,23 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: tours/forms.py:7
+#: tours/forms.py:8
 msgid "Scegli il viaggio"
 msgstr "Choose the trip"
 
-#: tours/routes.py:36
+#: tours/routes.py:54
 msgid "Scegli un viaggio"
 msgstr "Choose a trip"
 
-#: tours/dbms/templates/add_tour.jinja2:12 tours/routes.py:36 tours/utils.py:33
+#: tours/dbms/templates/add_tour.jinja2:12 tours/routes.py:54 tours/utils.py:33
 msgid "Nuovo Viaggio"
 msgstr "New Trip"
 
-#: tours/routes.py:61 tours/routes.py:66
+#: tours/routes.py:82 tours/routes.py:89
 msgid "Creazione database fallita"
 msgstr "Database creation failed"
 
-#: tours/routes.py:70
+#: tours/routes.py:93
 msgid "Database inizializzato..."
 msgstr "Database initialised..."
 
@@ -539,7 +539,7 @@ msgstr "Delete this hote"
 
 #: tours/laps/templates/hotels.jinja2:15 tours/laps/templates/hotels.jinja2:43
 #: tours/laps/templates/lap.jinja2:130 tours/laps/templates/s_lap.jinja2:94
-#: tours/templates/layout.jinja2:38 tours/templates/layout.jinja2:55
+#: tours/templates/layout.jinja2:38 tours/templates/layout.jinja2:66
 msgid "Alberghi"
 msgstr "Hotels"
 
@@ -591,7 +591,7 @@ msgid "Cancella questa tappa"
 msgstr "Delete this stage"
 
 #: tours/laps/templates/laps.jinja2:15 tours/templates/layout.jinja2:37
-#: tours/templates/layout.jinja2:54
+#: tours/templates/layout.jinja2:65
 msgid "Tappe"
 msgstr "Stages"
 
@@ -635,6 +635,22 @@ msgstr "My Trips"
 msgid "Viaggi"
 msgstr "Trips"
 
+#: tours/templates/layout.jinja2:44
+msgid "Crea db"
+msgstr "Create db"
+
+#: tours/templates/layout.jinja2:45
+msgid "Backup database"
+msgstr "Database backup"
+
+#: tours/templates/layout.jinja2:46
+msgid "Backup file utente"
+msgstr "User file backup"
+
+#: tours/templates/layout.jinja2:47
+msgid "Ripristino file utente"
+msgstr "User file restore"
+
 #: tours/templates/message.jinja2:3
 msgid "Gentile utente"
 msgstr "Dear user"
@@ -658,4 +674,12 @@ msgstr ""
 #: tours/templates/message.jinja2:16
 msgid "Cordiali saluti"
 msgstr "Best regards"
+
+#: tours/templates/upld_user_file.jinja2:3
+msgid "Upload files"
+msgstr "File upload"
+
+#: tours/templates/upld_user_file.jinja2:13
+msgid "Carica file utenti"
+msgstr "User file upload"
 

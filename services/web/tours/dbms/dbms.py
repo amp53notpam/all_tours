@@ -548,7 +548,7 @@ class UpdLap(View):
 
             flash(_('Tappa %(start)s - %(destination)s aggiornata.', start=lap.start, destination=lap.destination), category='info')
             current_app.logger.info(f"Updated lap {lap.start} - {lap.destination}.")
-            return redirect(url_for("lap_bp.lap_dashboard"))
+            return redirect(url_for("lap_bp.lap", id=id))
 
         lap = db.session.get(Lap, id)
         return render_template("upd_lap.jinja2", form=form, lap=lap, header=header)
@@ -655,7 +655,7 @@ class UpdHotel(View):
             db.session.commit()
             flash(_('Hotel %(hotel)s aggiornato.', hotel=hotel.name), category="info")
             current_app.logger.info(f"Updated hotel {hotel.name}.")
-            return redirect(url_for("lap_bp.hotel_dashboard"))
+            return redirect(url_for("lap_bp.hotel", id=id))
 
         hotel = db.session.get(Hotel, id)
         form.lap.choices = [(lap.id, f"{lap.start} - {lap.destination}", dict()) for lap in tour.laps]
