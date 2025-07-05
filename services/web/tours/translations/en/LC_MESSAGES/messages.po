@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-05-04 09:40+0200\n"
+"POT-Creation-Date: 2025-07-02 19:25+0200\n"
 "PO-Revision-Date: 2025-04-28 11:37+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -100,7 +100,7 @@ msgstr "Submit"
 
 #: tours/auth/forms.py:29
 msgid "Nuova Password"
-msgstr "Enter the new password"
+msgstr "New Password"
 
 #: tours/auth/templates/info_mail_sent.jinja2:12
 msgid "Ti abbiamo inviato una mail all'indirizzo "
@@ -133,11 +133,11 @@ msgstr "Forgot your password?"
 
 #: tours/auth/templates/login.jinja2:68
 msgid "Inserire lo username"
-msgstr "Enter username"
+msgstr "Enter the username"
 
 #: tours/auth/templates/login.jinja2:78
 msgid "Inserire la password"
-msgstr "Enter password"
+msgstr "Enter the password"
 
 #: tours/auth/templates/lost_password.jinja2:10
 msgid "Recupero Password"
@@ -303,7 +303,7 @@ msgstr "Time"
 
 #: tours/dbms/forms.py:29
 msgid "OK è fatta!"
-msgstr "OK it's done!"
+msgstr ""
 
 #: tours/dbms/forms.py:34
 msgid "File"
@@ -463,7 +463,7 @@ msgstr "Specify a name for the trip."
 
 #: tours/dbms/templates/add_tour.jinja2:108
 #: tours/dbms/templates/load_media.jinja2:70
-#: tours/dbms/templates/manage_tour.jinja2:149
+#: tours/dbms/templates/manage_tour.jinja2:157
 msgid "Didascalia troppo lunga: max. 32 caratteri."
 msgstr "Caption too long: max. 32 characters."
 
@@ -483,26 +483,27 @@ msgstr "Trip management"
 msgid "Gestione Viaggi"
 msgstr "Trip Management"
 
-#: tours/dbms/templates/manage_tour.jinja2:73
+#: tours/dbms/templates/manage_tour.jinja2:70
+msgid "La cancellazione del viaggio "
+msgstr "The deletion of the trip "
+
+#: tours/dbms/templates/manage_tour.jinja2:72
+msgid ""
+" comporta la cancellazione delle tappe e degli alberghi. Sei sicuro di "
+"voler continuare?"
+msgstr ""
+" entails the deletion of the stages and the hotels of this trip. Are you "
+"sure you want to continue?"
+
+#: tours/dbms/templates/manage_tour.jinja2:75
 msgid "SI"
 msgstr "YES"
 
-#: tours/dbms/templates/manage_tour.jinja2:84
+#: tours/dbms/templates/manage_tour.jinja2:86
 msgid "Cancella il viaggio"
 msgstr "Cancel the trip"
 
-#: tours/dbms/templates/manage_tour.jinja2:127
-#, python-format
-msgid ""
-"La cancellazione del viaggio \"%(tour)s\" comporta la cancellazione dei "
-"dati relative alle tappe e agli alberghi del viaggio. Sei sicuro di voler"
-" continuare?"
-msgstr ""
-"The deletion of the trip \\‘%(tour)s\\’ entails the deletion of the data "
-"concerning the stages and hotels of the trip. Are you sure you want to "
-"continue?"
-
-#: tours/dbms/templates/manage_tour.jinja2:140
+#: tours/dbms/templates/manage_tour.jinja2:148
 msgid "Selezionare un viaggio"
 msgstr "Select a trip"
 
@@ -655,23 +656,25 @@ msgstr "User file restore"
 msgid "Gentile utente"
 msgstr "Dear user"
 
-#: tours/templates/message.jinja2:8
+#: tours/templates/message.jinja2:5
 msgid ""
 "Lei riceve questa\n"
 "mail perché qualcuno ha richiesto di resettare la sua password per\n"
 "il sito “foreverwalk.ddns.net”. Se l’autore della richiesta non\n"
-"è lei ignori questa mail altrimenti clicchi su questo link <a href=\"{{ "
-"url }}\">Reset Password</a> per\n"
-"procedere al reset della passwod."
+"è lei ignori questa mail altrimenti clicchi su questo link "
 msgstr ""
-"You are receiving this\n"
-"email because someone has requested to reset your password for\n"
+"You are receiving this email because someone has requested to reset your "
+"password for\n"
 "the site “foreverwalk.ddns.net”. If the author of the request is not\n"
-"you, ignore this email otherwise click on this link <a href=\"{{ url "
-"}}\">Reset Password</a> to\n"
-"reset your password."
+"you, ignore this email otherwise click on this link "
 
-#: tours/templates/message.jinja2:16
+#: tours/templates/message.jinja2:8
+msgid ""
+" per\n"
+"procedere al reset della passwod."
+msgstr " to get on with the password reset."
+
+#: tours/templates/message.jinja2:13
 msgid "Cordiali saluti"
 msgstr "Best regards"
 

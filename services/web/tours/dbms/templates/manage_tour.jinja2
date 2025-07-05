@@ -66,11 +66,13 @@
 
         <hr class="w3-theme-d3" style="height: 4px;">
 
-        <div id="danger" class="w3-container" style="margin: auto; display: none; width: 70%;">
-            <p id="what-danger"></p>
+        <div id="danger" class="w3-container" style="margin: auto; display: none; width: 80%;">
+            <p>{{ _('La cancellazione del viaggio ') }}
+            <span id="tour-name"></span>
+            {{ _(' comporta la cancellazione delle tappe e degli alberghi. Sei sicuro di voler continuare?') }}</p>
             <div class="w3-bar" style="width: 50%; margin: auto;">
-                <p id="no" class="w3-bar-item w3-button w3-theme-action w3-hover-theme-d2 w3-ripple">NO</a>
-                <p id="yes" class="w3-bar-item w3-button w3-theme-action w3-hover-theme-d2 w3-ripple w3-right">{{ _('SI') }}</a>
+                <p id="no" class="w3-bar-item w3-button w3-theme-action w3-hover-theme-d2 w3-ripple">NO</p>
+                <p id="yes" class="w3-bar-item w3-button w3-theme-action w3-hover-theme-d2 w3-ripple w3-right">{{ _('SI') }}</p>
             </div>
         </div>
 
@@ -80,8 +82,8 @@
 
     </form>
 
-    <div class="w3-center" style="margin-bottom: 20px; margin-top: 50px;">
-        <p id="sure" class="w3-button w3-theme-action w3-hover-theme-d2 w3-ripple w3-center", style="width: 30%")>{{ _('Cancella il viaggio') }}</p>
+    <div id="sure" class="w3-center" style="margin-bottom: 20px; margin-top: 50px;">
+        <p class="w3-button w3-theme-action w3-hover-theme-d2 w3-ripple w3-center" style="width: 30%">{{ _('Cancella il viaggio') }}</p>
     </div>
 
 </div>
@@ -98,6 +100,8 @@ const sure = document.querySelector('#sure')
 sure.addEventListener("click", beCautious);
 document.querySelector("#no").addEventListener("click", (evt) => {
                                             document.querySelector("#danger").style.display = "none";
+                                            document.querySelector('#sure').style.display = "block";
+                                            history.go(-1);
                                            });
 
 document.querySelector("#yes").addEventListener("click", (evt) => {
@@ -109,7 +113,6 @@ document.querySelector("#yes").addEventListener("click", (evt) => {
 
 function beCautious(evt) {
     if (is_valid()) {
-        document.querySelector("#danger").style.display = "block";
         sure.style.display = "none";
         const tour_id = document.querySelector('#tour').value;
         const opts = document.querySelector('#tour').options;
@@ -123,8 +126,12 @@ function beCautious(evt) {
                 break;
             }
         }
-        const msg = document.querySelector('#what-danger')
-        msg.textContent = {{ _('La cancellazione del viaggio "%(tour)s" comporta la cancellazione dei dati relative alle tappe e agli alberghi del viaggio. Sei sicuro di voler continuare?', tour=tour) }};
+        const tourName = document.querySelector('#tour-name');
+        tourName.style.fontStyle = "italic";
+        tourName.style.fontWeight = "bold";
+        tourName.textContent = tour;
+
+        document.querySelector("#danger").style.display = "block";
     }
 }
 

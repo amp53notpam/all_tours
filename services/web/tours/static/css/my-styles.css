@@ -144,12 +144,11 @@ form  i {
 }
 
 form  .toggle {
-    margin-right: 25px;
 	margin-top: 15px;
 	cursor: pointer;
 }
 
-form  span {
+form  span.special {
     display: inline-block;
     margin-top: -20px;
     margin-left: -40px;

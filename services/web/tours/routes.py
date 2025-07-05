@@ -2,7 +2,7 @@ from locale import setlocale, LC_ALL
 from os import chdir, remove
 from os.path import join, basename
 from flask import current_app as app
-from flask import session, redirect, render_template, request, url_for, send_from_directory, flash
+from flask import session, redirect, render_template, request, url_for, send_from_directory, flash, abort
 from werkzeug.utils import secure_filename
 from . import db, get_locale
 from .models import Tour, User
@@ -141,15 +141,21 @@ class UploadUserFiles(View):
 
 
 class DbBackup(View):
-    def dispatch_request(self):
+    def dispatch_request(self, section='full'):
+        if section not in ['full', 'data']:
+            abort(400, 'Invalid backup type: should be "full" or "data"')
+
         base = app.config['UPLOAD_FOLDER']
         chdir(base)
-        for f in glob("./dump*"):
+        for f in glob("./*dump"):
             remove(f)
 
-        f_name = f"{basename(app.config['SQLALCHEMY_DATABASE_URI'])}-{round(time())}.dump"
+        f_name = f"{section}-{basename(app.config['SQLALCHEMY_DATABASE_URI'])}-{round(time())}.dump"
         with open(f"./{f_name}", 'w') as BCK:
-            Popen(split(f"pg_dump {app.config['SQLALCHEMY_DATABASE_URI']}"), stdout=BCK)
+            if section == 'full':
+                Popen(split(f"pg_dump {app.config['SQLALCHEMY_DATABASE_URI']}"), stdout=BCK, stderr=STDOUT).wait()
+            else:
+                Popen(split(f"pg_dump --section data {app.config['SQLALCHEMY_DATABASE_URI']}"), stdout=BCK, stderr=STDOUT).wait()
 
         return send_from_directory(base, f_name)
 
@@ -173,4 +179,5 @@ app.add_url_rule("/static/<path:filename>", view_func=StaticFiles.as_view("stati
 app.add_url_rule("/download/<path:filename>", view_func=DownloadFiles.as_view("download_files"))
 app.add_url_rule("/download/user_files", view_func=DownloadUserFiles.as_view("download_user_files"))
 app.add_url_rule("/download/db_backup", view_func=DbBackup.as_view("download_db_backup"))
+app.add_url_rule("/download/db_backup/<string:section>", view_func=DbBackup.as_view("download_db_backup_s"))
 app.add_url_rule("/upload/user_files", view_func=UploadUserFiles.as_view("upload_user_files"))

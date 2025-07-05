@@ -9,6 +9,7 @@ from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_session import Session
 from flask_babel import Babel
+from flask_babel_js import BabelJS
 from flask_mail import Mail
 from sqlalchemy.orm import DeclarativeBase
 from werkzeug.security import generate_password_hash
@@ -23,6 +24,7 @@ migrate = Migrate()
 login_manager = LoginManager()
 sess = Session()
 babel = Babel()
+babel_js = BabelJS()
 mail = Mail()
 
 
@@ -72,6 +74,7 @@ def initialize_extensions(app):
         return db.session.get(User, int(user_id))
 
     babel.init_app(app, default_locale='it', locale_selector=get_locale)
+    babel_js.init_app(app)
 
 
 def register_blueprints(app):

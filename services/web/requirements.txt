@@ -7,6 +7,7 @@ dnspython
 email_validator
 Flask
 flask-babel
+flask-babel-js
 Flask-Login
 Flask-Mail
 Flask-Migrate

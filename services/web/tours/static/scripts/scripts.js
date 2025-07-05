@@ -117,9 +117,10 @@ async function openLap(evt) {
     const tablinks = document.querySelectorAll(".tablink");
     for (const tablink of tablinks) {
         tablink.className = tablink.className.replace(" w3-theme-d2", "");
+        if (tablink.dataset.lapId == lapId) {
+            tablink.className += " w3-theme-d2";
+        }
     }
-
-    evt.target.className += " w3-theme-d2";
 
     closeMenu()
 }
