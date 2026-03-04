@@ -7,16 +7,15 @@ from sqlalchemy import Table, Column, String, BOOLEAN, INT, FLOAT, DATE, TIMESTA
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from flask_login import UserMixin
 from typing import List
-from flask_babel import _, lazy_gettext as _l
 
 
-class TripMode(enum.Enum):
+class TripMode(str, enum.Enum):
     WALKING = "walking"
     BICYCLING = "bicycling"
     DRIVING = "driving"
 
 
-class MediaType(enum.Enum):
+class MediaType(str, enum.Enum):
     VIDEO = "video"
     IMAGE = "image"
 
@@ -40,7 +39,7 @@ class Tour(db.Model):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(64))
-    trip_mode: Mapped[TripMode] = mapped_column(Enum("walking", "bicycling", "driving", name="mode_enum", native_enum=True), default="walking")
+    trip_mode: Mapped[TripMode] = mapped_column(Enum(TripMode, name="trip_mode_enum", native_enum=True), default='walking')
     is_visible: Mapped[bool | None] = mapped_column(BOOLEAN, default=True)
     trip_pic: Mapped[str | None] = mapped_column(String(96))
     pic_caption: Mapped[str | None] = mapped_column(String(128))
@@ -52,7 +51,7 @@ class Tour(db.Model):
     __table_args__ = (UniqueConstraint('name', 'trip_mode', name='name_mode_uc'),)
 
     def __repr__(self) -> str:
-        return self.name
+        return f"{self.name}"
 
 
 class Lap(db.Model):
@@ -85,9 +84,9 @@ class Media(db.Model):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     media_src: Mapped[str] = mapped_column(String(96))
-    media_width: Mapped[int] = mapped_column(INT, default=0)
-    media_height: Mapped[int] = mapped_column(INT, default=0)
-    media_type: Mapped[MediaType] = mapped_column(Enum("video", "image", name="media_types", native_enum=True), default="image")
+    media_width: Mapped[int | None]
+    media_height: Mapped[int | None]
+    media_type: Mapped[MediaType | None] = mapped_column(Enum(MediaType, name="media_type_enum", native_enum=True))
     date: Mapped[datetime] = mapped_column(TIMESTAMP)
     lat: Mapped[float | None] = mapped_column(FLOAT)
     long: Mapped[float | None] = mapped_column(FLOAT)

@@ -71,7 +71,8 @@ def update_all_dates(laps, new_date, old_date):
 def add_geo_tag(media, track):
     p = Popen(split(f"exiftool -s2 -n -gpslatitude -gpslongitude {media}"), stdout=PIPE, stderr=STDOUT, encoding="utf-8")
     position, error = p.communicate()
-    if not position and track:
+    # if not position and track:
+    if track:
         Popen(split(f"exiftool -geotag {track} -geosync=1:00:00 {media}"), stdout=PIPE, stderr=STDOUT, encoding="utf-8").wait()
         Popen(split(f"exiftool -delete_original! {media}"), stdout=PIPE, stderr=STDOUT).wait()
 
