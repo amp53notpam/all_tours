@@ -30,8 +30,9 @@ class UpdLapForm(FlaskForm):
     submit = SubmitField('OK')
 
 
-class LoadMediaForm(FlaskForm):
-    media_file = FileField(_l('File'), validators=[FileAllowed(['jpg', 'jpeg', 'mov', 'mp4'])])
+class LoadFileForm(FlaskForm):
+    file_type = RadioField(_l('Tipo file'), choices=[('image', _l('Foto')), ('video', _l('Video')), ('gpx', _l('Traccia gpx'))], default='image')
+    file_name = FileField('File', validators=[FileAllowed(['jpg', 'jpeg', 'mov', 'mp4', 'gpx'])])
     caption = StringField(_l('Didascalia'))
     submit = SubmitField('OK')
 

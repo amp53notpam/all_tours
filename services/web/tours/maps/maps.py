@@ -6,7 +6,7 @@ from flask import (
 from flask.views import View
 from sqlalchemy.exc import OperationalError, ProgrammingError
 from .. import db
-from ..models import Lap, Hotel, Tour, Media
+from ..models import Lap, Hotel, Tour, Media, Gpx
 
 map_bp = Blueprint('map_bp', __name__,
                    url_prefix="/maps",
@@ -23,7 +23,7 @@ def add_upload_path():
 class HotelMap(View):
     def dispatch_request(self, lat=None, long=None):
         hotel = db.session.execute(db.select(Hotel).where(Hotel.lat == lat and Hotel.long == long)).scalar()
-        gpx = db.session.get(Lap, hotel.lap_id).gpx
+        gpx = db.session.get(Lap, hotel.lap_id).primary_gpx
 
         return render_template("map_hotel.jinja2", lat=lat, long=long, popup=hotel.name, media=None, track=gpx)
 
@@ -32,7 +32,15 @@ class LapMap(View):
     def dispatch_request(self, id=None):
         lap = db.session.get(Lap, id)
 
-        return render_template("map_lap.jinja2", lap=lap, track=lap.gpx)
+        return render_template("map_lap.jinja2", lap=lap, track=lap.primary_gpx)
+
+
+class LapMapGpx(View):
+    def dispatch_request(self, id=None):
+        gpx = db.session.get(Gpx, id)
+        lap = db.session.get(Lap, gpx.lap_id)
+
+        return render_template("map_lap_extras.jinja2", lap=lap, track=gpx.gpx)
 
 
 class PhotoMap(View):
@@ -40,12 +48,13 @@ class PhotoMap(View):
         media = db.session.execute(db.select(Media).where(Media.lat == lat and Media.long == long)).scalar()
         media_url = url_for('download_files', filename='images/' + media.media_src)
         popup = f'<a target="_blank" href={media_url}><img src={media_url} style="width: 100px;"></a>'
-        gpx = db.session.get(Lap, media.lap_id).gpx
+        gpx = db.session.get(Lap, media.lap_id).primary_gpx
         foto_on_track = db.session.execute(db.select(Media).where(Media.lap_id == media.lap_id, Media.lat != None)).fetchall()
 
         return render_template("map_photo.jinja2", lat=lat, long=long, popup=popup, media=foto_on_track, track=gpx)
 
 
 map_bp.add_url_rule('/lap/<int:id>', view_func=LapMap.as_view('lap_map'))
+map_bp.add_url_rule('/lap/gpx/<int:id>', view_func=LapMapGpx.as_view('lap_gpx'))
 map_bp.add_url_rule('/hotel/<float:lat>/<float:long>', view_func=HotelMap.as_view('hotel_map'))
 map_bp.add_url_rule('/media/<float:lat>/<float:long>', view_func=PhotoMap.as_view('photo_map'))

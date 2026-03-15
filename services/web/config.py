@@ -4,25 +4,28 @@ from datetime import timedelta
 from tours import db
 
 
-load_dotenv('.env')
+load_dotenv('.env.pg')
 
 
 class DevelopmentConfig:
     FLASK_ENV = 'development'
-    DEBUG = True if FLASK_ENV == 'development' else False
-    TESTING = True if FLASK_ENV == 'development' else False
+    DEBUG = True
+    TESTING = True
 
     SECRET_KEY = environ.get('SECRET_KEY')
     STATIC_FORLDER = 'static'
     TEMPLATES_FOLDER = 'templates'
 
     # Database
-    SQLALCHEMY_DATABASE_URI = environ.get("DATABASE_URL", "sqlite://")
+    SQLALCHEMY_DATABASE_URI = f"{environ.get('DATABASE')}://\
+                                {environ.get('POSTGRES_USER')}:{environ.get('POSTGRES_PASSWORD')}@\
+                                {environ.get('POSTGRES_HOST')}:{environ.get('POSTGRES_PORT')}/\
+                                {environ.get('POSTGRES_DB')}".replace(" ", "")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = False
 
     # Logging
-    LOG_WITH_GUNICORN = environ.get('LOG_WITH_GUNICORN', default=False)
+    LOG_WITH_GUNICORN = True
 
     # server-side sessions from flask-session
     SESSION_TYPE = "sqlalchemy"
@@ -48,3 +51,6 @@ class DevelopmentConfig:
 
 class ProductionConfig(DevelopmentConfig):
     FLASK_ENV = 'production'
+
+    DEBUG = False
+    TESTING = False

@@ -11,7 +11,7 @@ flask-babel-js
 Flask-Login
 Flask-Mail
 Flask-Migrate
-Flask-Session
+Flask-Session[sqlalchemy]
 Flask-SQLAlchemy
 Flask-WTF
 greenlet

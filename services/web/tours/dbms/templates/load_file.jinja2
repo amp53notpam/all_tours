@@ -1,0 +1,144 @@
+{% extends 'layout.jinja2' %}
+
+{% block title %}{{ _('Media') }}{% endblock %}
+
+{% block header %}
+{{ header }}
+{% endblock %}
+
+{% block content %}
+<div class="w3-card-4 w3-padding-large" style="max-width: 620px; margin:auto; margin-top: 80px">
+    <div class="w3-container w3-padding-24">
+        <div class="w3-theme-d2">
+            <h2 class="w3-center">{{ _('Carica file') }}</h2>
+            <h3 class="w3-center">{{ _('Tappa') }} {{ lap.start }} - {{ lap.destination }}</h3>
+        </div>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.csrf_token }}
+
+       {# media type #}
+        <div class="w3-container w3-row form-group" style="margin-bottom: 10px">
+            <div class="w3-col m4 w3-mobile">
+                {{ form.file_type.label(class="w3-theme-l4 w3-left-align wbold form_label") }}
+            </div>
+            <div class="w3-col m8 w3-mobile">
+                {{ form.file_type(class="w3-left-align w3-input w3-theme-l4") }}
+            </div>
+        </div>
+
+        {# foto/video #}
+        <div class="w3-container w3-row form-group" style="margin-bottom: 10px">
+            <div class="w3-col m4 w3-mobile">
+                {{ form.file_name.label(class="w3-theme-l4 w3-left-align wbold form_label required") }}
+            </div>
+            <div class="w3-col m8 w3-mobile tooltip">
+                {{ form.file_name(class="w3-left-align w3-input w3-theme-l4", accept=".jpg,.jpeg") }}
+                <span class="w3-monospace tooltiptext"></span>
+            </div>
+        </div>
+
+        {# didascalia #}
+        <div id="div-caption" class="w3-container w3-row form-group" style="margin-bottom: 10px">
+            <div class="w3-col m4 w3-mobile">
+                {{ form.caption.label(class="w3-theme-l4 w3-left-align wbold form_label") }}
+            </div>
+            <div class="w3-col m8 w3-mobile tooltip">
+                {{ form.caption(class="w3-left-align w3-input w3-theme-l4") }}
+                <span class="w3-monospace tooltiptext"></span>
+            </div>
+        </div>
+
+        {# submit #}
+        <div style="margin-bottom: 20px; margin-top:50px;">
+            <p class="w3-center">
+                {{ form.submit(class="w3-center w3-button w3-theme-action w3-hover-theme-d2 w3-ripple w3-center", style="width: 30%") }}
+            </p>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const form = document.querySelector("form");
+const caption = document.querySelector("#caption");
+const caption_label = document.querySelector('label[for="caption"]')
+const file_name = document.querySelector("#file_name");
+const file_type = document.querySelector("#file_type");
+caption.maxLength=64;
+
+form.addEventListener("submit", examineForm);
+document.addEventListener("change", manage_form);
+
+function examineForm(evt) {
+    if (! is_valid()) {
+        evt.preventDefault();
+    }
+}
+
+function manage_form(evt) {
+    let target = evt.target;
+    switch (target.id) {
+        case "file_type-0":
+            file_name.setAttribute("accept", ".jpg,.jpeg");
+            break
+        case "file_type-1":
+            file_name.setAttribute("accept", ".mov");
+            break;
+        case "file_type-2":
+            file_name.setAttribute("accept", ".gpx");
+            break;
+    }
+
+    switch (target.id) {
+        case "file_type-0":
+        case "file_type-1":
+            caption.maxLength = 64;
+            caption_label.textContent = "{{ _('Didascalia') }}"
+            break;
+        case "file_type-2":
+            caption.maxLength = 32;
+            caption_label.textContent = "{{ _('Nome traccia') }}"
+            break;
+    }
+}
+
+function is_valid() {
+    let tooltip = document.querySelector("#caption ~ [class~=tooltiptext]");
+    if (caption.maxLength == 32) {
+        if (caption.value.length == 0){
+            tooltip.textContent = "{{ _('Inserire un nome identificativo della traccia gpx') }}"
+            tooltip.style.display = "block";
+            return false;
+       } else if (caption.value.length > caption.maxLength) {
+            tooltip.textContent = "{{ _('Nome identificativo della traccia gpx troppo lungo (max. 32 caratteri)') }}"
+            tooltip.style.display = "block";
+            return false;
+       }
+    }
+
+    tooltip = document.querySelector("#file_name ~ [class~=tooltiptext]");
+    const file_extension = file_name.value.split('.').pop();
+    if (! file_name.value) {
+        tooltip.textContent = "{{ _('Scegliere un file.') }}";
+        tooltip.style.display = "block";
+        return false;
+    } else if (! file_name.getAttribute("accept").match(file_extension)) {
+        tooltip.textContent = "{{ _('Il file selezionato non è compatibile con il tipo di file selezionato') }}";
+        tooltip.style.display = "block";
+        return false
+    } else {
+        resetTooltip(tooltip);
+    }
+    return true;
+}
+
+function resetTooltip(tooltip) {
+    tooltip.textContent = "";
+    tooltip.style.display= "none";
+}
+
+</script>
+{% endblock %}

@@ -65,11 +65,13 @@ class Lap(db.Model):
     distance: Mapped[float | None] = mapped_column(FLOAT)
     ascent: Mapped[int | None]
     descent: Mapped[int | None]
-    gpx: Mapped[str | None] = mapped_column(String(64))
+    # main gpx
+    primary_gpx: Mapped[str | None] = mapped_column(String(64))
     done: Mapped[bool | None] = mapped_column(BOOLEAN, default=False)
     tour_id: Mapped[int] = mapped_column(ForeignKey("tour.id"))
     tour: Mapped[Tour] = relationship(back_populates="laps")
 
+    other_gpx: Mapped[List[Gpx]] = relationship(back_populates="lap")
     hotels: Mapped[List[Hotel]] = relationship(back_populates="lap")
     photos: Mapped[List[Media]] = relationship(back_populates="lap", order_by="Media.date")
 
@@ -77,6 +79,16 @@ class Lap(db.Model):
 
     def __repr__(self) -> str:
         return f"{self.start}-{self.destination}  {self.date}."
+
+
+class Gpx(db.Model):
+    id: Mapped[int] = mapped_column(primary_key=True)
+    gpx: Mapped[str] = mapped_column(String(64))
+    caption: Mapped[str | None] = mapped_column(String(32))
+    lap_id: Mapped[int] = mapped_column(ForeignKey("lap.id"))
+    lap: Mapped[Lap] = relationship(back_populates="other_gpx")
+
+    __table_args__ = (UniqueConstraint('lap_id', 'gpx', name='lap_gpx_uc'),)
 
 
 class Media(db.Model):

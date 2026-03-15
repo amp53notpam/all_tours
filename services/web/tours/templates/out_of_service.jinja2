@@ -13,3 +13,9 @@
     <p>Site temporarily out of service. Please try again later</p>
 </div>
 {% endblock %}
+
+{% block scripts %}
+<script>
+    document.querySelector(`#login`).style.display = "none";
+</script>
+{% endblock %}

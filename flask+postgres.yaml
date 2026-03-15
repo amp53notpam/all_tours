@@ -1,4 +1,4 @@
-# compose for app container connectiong to local database
+# compose for an app container connectiong to postgres database container
 services:
     web:
         build:
@@ -24,13 +24,24 @@ services:
             - ntw
         env_file:
             - ./.env
-            - ./.env.pg
+            - ./.env.flask+postgres
         environment:
             - FLASK_ENV=production
-
+        depends_on:
+            - db
+  
+    db:
+        image: docker.io/library/postgres:18-alpine
+        volumes:
+            - postgres_data:/var/lib/postgresql
+        container_name: postgres_db
+        env_file:
+            - ./.env.flask+postgres
 volumes:
     vol:
         name: all_tours
+    postgres_data:
+        name: all_tours_db
 
 networks:
     ntw:

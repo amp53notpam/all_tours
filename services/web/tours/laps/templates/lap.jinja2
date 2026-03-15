@@ -110,16 +110,55 @@
         </div>
         {% endif %}
 
-        {% if lap.gpx %}
+        {% if lap.primary_gpx %}
         <div class="row w3-row">
             <div class="w3-container w3-col m4 w3-mobile">
-                <p class="w3-left-align wbold">{{ _('Traccia gpx') }}:</p>
+                <p class="w3-left-align wbold">{{ _('Traccia principale') }}:</p>
             </div>
             <div class="w3-container w3-col m7 w3-mobile">
-                <p class="w3-left-align"><a href='{{ url_for("download_files", filename="tracks/"+lap.gpx) }}'>{{ lap.start }} - {{ lap.destination }}</a></p>
+                <p class="w3-left-align"><a href='{{ url_for("download_files", filename="tracks/"+lap.primary_gpx) }}' class="w3-hover-theme-d3">{{ lap.start }} - {{ lap.destination }}</a></p>
             </div>
             <div class="w3-container w3-col m1 w3-mobile">
-                <p class="w3-left-align"><a target="_blank" href="{{ url_for("map_bp.lap_map", id=lap.id) }}" class="w3-hover-theme-d3 w3-right"><i class="fa-solid fa-map-location-dot icon28"></i></a></p>
+                <p class="w3-left-align">
+                <a target="_blank" href="{{ url_for("map_bp.lap_map", id=lap.id) }}" class="w3-hover-theme-d3 w3-right"><i class="fa-solid fa-map icon28"></i></a>
+                </p>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if lap.other_gpx %}
+        <div class="row w3-row">
+            <div class="w3-container w3-col m4  w3-mobile">
+                <p class="w3-bold w3-left-align">Altre tracce:</p>
+                {% for x in lap.other_gpx %}
+                {% if not loop.last %}
+                <p style="visibility: hidden">xxx</p>
+                {% endif %}
+                {% endfor %}
+            </div>
+            <div class="w3-col m8 w3-mobile">
+                <div class="w3-row">
+                    <div class="w3-container w3-col m10 w3-center w3-mobile">
+                        {% for gpx in lap.other_gpx %}
+                        {% if gpx.caption %}
+                        {% set track_title = gpx.caption %}
+                        {% else %}
+                        {% set track_title = _('Traccia') + ' ' + loop.index|string %}
+                        {% endif %}
+                        <p class="w3-left-align"><a href='{{ url_for("download_files", filename="tracks/"+gpx.gpx) }}' class="w3-hover-theme-d3">{{ track_title }}</a></p>
+                        {% endfor %}
+                    </div>
+                    <div class="w3-col w3-container m2 w3-center w3-mobile">
+                        {% for gpx in lap.other_gpx %}
+                            <p class="w3-right-align">
+                            <a target="_blank" href="{{ url_for("map_bp.lap_gpx", id=gpx.id) }}"><i class="fa-regular fa-map icon28"></i></a>
+                            {% if is_editable %}
+                            <a href="{{ url_for("dbms_bp.delete_track", id=gpx.id) }}"><i class="fa-regular fa-trash-can icon28"></i></a>
+                            {% endif %}
+                            </p>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
         </div>
         {% endif %}
@@ -183,7 +222,7 @@
         {% if is_editable %}
         <div class="w3-container w3-center" style="margin-top: 60px;">
             <div class="w3-bar">
-                <a href="{{ url_for('dbms_bp.load_lap_media', id=lap.id) }}" class="w3-bar-item w3-left w3-ripple" title="{{ _('Aggiungi foto/film') }}"><i class="fa-solid fa-photo-film icon28"></i></a>
+                <a href="{{ url_for('dbms_bp.load_lap_file', id=lap.id) }}" class="w3-bar-item w3-left w3-ripple" title="{{ _('Carica tracce gpx/foto/film') }}"><i class="fa-solid fa-arrow-up-from-bracket icon28"></i></a>
                 <a href="{{ url_for('dbms_bp.update_lap', id=lap.id) }}" class="w3-bar-item w3-ripple" title="{{ _('Modifica questa tappa') }}"><i class="fa-solid fa-pencil icon28"></i></a>
                 <a href="{{ url_for('dbms_bp.delete_lap', id=lap.id) }}" class="w3-bar-item w3-ripple" title="{{ _('Cancella questa tappa') }}"><i class="fa-solid fa-trash-can icon28"></i></a>
             </div>

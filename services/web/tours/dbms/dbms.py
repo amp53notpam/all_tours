@@ -11,8 +11,8 @@ from flask_babel import _
 from sqlalchemy import func, desc
 from sqlalchemy.exc import IntegrityError
 from werkzeug.utils import secure_filename
-from ..models import Lap, Hotel, Tour, Media, User, PhoneNumber
-from .forms import AddTourForm, AddLapForm, UpdLapForm, AddHotelForm, UpdHotelForm, LoadMediaForm, TourMgmtForm
+from ..models import Lap, Hotel, Tour, Media, User, PhoneNumber, Gpx
+from .forms import AddTourForm, AddLapForm, UpdLapForm, AddHotelForm, UpdHotelForm, LoadFileForm, TourMgmtForm
 from .. import db
 from ..utils import make_header, translations, get_trip
 
@@ -78,7 +78,7 @@ def add_geo_tag(media, track):
 
 
 def register_media(lap, media, caption):
-    track = join(current_app.config['UPLOAD_FOLDER'], 'tracks', lap.gpx) if lap.gpx else None
+    track = join(current_app.config['UPLOAD_FOLDER'], 'tracks', lap.primary_gpx) if lap.primary_gpx else None
     media_dir = join(current_app.config['UPLOAD_FOLDER'], 'images')
     media_fp = join(media_dir, media)
 
@@ -191,13 +191,56 @@ def do_phone_mngmt(hotel, act, phone):
             db.session.delete(phone_obj)
 
 
+def load_gpx(request, id):
+    caption = request.form.get("caption")
+    gpx = None
+    if 'file_name' in request.files:
+        file = request.files['file_name']
+        if file.filename != '':
+            if allowed_file(file.filename):
+                gpx = secure_filename(file.filename)
+                file.save(join(current_app.config['UPLOAD_FOLDER'], 'tracks', gpx))
+            else:
+                flash(_('Il file "%(file)s" non è una traccia gpx ed è stato ignorato', file=file.filename),
+                      category="warning")
+
+    new_track = Gpx(
+        gpx=gpx,
+        lap_id=id
+    )
+
+    if caption:
+        new_track.caption = caption
+
+    db.session.add(new_track)
+    try:
+        db.session.commit()
+    except IntegrityError:
+        flash(_('In questo viaggio è gia definita una tappa alla stessa data'), category="error")
+
+
+def load_media(request, id):
+    caption = request.form.get("caption")
+    file = None
+    if 'file_name' in request.files:
+        file = request.files['file_name']
+        if file.filename != '' and allowed_file(file.filename):
+            media_file = secure_filename(file.filename)
+            file.save(join(current_app.config['UPLOAD_FOLDER'], 'images', media_file))
+
+    lap = db.session.get(Lap, id)
+    try:
+        register_media(lap, media_file, caption)
+    except ZeroDivisionError:
+        flash(_("Il file %(m_file)s potrebbe essere corrotto", mfile=media_file), category='error')
+    except IntegrityError:
+        current_app.logger.warning(f"The picture {media_file} has been already loaded.")
+
+
 def delete_lap(lap):
     # delete the relevant track file
-    if lap.gpx:
-        try:
-            remove(join(current_app.config['UPLOAD_FOLDER'], 'tracks', lap.gpx))
-        except FileNotFoundError:
-            pass
+    for gpx in lap.other_gpx:
+        delete_gpx(gpx)
     for hotel in lap.hotels:
         delete_hotel(hotel)
     for media in lap.photos:
@@ -225,6 +268,15 @@ def delete_media(media):
     except FileNotFoundError:
         pass
     db.session.delete(media)
+    db.session.commit()
+
+
+def delete_gpx(gpx):
+    try:
+        remove(join(current_app.config['UPLOAD_FOLDER'], 'tracks', gpx.gpx))
+    except FileNotFoundError:
+        pass
+    db.session.delete(gpx)
     db.session.commit()
 
 
@@ -335,7 +387,7 @@ class AddLap(View):
             if tempo:
                 new_lap.duration = tempo
             if gpx:
-                new_lap.gpx = gpx
+                new_lap.primary_gpx = gpx
 
             db.session.add(new_lap)
             try:
@@ -345,8 +397,6 @@ class AddLap(View):
             else:
                 flash(_("Aggiunta tappa %(partenza)s - %(arrivo)s.", partenza=partenza, arrivo=arrivo), category="info")
                 current_app.logger.info(f"Added lap {partenza} - {arrivo}.")
-
-                db.session.commit()
 
             return redirect(url_for("lap_bp.lap_dashboard"))
 
@@ -483,8 +533,10 @@ class TourManagement(View):
             return redirect(url_for("start"))
 
         user = db.session.get(User, session['_user_id'])
-
-        form.tour.choices = [(tour.id, tour.name + " " + translations[tour.trip_mode], dict()) for tour in user.tours]
+        if user.is_admin:
+            form.tour.choices = [(tour.id, tour.name + " " + translations[tour.trip_mode], dict()) for tour in db.session.execute(db.select(Tour).order_by(Tour.id)).scalars()]
+        else:
+            form.tour.choices = [(tour.id, tour.name + " " + translations[tour.trip_mode], dict()) for tour in user.tours]
         form.tour.choices.extend([("", "--------", {"disabled": "disabled"})])
         form.tour.default = ""
         form.process([])
@@ -544,7 +596,7 @@ class UpdLap(View):
                 lap.duration = tempo
             lap.done = fatta
             if gpx:
-                lap.gpx = gpx
+                lap.primary_gpx = gpx
             db.session.commit()
 
             flash(_('Tappa %(start)s - %(destination)s aggiornata.', start=lap.start, destination=lap.destination), category='info')
@@ -555,34 +607,25 @@ class UpdLap(View):
         return render_template("upd_lap.jinja2", form=form, lap=lap, header=header)
 
 
-class LoadLapMedia(View):
+class LoadLapFile(View):
     methods = ['GET', 'POST']
     decorators = [login_required]
 
     def dispatch_request(self, id=None):
-        form = LoadMediaForm()
+        form = LoadFileForm()
 
         if request.method == 'POST':
-            caption = request.form.get("caption")
-            media_file = None
-            if 'media_file' in request.files:
-                file = request.files['media_file']
-                if file.filename != '' and allowed_file(file.filename):
-                    media_file = secure_filename(file.filename)
-                    file.save(join(current_app.config['UPLOAD_FOLDER'], 'images', media_file))
+            file_type = request.form.get("file_type")
+            if file_type == 'gpx':
+                load_gpx(request, id)
+            else:
+                load_media(request, id)
 
-            lap = db.session.get(Lap, id)
-            try:
-                register_media(lap, media_file, caption)
-            except ZeroDivisionError:
-                flash(_("Il file %(m_file)s potrebbe essere corrotto", mfile=media_file), category='error')
-            except IntegrityError:
-                current_app.logger.warning(f"The picture {media_file} has been already loaded.")
             return redirect(url_for("lap_bp.lap", id=id))
 
         lap = db.session.get(Lap, id)
         header = make_header()
-        return render_template("load_media.jinja2", form=form, lap=lap, header=header)
+        return render_template("load_file.jinja2", form=form, lap=lap, header=header)
 
 
 class UpdHotel(View):
@@ -709,6 +752,16 @@ class DeleteMedia(View):
         return jsonify("Done")
 
 
+class DeleteTrack(View):
+    decorators = [login_required]
+
+    def dispatch_request(self, id=None):
+        track = db.session.get(Gpx, id)
+        lap_id = track.lap_id
+        delete_gpx(track)
+        return redirect(url_for("lap_bp.lap", id=lap_id))
+
+
 class DeleteHotel(View):
     decorators = [login_required]
 
@@ -726,8 +779,9 @@ class DeleteHotel(View):
 dbms_bp.add_url_rule('/trip/add/', view_func=AddTour.as_view("add_tour"))
 dbms_bp.add_url_rule('/lap/add/', view_func=AddLap.as_view("add_lap"))
 dbms_bp.add_url_rule('/lap/update/<int:id>', view_func=UpdLap.as_view("update_lap"))
-dbms_bp.add_url_rule('/lap/update/<int:id>/load_media', view_func=LoadLapMedia.as_view("load_lap_media"))
+dbms_bp.add_url_rule('/lap/update/<int:id>/load_file', view_func=LoadLapFile.as_view("load_lap_file"))
 dbms_bp.add_url_rule('/lap/delete/<int:id>', view_func=DeleteLap.as_view('delete_lap'))
+dbms_bp.add_url_rule('/track/delete/<int:id>', view_func=DeleteTrack.as_view('delete_track'))
 dbms_bp.add_url_rule('/media/delete/<string:media>', view_func=DeleteMedia.as_view('delete_media'))
 dbms_bp.add_url_rule('/hotel/add/', view_func=AddHotel.as_view("add_hotel"))
 dbms_bp.add_url_rule('/hotel/update/<int:id>', view_func=UpdHotel.as_view("update_hotel"))

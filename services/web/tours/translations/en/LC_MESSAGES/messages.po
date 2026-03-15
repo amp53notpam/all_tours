@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-07-02 19:25+0200\n"
+"POT-Creation-Date: 2026-03-15 18:41+0100\n"
 "PO-Revision-Date: 2025-04-28 11:37+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -16,7 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.17.0\n"
+"Generated-By: Babel 2.18.0\n"
 
 #: tours/forms.py:8
 msgid "Scegli il viaggio"
@@ -42,11 +42,11 @@ msgstr "Database initialised..."
 msgid "in bici"
 msgstr "by bicycle"
 
-#: tours/dbms/forms.py:76 tours/utils.py:10
+#: tours/dbms/forms.py:77 tours/utils.py:10
 msgid "a piedi"
 msgstr "on foot"
 
-#: tours/dbms/forms.py:76 tours/utils.py:10
+#: tours/dbms/forms.py:77 tours/utils.py:10
 msgid "in auto"
 msgstr "by car"
 
@@ -76,7 +76,7 @@ msgstr "Unknown user"
 
 #: tours/auth/forms.py:11
 msgid "Ricordami"
-msgstr "Remenber me"
+msgstr "Remember me"
 
 #: tours/auth/forms.py:17 tours/auth/forms.py:29
 msgid "Le passwords non coincidono"
@@ -84,15 +84,15 @@ msgstr "The passwords do not match"
 
 #: tours/auth/forms.py:18 tours/auth/forms.py:30
 msgid "Conferma"
-msgstr "Confirm"
+msgstr "Verify"
 
-#: tours/auth/forms.py:19 tours/dbms/forms.py:47 tours/dbms/forms.py:62
+#: tours/auth/forms.py:19 tours/dbms/forms.py:48 tours/dbms/forms.py:63
 msgid "E-mail non valida"
-msgstr "Invalid e-mail"
+msgstr "Invalid email address"
 
 #: tours/auth/forms.py:20
 msgid "Registrami"
-msgstr "Sign me up"
+msgstr "Sign up"
 
 #: tours/auth/forms.py:25 tours/auth/forms.py:31
 msgid "Invia"
@@ -191,66 +191,66 @@ msgstr ""
 "The check-out date from the hotel %(hotel)s is incompatible with the new "
 "date"
 
-#: tours/dbms/dbms.py:276
-#, python-format
-msgid "Un viaggio con nome %(titolo)s esiste già."
-msgstr "A trip with name %(titolo)s already exists."
-
-#: tours/dbms/dbms.py:280
-#, python-format
-msgid "Aggiunto viaggio \"%(titolo)s\"."
-msgstr "Added trip \"%(titolo)s\"."
-
-#: tours/dbms/dbms.py:312 tours/dbms/dbms.py:521
+#: tours/dbms/dbms.py:204 tours/dbms/dbms.py:365 tours/dbms/dbms.py:574
 #, python-format
 msgid "Il file \"%(file)s\" non è una traccia gpx ed è stato ignorato"
 msgstr "The file \"%(file)s\" is not a gpx track so it has been ignored"
 
-#: tours/dbms/dbms.py:343
+#: tours/dbms/dbms.py:219 tours/dbms/dbms.py:396
 msgid "In questo viaggio è gia definita una tappa alla stessa data"
 msgstr "On this journey a stage is already defined on the same date"
 
-#: tours/dbms/dbms.py:345
-#, python-format
-msgid "Aggiunta tappa %(partenza)s - %(arrivo)s."
-msgstr "Added stage %(partenza)s - %(arrivo)s."
-
-#: tours/dbms/dbms.py:390 tours/dbms/dbms.py:617
-#, python-format
-msgid "Il file \"%(file)s\" non è una immagine ed è stato ignorato"
-msgstr "The file \"%(file)s\" is not an image so it has been ignored"
-
-#: tours/dbms/dbms.py:440
-#, python-format
-msgid "Aggiunto albergo %(name)s a %(town)s."
-msgstr "‘Added hotel %(name)s in %(town)s."
-
-#: tours/dbms/dbms.py:549
-#, python-format
-msgid "Tappa %(start)s - %(destination)s aggiornata."
-msgstr "Stage %(start)s - %(destination)s updated."
-
-#: tours/dbms/dbms.py:577
+#: tours/dbms/dbms.py:235
 #, python-format
 msgid "Il file %(m_file)s potrebbe essere corrotto"
 msgstr "The file %(m_file)s may be corrupted"
 
-#: tours/dbms/dbms.py:656
+#: tours/dbms/dbms.py:329
+#, python-format
+msgid "Un viaggio con nome %(titolo)s esiste già."
+msgstr "A trip with name %(titolo)s already exists."
+
+#: tours/dbms/dbms.py:333
+#, python-format
+msgid "Aggiunto viaggio \"%(titolo)s\"."
+msgstr "Added trip \"%(titolo)s\"."
+
+#: tours/dbms/dbms.py:398
+#, python-format
+msgid "Aggiunta tappa %(partenza)s - %(arrivo)s."
+msgstr "Added stage %(partenza)s - %(arrivo)s."
+
+#: tours/dbms/dbms.py:441 tours/dbms/dbms.py:661
+#, python-format
+msgid "Il file \"%(file)s\" non è una immagine ed è stato ignorato"
+msgstr "The file \"%(file)s\" is not an image so it has been ignored"
+
+#: tours/dbms/dbms.py:491
+#, python-format
+msgid "Aggiunto albergo %(name)s a %(town)s."
+msgstr "‘Added hotel %(name)s in %(town)s."
+
+#: tours/dbms/dbms.py:602
+#, python-format
+msgid "Tappa %(start)s - %(destination)s aggiornata."
+msgstr "Stage %(start)s - %(destination)s updated."
+
+#: tours/dbms/dbms.py:700
 #, python-format
 msgid "Hotel %(hotel)s aggiornato."
 msgstr "Hotel %(hotel)s updated."
 
-#: tours/dbms/dbms.py:680
+#: tours/dbms/dbms.py:724
 #, python-format
 msgid "Cancellato viaggio %(tour)s."
 msgstr "Deleted tour %(tour)s."
 
-#: tours/dbms/dbms.py:696
+#: tours/dbms/dbms.py:740
 #, python-format
 msgid "Cancellata tappa %(start)s - %(destination)s."
 msgstr "Deleted stage %(start)s - %(destination)s."
 
-#: tours/dbms/dbms.py:719
+#: tours/dbms/dbms.py:773
 #, python-format
 msgid "Cancellato albergo %(hotel)s."
 msgstr "Deleted hotel %(hotel)s."
@@ -261,11 +261,11 @@ msgstr "Stage date"
 
 #: tours/dbms/forms.py:10
 msgid "Partenza"
-msgstr "Start"
+msgstr "From"
 
 #: tours/dbms/forms.py:11
 msgid "Arrivo"
-msgstr "End"
+msgstr "To"
 
 #: tours/dbms/forms.py:12 tours/dbms/forms.py:23
 #: tours/laps/templates/lap.jinja2:56 tours/laps/templates/s_lap.jinja2:20
@@ -284,17 +284,17 @@ msgstr "Descent"
 
 #: tours/dbms/forms.py:15
 msgid "Tempo previsto"
-msgstr "Expected time"
+msgstr "Estimated duration"
 
 #: tours/dbms/forms.py:16 tours/dbms/forms.py:27
-#: tours/dbms/templates/load_media.jinja2:3 tours/laps/templates/lap.jinja2:104
+#: tours/dbms/templates/load_file.jinja2:3 tours/laps/templates/lap.jinja2:104
 #: tours/laps/templates/s_lap.jinja2:68
 msgid "Media"
 msgstr "Average speed"
 
 #: tours/dbms/forms.py:17 tours/dbms/forms.py:28
 msgid "Traccia gpx (.gpx)"
-msgstr "Gpx track (.gpx)"
+msgstr "GPX track (.gpx)"
 
 #: tours/dbms/forms.py:26 tours/laps/templates/lap.jinja2:89
 #: tours/laps/templates/s_lap.jinja2:53
@@ -303,110 +303,124 @@ msgstr "Time"
 
 #: tours/dbms/forms.py:29
 msgid "OK è fatta!"
-msgstr ""
+msgstr "OK, it's done!"
 
 #: tours/dbms/forms.py:34
-msgid "File"
-msgstr "File"
+msgid "Tipo file"
+msgstr "File type"
 
-#: tours/dbms/forms.py:35 tours/dbms/forms.py:79 tours/dbms/forms.py:87
+#: tours/dbms/forms.py:34 tours/laps/templates/lap.jinja2:218
+#: tours/laps/templates/photos.jinja2:17 tours/laps/templates/s_lap.jinja2:182
+msgid "Foto"
+msgstr "Pictures"
+
+#: tours/dbms/forms.py:34
+msgid "Video"
+msgstr "Video"
+
+#: tours/dbms/forms.py:34
+msgid "Traccia gpx"
+msgstr "Gpx track"
+
+#: tours/dbms/forms.py:36 tours/dbms/forms.py:80 tours/dbms/forms.py:88
+#: tours/dbms/templates/load_file.jinja2:99
 msgid "Didascalia"
 msgstr "Caption"
 
-#: tours/dbms/forms.py:40
+#: tours/dbms/forms.py:41
 msgid "Albergo"
 msgstr "Hotel"
 
-#: tours/dbms/forms.py:41 tours/dbms/forms.py:60
+#: tours/dbms/forms.py:42 tours/dbms/forms.py:61
 #: tours/laps/templates/hotel.jinja2:62 tours/laps/templates/s_hotel.jinja2:20
 msgid "Indirizzo"
 msgstr "Address"
 
-#: tours/dbms/forms.py:42 tours/laps/templates/hotel.jinja2:76
+#: tours/dbms/forms.py:43 tours/laps/templates/hotel.jinja2:76
 #: tours/laps/templates/s_hotel.jinja2:34
 msgid "Città"
 msgstr "City"
 
-#: tours/dbms/forms.py:43 tours/dbms/forms.py:59
-#: tours/dbms/templates/load_media.jinja2:14
+#: tours/dbms/forms.py:44 tours/dbms/forms.py:60
+#: tours/dbms/templates/load_file.jinja2:14
 #: tours/laps/templates/hotel.jinja2:164 tours/laps/templates/photos.jinja2:42
 #: tours/laps/templates/s_hotel.jinja2:122
 msgid "Tappa"
 msgstr "Stage"
 
-#: tours/dbms/forms.py:44 tours/dbms/forms.py:61
+#: tours/dbms/forms.py:45 tours/dbms/forms.py:62
 msgid "Giorni di soggiorno"
-msgstr "Days of stay"
+msgstr "Length of stay"
 
-#: tours/dbms/forms.py:48 tours/dbms/forms.py:49 tours/dbms/forms.py:50
-#: tours/dbms/forms.py:64 tours/laps/templates/hotel.jinja2:86
+#: tours/dbms/forms.py:49 tours/dbms/forms.py:50 tours/dbms/forms.py:51
+#: tours/dbms/forms.py:65 tours/laps/templates/hotel.jinja2:86
 #: tours/laps/templates/s_hotel.jinja2:44
 msgid "Telefono"
 msgstr "Phone #"
 
-#: tours/dbms/forms.py:51 tours/dbms/forms.py:67
+#: tours/dbms/forms.py:52 tours/dbms/forms.py:68
 #: tours/laps/templates/hotel.jinja2:153
 #: tours/laps/templates/s_hotel.jinja2:111
 msgid "Costo"
 msgstr "Cost"
 
-#: tours/dbms/forms.py:52 tours/dbms/forms.py:68
-msgid "Foto dell'albergo"
-msgstr "Hotel picture"
-
 #: tours/dbms/forms.py:53 tours/dbms/forms.py:69
+msgid "Foto dell'albergo"
+msgstr "Photo of the hotel"
+
+#: tours/dbms/forms.py:54 tours/dbms/forms.py:70
 #: tours/laps/templates/hotel.jinja2:175
 #: tours/laps/templates/s_hotel.jinja2:133
 msgid "Sito web"
 msgstr "Website"
 
-#: tours/dbms/forms.py:54 tours/dbms/forms.py:70
+#: tours/dbms/forms.py:55 tours/dbms/forms.py:71
 msgid "È prenotato"
-msgstr "It is booked"
+msgstr "It's reserved"
 
-#: tours/dbms/forms.py:64
+#: tours/dbms/forms.py:65
 msgid "Aggiungi"
 msgstr "Add"
 
-#: tours/dbms/forms.py:64 tours/dbms/forms.py:89
+#: tours/dbms/forms.py:65 tours/dbms/forms.py:90
 msgid "Cancella"
 msgstr "Delete"
 
-#: tours/dbms/forms.py:75
+#: tours/dbms/forms.py:76
 msgid "Titolo del Viaggio"
-msgstr "Trip Title"
+msgstr "Trip title"
 
-#: tours/dbms/forms.py:76
+#: tours/dbms/forms.py:77
 msgid "Tipo di Viaggio"
-msgstr "Trip mode"
+msgstr "Type of Trip"
 
-#: tours/dbms/forms.py:76
+#: tours/dbms/forms.py:77
 msgid "in bicicletta"
 msgstr "by bicycle"
 
-#: tours/dbms/forms.py:77 tours/dbms/forms.py:85
+#: tours/dbms/forms.py:78 tours/dbms/forms.py:86
 msgid "Visibilità"
 msgstr "Visibility"
 
-#: tours/dbms/forms.py:77 tours/dbms/forms.py:85
+#: tours/dbms/forms.py:78 tours/dbms/forms.py:86
 msgid "Totale"
 msgstr "Full"
 
-#: tours/dbms/forms.py:77 tours/dbms/forms.py:85
-msgid "Ristretta"
-msgstr "Owner"
-
 #: tours/dbms/forms.py:78 tours/dbms/forms.py:86
+msgid "Ristretta"
+msgstr "Restricted"
+
+#: tours/dbms/forms.py:79 tours/dbms/forms.py:87
 msgid "Copertina"
 msgstr "Cover"
 
-#: tours/dbms/forms.py:84
+#: tours/dbms/forms.py:85
 msgid "Viaggio"
 msgstr "Trip"
 
-#: tours/dbms/forms.py:88
+#: tours/dbms/forms.py:89
 msgid "Modifica"
-msgstr "Change"
+msgstr "Apply"
 
 #: tours/dbms/templates/add_hotel.jinja2:3
 msgid "Nuovo Albergo"
@@ -462,18 +476,33 @@ msgid "Specificare un nome per il viaggio."
 msgstr "Specify a name for the trip."
 
 #: tours/dbms/templates/add_tour.jinja2:108
-#: tours/dbms/templates/load_media.jinja2:70
-#: tours/dbms/templates/manage_tour.jinja2:157
+#: tours/dbms/templates/manage_tour.jinja2:156
 msgid "Didascalia troppo lunga: max. 32 caratteri."
 msgstr "Caption too long: max. 32 characters."
 
-#: tours/dbms/templates/load_media.jinja2:13
-msgid "Carica foto/filmato"
-msgstr "Upload photo/video"
+#: tours/dbms/templates/load_file.jinja2:13
+msgid "Carica file"
+msgstr "File upload"
 
-#: tours/dbms/templates/load_media.jinja2:79
-msgid "Scegliere una foto o un video."
-msgstr "Choose a photo or video."
+#: tours/dbms/templates/load_file.jinja2:103
+msgid "Nome traccia"
+msgstr "Track title"
+
+#: tours/dbms/templates/load_file.jinja2:112
+msgid "Inserire un nome identificativo della traccia gpx"
+msgstr "Enter a descriptive name for the GPX track"
+
+#: tours/dbms/templates/load_file.jinja2:116
+msgid "Nome identificativo della traccia gpx troppo lungo (max. 32 caratteri)"
+msgstr "The descriptive name for the GPX track is too long (max. 32 characters)"
+
+#: tours/dbms/templates/load_file.jinja2:125
+msgid "Scegliere un file."
+msgstr "Choose a file."
+
+#: tours/dbms/templates/load_file.jinja2:129
+msgid "Il file selezionato non è compatibile con il tipo di file selezionato"
+msgstr "The selected file is not compatible with the selected file type"
 
 #: tours/dbms/templates/manage_tour.jinja2:3
 msgid "Gestione viaggio"
@@ -503,7 +532,7 @@ msgstr "YES"
 msgid "Cancella il viaggio"
 msgstr "Cancel the trip"
 
-#: tours/dbms/templates/manage_tour.jinja2:148
+#: tours/dbms/templates/manage_tour.jinja2:147
 msgid "Selezionare un viaggio"
 msgstr "Select a trip"
 
@@ -539,7 +568,7 @@ msgid "Cancella questo albergo"
 msgstr "Delete this hote"
 
 #: tours/laps/templates/hotels.jinja2:15 tours/laps/templates/hotels.jinja2:43
-#: tours/laps/templates/lap.jinja2:130 tours/laps/templates/s_lap.jinja2:94
+#: tours/laps/templates/lap.jinja2:169 tours/laps/templates/s_lap.jinja2:133
 #: tours/templates/layout.jinja2:38 tours/templates/layout.jinja2:66
 msgid "Alberghi"
 msgstr "Hotels"
@@ -561,33 +590,32 @@ msgid " prevista"
 msgstr " expected"
 
 #: tours/laps/templates/lap.jinja2:116 tours/laps/templates/s_lap.jinja2:80
-msgid "Traccia gpx"
+msgid "Traccia principale"
+msgstr "Official Gpx track"
+
+#: tours/laps/templates/lap.jinja2:146 tours/laps/templates/s_lap.jinja2:110
+msgid "Traccia"
 msgstr "Gpx track"
 
-#: tours/laps/templates/lap.jinja2:143 tours/laps/templates/photos.jinja2:24
-#: tours/laps/templates/s_lap.jinja2:107
+#: tours/laps/templates/lap.jinja2:182 tours/laps/templates/photos.jinja2:24
+#: tours/laps/templates/s_lap.jinja2:146
 msgid "Tappa precedente"
 msgstr "Previous stage"
 
-#: tours/laps/templates/lap.jinja2:154 tours/laps/templates/photos.jinja2:32
-#: tours/laps/templates/s_lap.jinja2:118
+#: tours/laps/templates/lap.jinja2:193 tours/laps/templates/photos.jinja2:32
+#: tours/laps/templates/s_lap.jinja2:157
 msgid "Tappa successiva"
 msgstr "Next stage"
 
-#: tours/laps/templates/lap.jinja2:179 tours/laps/templates/photos.jinja2:17
-#: tours/laps/templates/s_lap.jinja2:143
-msgid "Foto"
-msgstr "Pictures"
+#: tours/laps/templates/lap.jinja2:225 tours/laps/templates/s_lap.jinja2:189
+msgid "Carica tracce gpx/foto/film"
+msgstr "Upload GPX track/photo/video"
 
-#: tours/laps/templates/lap.jinja2:186 tours/laps/templates/s_lap.jinja2:150
-msgid "Aggiungi foto/film"
-msgstr "Add photo/movie"
-
-#: tours/laps/templates/lap.jinja2:187 tours/laps/templates/s_lap.jinja2:151
+#: tours/laps/templates/lap.jinja2:226 tours/laps/templates/s_lap.jinja2:190
 msgid "Modifica questa tappa"
 msgstr "Edit this stage"
 
-#: tours/laps/templates/lap.jinja2:188 tours/laps/templates/s_lap.jinja2:152
+#: tours/laps/templates/lap.jinja2:227 tours/laps/templates/s_lap.jinja2:191
 msgid "Cancella questa tappa"
 msgstr "Delete this stage"
 
