@@ -776,6 +776,16 @@ class DeleteHotel(View):
         return redirect(url_for("lap_bp.hotel_dashboard"))
 
 
+class DeletePhone(View):
+    decorators = [login_required]
+
+    def dispatch_request(self, hotel_id=None, phone=None):
+        hotel = db.session.get(Hotel, hotel_id)
+        do_phone_mngmt(hotel, 'delete_phone', phone)
+
+        return redirect(url_for("lap_bp.hotel", id=hotel_id))
+
+
 dbms_bp.add_url_rule('/trip/add/', view_func=AddTour.as_view("add_tour"))
 dbms_bp.add_url_rule('/lap/add/', view_func=AddLap.as_view("add_lap"))
 dbms_bp.add_url_rule('/lap/update/<int:id>', view_func=UpdLap.as_view("update_lap"))
@@ -788,3 +798,4 @@ dbms_bp.add_url_rule('/hotel/update/<int:id>', view_func=UpdHotel.as_view("updat
 dbms_bp.add_url_rule('/hotel/delete/<int:id>', view_func=DeleteHotel.as_view('delete_hotel'))
 dbms_bp.add_url_rule('/tour', view_func=TourManagement.as_view('tour_mng'))
 dbms_bp.add_url_rule('/tour/delete', view_func=DeleteTour.as_view('delete_tour'))
+dbms_bp.add_url_rule('/phone/delete/<int:hotel_id>/<string:phone>', view_func=DeletePhone.as_view("delete_phone"))

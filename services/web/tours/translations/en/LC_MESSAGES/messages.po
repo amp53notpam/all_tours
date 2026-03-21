@@ -1,4 +1,3 @@
-# English translations for PROJECT.
 # Copyright (C) 2025 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
@@ -7,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-15 18:41+0100\n"
+"POT-Creation-Date: 2026-03-19 11:24+0100\n"
 "PO-Revision-Date: 2025-04-28 11:37+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -656,6 +655,15 @@ msgstr "Stages done"
 msgid "Chilometri percorsi"
 msgstr "Kilometres covered"
 
+#: tours/maps/maps.py:35
+#, python-brace-format
+msgid "Nel file %{gpx}s ci sono più tracce"
+msgstr "The %{gpx} file contains multiple tracks"
+
+#: tours/maps/maps.py:38
+msgid "Traccia con più segmenti"
+msgstr "Track with multiple segments"
+
 #: tours/templates/layout.jinja2:25 tours/templates/layout_light.jinja2:25
 msgid "I miei viaggi"
 msgstr "My Trips"
@@ -713,4 +721,7 @@ msgstr "File upload"
 #: tours/templates/upld_user_file.jinja2:13
 msgid "Carica file utenti"
 msgstr "User file upload"
+
+#~ msgid "Ci sono più tracce in %{gpx}s"
+#~ msgstr "The %{gpx} file contains multiple tracks"
 

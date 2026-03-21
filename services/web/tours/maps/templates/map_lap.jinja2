@@ -68,37 +68,47 @@ html, body, #map {
 <body>
     <div id="map"></div>
     <div id="popup-1" class="ol-popup">
+        <a href="#" id="popup-closer-1" class="ol-popup-closer"></a>
         <div id="popup-content-1"></div>
     </div>
     <div id="popup-2" class="ol-popup">
+        <a href="#" id="popup-closer-2" class="ol-popup-closer"></a>
         <div id="popup-content-2"></div>
     </div>
 
 <script>
 const containerStart = document.querySelector("#popup-1");
 const contentStart = document.querySelector("#popup-content-1");
+const closerStart = document.querySelector("#popup-closer-1");
 
 const containerEnd = document.querySelector("#popup-2");
 const contentEnd = document.querySelector("#popup-content-2");
+const closerEnd = document.querySelector("#popup-closer-2");
+
+{% if not start and not end %}
+const offset = [0, 0];
+{% else %}
+const offset =  [0, -20];
+{% endif%}
 
 const overlayStart = new ol.Overlay({
      element: containerStart,
-     offset: [0, 0],
-     autoPan: true,
-     autoPanAnimation: {
-         duration: 250
-     }
- });
-const overlayEnd = new ol.Overlay({
-     element: containerEnd,
-     offset: [0, 0],
+     offset: offset,
      autoPan: true,
      autoPanAnimation: {
          duration: 250
      }
  });
 
-{#
+const overlayEnd = new ol.Overlay({
+     element: containerEnd,
+     offset: offset,
+     autoPan: true,
+     autoPanAnimation: {
+         duration: 250
+     }
+ });
+
 closerStart.addEventListener("click", (evt) => {
      overlayStart.setPosition(undefined);
      closerStart.blur();
@@ -110,10 +120,10 @@ closerEnd.addEventListener("click", (evt) => {
      closerEnd.blur();
      return false;
  });
-#}
+
 const attribution = new ol.control.Attribution({
   attributions: ['<a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap</a>',
-                ],
+                 '<a target="_blank" href="https://icons8.com/icon/97370/location"> | Marker</a> icon by <a target="_blank" href="https://icons8.com">Icons8</a>'],
   collapsible: false,
 });
 
@@ -125,6 +135,7 @@ const tileLayer = new ol.layer.Tile({
 });
 
 const style = {
+  {% if not start and not end %}
   'Point': new ol.style.Style({
     image: new ol.style.Circle({
       fill: new ol.style.Fill({
@@ -137,6 +148,7 @@ const style = {
       }),
     }),
   }),
+  {% endif %}
   'MultiLineString': new ol.style.Style({
     stroke: new ol.style.Stroke({
       color: '#00f',
@@ -155,7 +167,6 @@ const gpxLayer = new ol.layer.Vector({
     },
 });
 
-{#
 const iconStyle = new ol.style.Style({
     image: new ol.style.Icon({
         anchor: [0.5, 40],
@@ -164,7 +175,6 @@ const iconStyle = new ol.style.Style({
         src: "{{ url_for('static', filename='images/marker.png') }}"
     })
 });
-#}
 
 const map = new ol.Map({
   layers: [
@@ -174,23 +184,51 @@ const map = new ol.Map({
   controls: ol.control.defaults.defaults({attribution: false}).extend([attribution]),
   target: 'map',
   view: new ol.View({
-    maxZoom: 19
+    center: [0, 0],
+    maxZoom: 19,
+    zoom: 0,
   }),
 });
 
 map.addOverlay(overlayStart);
 map.addOverlay(overlayEnd);
 
-map.getView().setCenter([0, 0]);
-map.getView().setZoom(0);
+const iconFeatureStart =  new ol.Feature ({
+    geometry: new ol.geom.Point(ol.proj.fromLonLat([{{ start.longitude }}, {{ start.latitude }}]))
+});
+iconFeatureStart.setStyle(iconStyle);
+
+const markerStart = new ol.layer.Vector({
+    source: new ol.source.Vector({
+        features: [iconFeatureStart]
+    })
+});
+
+map.addLayer(markerStart);
+
+
+const iconFeatureEnd =  new ol.Feature ({
+    geometry: new ol.geom.Point(ol.proj.fromLonLat([{{ end.longitude }}, {{ end.latitude }}]))
+});
+iconFeatureEnd.setStyle(iconStyle);
+
+const markerEnd = new ol.layer.Vector({
+    source: new ol.source.Vector({
+        features: [iconFeatureEnd]
+    })
+});
+
+map.addLayer(markerEnd);
+
+
 
 function showPopup(evt) {
     const track = gpxLayer.getSource().getFeatures()[0].getGeometry()
     const startCoord = track.getFirstCoordinate().slice(0,2)
     const endCoord = track.getLastCoordinate().slice(0,2)
+
     if (map.hasFeatureAtPixel(evt.pixel) === true) {
         const featureUid = map.getFeaturesAtPixel(evt.pixel)[0].ol_uid
-
 
         const layers = []
         map.getLayers().forEach((layer) => {

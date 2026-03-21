@@ -87,7 +87,11 @@
             </div>
             <div class="w3-container w3-twothird w3-mobile">
                 {% for phone in hotel.phones %}
-                <p class="w3-left-align"><a href="tel:{{ phone.href_phone }}">{{ phone.phone }}</a></p>
+                <p class="w3-left-align"><a href="tel:{{ phone.href_phone }}">{{ phone.phone }}</a>
+                {% if is_editable %}
+                <a href={{ url_for("dbms_bp.delete_phone", hotel_id=hotel.id, phone=phone.phone) }} class="w3-right w3-hover-theme-d3"><i class="fa-solid fa-sm fa-x icon28 wbold"></i></a>
+                {% endif %}
+                </p>
                 {% endfor %}
             </div>
         </div>

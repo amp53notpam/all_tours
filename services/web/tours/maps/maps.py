@@ -1,9 +1,11 @@
 from datetime import date, timedelta
 from os.path import join
+from gpxpy import parse
 from flask import (
-    Blueprint, flash, render_template, current_app, url_for, jsonify, session, typing as ft
+    Blueprint, flash, render_template, current_app, url_for, redirect, jsonify, session, typing as ft
 )
 from flask.views import View
+from flask_babel import _
 from sqlalchemy.exc import OperationalError, ProgrammingError
 from .. import db
 from ..models import Lap, Hotel, Tour, Media, Gpx
@@ -20,6 +22,27 @@ def add_upload_path():
     return dict(upload_path=current_app.config['UPLOAD_FOLDER'])
 
 
+def get_lap_bounds(gpx):
+    gpx = join(current_app.config['UPLOAD_FOLDER'], "tracks", gpx)
+    with open(gpx) as IN:
+        gpx = parse(IN)
+    if len(gpx.tracks) > 1:
+        raise TrackError(_("Nel file %{gpx}s ci sono più tracce", gpx=gpx))
+    for track in gpx.tracks:
+        if len(track.segments) > 1:
+            raise TrackError(_("Traccia con più segmenti"))
+        for segment in track.segments:
+            points = segment.points
+            return (points[0], points[-1])
+    return (None, None)
+
+
+class TrackError(Exception):
+    def __init__(self, message):
+        self.message = message
+        super().__init__(self.message)
+
+
 class HotelMap(View):
     def dispatch_request(self, lat=None, long=None):
         hotel = db.session.execute(db.select(Hotel).where(Hotel.lat == lat and Hotel.long == long)).scalar()
@@ -31,8 +54,13 @@ class HotelMap(View):
 class LapMap(View):
     def dispatch_request(self, id=None):
         lap = db.session.get(Lap, id)
+        try:
+            start, end = get_lap_bounds(lap.primary_gpx)
+        except TrackError as e:
+            flash(e.message, category="error")
+            return redirect(url_for("lap_bp.lap", id=id))
 
-        return render_template("map_lap.jinja2", lap=lap, track=lap.primary_gpx)
+        return render_template("map_lap.jinja2", start=start, end=end, lap=lap, track=lap.primary_gpx)
 
 
 class LapMapGpx(View):
