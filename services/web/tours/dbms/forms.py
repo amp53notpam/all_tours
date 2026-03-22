@@ -31,8 +31,8 @@ class UpdLapForm(FlaskForm):
 
 
 class LoadFileForm(FlaskForm):
-    file_type = RadioField(_l('Tipo file'), choices=[('image', _l('Foto')), ('video', _l('Video')), ('gpx', _l('Traccia gpx'))], default='image')
-    file_name = FileField('File', validators=[FileAllowed(['jpg', 'jpeg', 'mov', 'mp4', 'gpx'])])
+    file_type = RadioField(_l('Tipo file'), choices=[('image', _l('Foto')), ('video', _l('Video')), ('gpx', _l('Traccia gpx')), ('POI', _('Text'))], default='image')
+    file_name = FileField('File', validators=[FileAllowed(['jpg', 'jpeg', 'mov', 'mp4', 'gpx', 'txt'])])
     caption = StringField(_l('Didascalia'))
     submit = SubmitField('OK')
 

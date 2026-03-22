@@ -72,6 +72,7 @@ class Lap(db.Model):
     tour: Mapped[Tour] = relationship(back_populates="laps")
 
     other_gpx: Mapped[List[Gpx]] = relationship(back_populates="lap")
+    pois: Mapped[List[POI]] = relationship(back_populates="lap")
     hotels: Mapped[List[Hotel]] = relationship(back_populates="lap")
     photos: Mapped[List[Media]] = relationship(back_populates="lap", order_by="Media.date")
 
@@ -89,6 +90,14 @@ class Gpx(db.Model):
     lap: Mapped[Lap] = relationship(back_populates="other_gpx")
 
     __table_args__ = (UniqueConstraint('lap_id', 'gpx', name='lap_gpx_uc'),)
+
+
+class POI(db.Model):
+    id: Mapped[int] = mapped_column(primary_key=True)
+    poi:  Mapped[str] = mapped_column(String(128))
+    at_km: Mapped[int | None]
+    lap_id: Mapped[int] = mapped_column(ForeignKey("lap.id"))
+    lap: Mapped[Lap] = relationship(back_populates="pois")
 
 
 class Media(db.Model):
