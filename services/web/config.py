@@ -4,7 +4,7 @@ from datetime import timedelta
 from tours import db
 
 
-load_dotenv('.env.pg')
+load_dotenv('.env')
 
 
 class DevelopmentConfig:
