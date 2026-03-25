@@ -82,13 +82,16 @@ function manage_form(evt) {
     let target = evt.target;
     switch (target.id) {
         case "file_type-0":
-            file_name.setAttribute("accept", ".jpg,.jpeg");
+            file_name.setAttribute("accept", ".jpg,.jpeg,.webp");
             break
         case "file_type-1":
             file_name.setAttribute("accept", ".mov");
             break;
         case "file_type-2":
             file_name.setAttribute("accept", ".gpx");
+            break;
+        case "file_type-3":
+            file_name.setAttribute("accept", ".txt,.csv");
             break;
     }
 
@@ -97,30 +100,23 @@ function manage_form(evt) {
         case "file_type-1":
             caption.maxLength = 64;
             caption_label.textContent = "{{ _('Didascalia') }}"
+            caption.style.display = caption_label.style.display = "block";
             break;
         case "file_type-2":
             caption.maxLength = 32;
             caption_label.textContent = "{{ _('Nome traccia') }}"
+            caption.style.display = caption_label.style.display = "block";
+            break;
+        case "file_type-3":
+            caption.style.display = caption_label.style.display = "none";
             break;
     }
 }
 
 function is_valid() {
-    let tooltip = document.querySelector("#caption ~ [class~=tooltiptext]");
-    if (caption.maxLength == 32) {
-        if (caption.value.length == 0){
-            tooltip.textContent = "{{ _('Inserire un nome identificativo della traccia gpx') }}"
-            tooltip.style.display = "block";
-            return false;
-       } else if (caption.value.length > caption.maxLength) {
-            tooltip.textContent = "{{ _('Nome identificativo della traccia gpx troppo lungo (max. 32 caratteri)') }}"
-            tooltip.style.display = "block";
-            return false;
-       }
-    }
-
     tooltip = document.querySelector("#file_name ~ [class~=tooltiptext]");
-    const file_extension = file_name.value.split('.').pop();
+    resetTooltip(tooltip);
+    const file_extension = file_name.value.split('.').pop().toLowerCase();
     if (! file_name.value) {
         tooltip.textContent = "{{ _('Scegliere un file.') }}";
         tooltip.style.display = "block";
@@ -131,6 +127,23 @@ function is_valid() {
         return false
     } else {
         resetTooltip(tooltip);
+
+    let tooltip = document.querySelector("#caption ~ [class~=tooltiptext]");
+    resetTooltip(tooltip);
+    if (caption.style.display == "block") {
+        if (caption.maxLength == 32) {
+            if (caption.value.length == 0){
+                tooltip.textContent = "{{ _('Inserire un nome identificativo della traccia gpx') }}"
+                tooltip.style.display = "block";
+                return false;
+            } else if (caption.value.length > caption.maxLength) {
+                tooltip.textContent = "{{ _('Nome identificativo della traccia gpx troppo lungo (max. 32 caratteri)') }}"
+                tooltip.style.display = "block";
+                return false;
+            }
+        }
+    }
+
     }
     return true;
 }

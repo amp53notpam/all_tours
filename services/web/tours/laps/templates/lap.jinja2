@@ -176,6 +176,32 @@
         </div>
         {% endif %}
 
+        {% if lap.photos %}
+        <div class="row w3-row">
+            <div class="w3-container w3-col m4 w3-mobile">
+                <p class="w3-left-align wbold">{{ _('Foto') }}:</p>
+            </div>
+            <div class="w3-container w3-col m1 w3-mobile">
+                <p class="w3-right-align">
+                <a target="_blank" href={{ url_for("lap_bp.lap_media", id=lap.id) }} class="w3-hover-theme-d3 w3-left"><i class="fa-solid fa-play icon28"></i></a>
+                </p>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if lap.pois %}
+        <div class="row w3-row">
+            <div class="w3-container w3-col m4 w3-mobile">
+                <p class="w3-left-align wbold">POIs:</p>
+            </div>
+            <div class="w3-container w3-col m1 w3-mobile">
+                <p class="w3-right-align">
+                <a target="_blank" href={{ url_for("lap_bp.lap_pois", id=lap.id) }} class="w3-hover-theme-d3 w3-left"><i class="fa-solid fa-arrow-right icon28"></i></a>
+                </p>
+            </div>
+        </div>
+        {% endif %}
+
         {% if prev_lap %}
         <div class="row w3-row">
             <div class="w3-container w3-third w3-mobile">
@@ -213,13 +239,7 @@
         </div>
         #}
 
-        {% if lap.photos %}
-        <div class="w3-content w3-theme w3-hover-theme Xref">
-            <a href={{ url_for("lap_bp.lap_media", id=lap.id) }} class="a-no-decoration">{{ _('Foto') }}</a>
-        </div>
-        {% endif %}
-
-        {% if is_editable %}
+       {% if is_editable %}
         <div class="w3-container w3-center" style="margin-top: 60px;">
             <div class="w3-bar">
                 <a href="{{ url_for('dbms_bp.load_lap_file', id=lap.id) }}" class="w3-bar-item w3-left w3-ripple" title="{{ _('Carica tracce gpx/foto/film') }}"><i class="fa-solid fa-arrow-up-from-bracket icon28"></i></a>

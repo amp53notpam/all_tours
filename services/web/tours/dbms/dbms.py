@@ -4,6 +4,7 @@ from datetime import datetime, date, time, timedelta
 from re import compile, sub
 from subprocess import Popen, PIPE, STDOUT
 from shlex import split
+from csv import DictReader, QUOTE_NONNUMERIC
 from flask import Blueprint, render_template, redirect, request, url_for, flash, current_app, session, jsonify
 from flask.views import View
 from flask_login import login_required
@@ -11,12 +12,12 @@ from flask_babel import _
 from sqlalchemy import func, desc
 from sqlalchemy.exc import IntegrityError
 from werkzeug.utils import secure_filename
-from ..models import Lap, Hotel, Tour, Media, User, PhoneNumber, Gpx
+from ..models import Lap, Hotel, Tour, Media, User, PhoneNumber, Gpx, POI
 from .forms import AddTourForm, AddLapForm, UpdLapForm, AddHotelForm, UpdHotelForm, LoadFileForm, TourMgmtForm
 from .. import db
 from ..utils import make_header, translations, get_trip
 
-ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'webp', 'gpx', 'mp4'}
+ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'webp', 'gpx', 'mp4', 'txt', 'csv'}
 
 dbms_bp = Blueprint('dbms_bp', __name__,
                     url_prefix='/dbms',
@@ -217,6 +218,45 @@ def load_gpx(request, id):
         db.session.commit()
     except IntegrityError:
         flash(_('In questo viaggio è gia definita una tappa alla stessa data'), category="error")
+
+
+def load_poi(request, id):
+    def reset_pois():
+        for poi in lap.pois:
+            db.session.delete(poi)
+        db.session.commit()
+
+    lap = db.session.get(Lap, id)
+    if lap.pois:
+        reset_pois()
+    file_path = None
+    if 'file_name' in request.files:
+        file = request.files['file_name']
+        if file.filename != '':
+            if allowed_file(file.filename):
+                poi_file = secure_filename(file.filename)
+                file_path = join(current_app.config['UPLOAD_FOLDER'], 'tmp', poi_file)
+                file.save(file_path)
+            else:
+                flash(_('Il file "%(file)s" non è di tipo .txt o .csv e quindi è stato ignorato', file=file.filename),
+                      category="warning")
+
+    if file_path:
+        with open(file_path, newline='') as csvfile:
+            reader = DictReader(csvfile, fieldnames=['position', 'desc', 'km'], delimiter=' ', quoting=QUOTE_NONNUMERIC)
+            for line in reader:
+                new_poi = POI(
+                    position=line['position'],
+                    poi=line['desc'],
+                    lap_id=id
+                )
+                if line['km']:
+                    new_poi.at_km = line['km']
+
+                db.session.add(new_poi)
+            db.session.commit()
+
+        remove(file_path)
 
 
 def load_media(request, id):
@@ -479,7 +519,7 @@ class AddHotel(View):
                 new_hotel.long = longitude
 
             if price:
-                new_hotel.price = price
+                new_hotel.price = float(price)
             if website:
                 new_hotel.link = website
             new_hotel.reserved = reserved
@@ -618,6 +658,8 @@ class LoadLapFile(View):
             file_type = request.form.get("file_type")
             if file_type == 'gpx':
                 load_gpx(request, id)
+            elif file_type == 'POI':
+                load_poi(request, id)
             else:
                 load_media(request, id)
 
@@ -689,7 +731,7 @@ class UpdHotel(View):
             if lap_id:
                 hotel.lap_id = lap_id
             if price:
-                hotel.price = price
+                hotel.price = float(price)
             if website:
                 hotel.link = website
             hotel.reserved = reserved

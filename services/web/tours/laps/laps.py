@@ -5,7 +5,7 @@ from flask import (
 from flask.views import View
 from sqlalchemy.exc import OperationalError, ProgrammingError
 from .. import db
-from ..models import Lap, Hotel, Tour, Media, User
+from ..models import Lap, Hotel, Tour, Media, User, POI
 from ..utils import make_header, make_short_template, get_trip
 from flask_babel import _
 
@@ -168,11 +168,18 @@ class SingleLapMedia(View):
         can_edit = is_editable()
         this_lap = db.session.get(Lap, id)
         x, prev_lap, next_lap = get_laps_prev_next(this_lap)
-        # prev_lap = db.session.execute(db.select(Lap.id, Lap.start, Lap.destination).where(Lap.destination == this_lap.start)).fetchone()
-        # next_lap = db.session.execute(db.select(Lap.id, Lap.start, Lap.destination).where(Lap.start == this_lap.destination)).fetchone()
         photos = db.session.execute(db.select(Media).where(Media.lap_id == id).order_by(Media.date)).fetchall()
 
         return render_template("photos.jinja2", header=header, lap=this_lap, prev_lap=prev_lap, next_lap=next_lap, photos=photos, is_editable=can_edit)
+
+
+class SingleLapPOIs(View):
+    def dispatch_request(self, id=None):
+        header = make_header()
+        this_lap = db.session.get(Lap, id)
+        pois = db.session.execute(db.select(POI).where(POI.lap_id == id).order_by(POI.position)).fetchall()
+
+        return render_template("pois.jinja2", header=header, lap=this_lap, pois=pois)
 
 
 class SingleLapMediaJS(View):
@@ -202,6 +209,7 @@ lap_bp.add_url_rule('/tappe', view_func=Laps.as_view('lap_dashboard'))
 lap_bp.add_url_rule('/tappe/<int:id>', view_func=SingleLap.as_view('lap'))
 lap_bp.add_url_rule('/tappe/<int:id>/js', view_func=SingleLapJS.as_view('lapJS'))
 lap_bp.add_url_rule('/tappe/<int:id>/photos', view_func=SingleLapMedia.as_view('lap_media'))
+lap_bp.add_url_rule('/tappe/<int:id>/pois', view_func=SingleLapPOIs.as_view('lap_pois'))
 lap_bp.add_url_rule('/tappe/<int:id>/photos/js', view_func=SingleLapMediaJS.as_view('lap_media_js'))
 lap_bp.add_url_rule('/alberghi', view_func=Hotels.as_view('hotel_dashboard'))
 lap_bp.add_url_rule('/alberghi/<int:id>', view_func=SingleHotel.as_view('hotel'))

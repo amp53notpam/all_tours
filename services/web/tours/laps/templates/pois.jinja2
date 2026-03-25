@@ -1,0 +1,63 @@
+{% extends 'layout_light.jinja2' %}
+
+{% block title %}Tappe{% endblock %}
+
+{% block header %}
+{{ header }}
+{% endblock %}
+
+{% block extend %}
+{% endblock %}
+
+{% block content %}
+<div class="w3-card-4 w3-padding-large" style="max-width: 800px; margin: auto; margin-top: 80px">
+    <div  class="w3-container w3-center">
+        <div class="w3-container w3-padding-24">
+            <h2 class="w3-center w3-theme-d2">{{ lap.start }} - {{ lap.destination }} | POIs</h2>
+        </div>
+        <article style="margin: 0 5% 0 5%;">
+            <div class="w3-responsive">
+                <table class="w3-table w3-bordered">
+                    <thead>
+                        <tr class="w3-theme-l1">
+                            <th>{{ _('Da visitare') }}</th>
+                            <th class="w3-right">{{ _('al Km.') }}</th>
+                        </tr>
+                    </thead>
+                    {% for poi in lap.pois %}
+                    {% if loop.index % 2 == 0 %}
+                    <tr class="w3-theme-l3">
+                    {% else %}
+                    <tr>
+                    {% endif %}
+                        <td>{{ poi.poi }}</td>
+                        {% if poi.at_km %}
+                        <td class="w3-right">{{ poi.at_km }}</td>
+                        {% endif %}
+                    <tr>
+                    {% endfor %}
+                </table>
+        </article>
+
+
+
+
+        <div class="w3-content w3-btn w3-theme w3-hover-theme Xref">
+            <a href={{ url_for("lap_bp.lap", id=lap.id) }} class="w3-center a-no-decoration">{{ _('Chiudi') }}</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const SCRIPT_ROOT = {{ url_for("lap_bp.lap_media_js", id=-1)|tojson }};
+    const DELETE_MEDIA = {{ url_for("dbms_bp.delete_media", media="tbd")|tojson }};
+    {% if is_editable %}
+    const IS_EDITABLE = true;
+    {% else %}
+    const IS_EDITABLE = false;
+    {% endif %}
+    console.log(IS_EDITABLE);
+</script>
+{% endblock %}
