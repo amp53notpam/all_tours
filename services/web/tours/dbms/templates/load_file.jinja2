@@ -82,7 +82,7 @@ function manage_form(evt) {
     let target = evt.target;
     switch (target.id) {
         case "file_type-0":
-            file_name.setAttribute("accept", ".jpg,.jpeg");
+            file_name.setAttribute("accept", ".jpg,.jpeg,.webp");
             break
         case "file_type-1":
             file_name.setAttribute("accept", ".mov");
@@ -91,7 +91,7 @@ function manage_form(evt) {
             file_name.setAttribute("accept", ".gpx");
             break;
         case "file_type-3":
-            file_name.setAttribute("accept", ".txt");
+            file_name.setAttribute("accept", ".txt,.csv");
             break;
     }
 

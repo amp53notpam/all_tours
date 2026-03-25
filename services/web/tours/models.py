@@ -94,8 +94,9 @@ class Gpx(db.Model):
 
 class POI(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
-    poi:  Mapped[str] = mapped_column(String(128))
-    at_km: Mapped[int | None]
+    poi: Mapped[str] = mapped_column(String(128))
+    at_km: Mapped[float | None]
+    position: Mapped[int]
     lap_id: Mapped[int] = mapped_column(ForeignKey("lap.id"))
     lap: Mapped[Lap] = relationship(back_populates="pois")
 

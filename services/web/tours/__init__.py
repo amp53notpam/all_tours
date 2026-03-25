@@ -132,6 +132,12 @@ def configure_upload_area(app):
     except FileExistsError:
         pass
 
+    try:
+        os.mkdir(f"{app.config['UPLOAD_FOLDER']}/tmp")
+        app.logger.info("Created sub-folder 'tmp' in 'uploaded")
+    except FileExistsError:
+        pass
+
 
 def register_cli_commands(app):
 

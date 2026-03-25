@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-19 11:24+0100\n"
+"POT-Creation-Date: 2026-03-24 19:39+0100\n"
 "PO-Revision-Date: 2025-04-28 11:37+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -175,13 +175,13 @@ msgstr "Enter a password"
 msgid "Inserire una E-mail"
 msgstr "Enter an E-mail"
 
-#: tours/dbms/dbms.py:60
+#: tours/dbms/dbms.py:61
 msgid ""
 "Non ci sono abbastanza giorni liberi per spostare la tappa indietro nel "
 "tempo"
 msgstr "There are not enough free days to move the stage back in time"
 
-#: tours/dbms/dbms.py:63
+#: tours/dbms/dbms.py:64
 #, python-format
 msgid ""
 "La data di check out dall'albergo %(hotel)s è incompatibile con la nuova "
@@ -190,66 +190,71 @@ msgstr ""
 "The check-out date from the hotel %(hotel)s is incompatible with the new "
 "date"
 
-#: tours/dbms/dbms.py:204 tours/dbms/dbms.py:365 tours/dbms/dbms.py:574
+#: tours/dbms/dbms.py:205 tours/dbms/dbms.py:405 tours/dbms/dbms.py:614
 #, python-format
 msgid "Il file \"%(file)s\" non è una traccia gpx ed è stato ignorato"
 msgstr "The file \"%(file)s\" is not a gpx track so it has been ignored"
 
-#: tours/dbms/dbms.py:219 tours/dbms/dbms.py:396
+#: tours/dbms/dbms.py:220 tours/dbms/dbms.py:436
 msgid "In questo viaggio è gia definita una tappa alla stessa data"
 msgstr "On this journey a stage is already defined on the same date"
 
-#: tours/dbms/dbms.py:235
+#: tours/dbms/dbms.py:241
+#, fuzzy, python-format
+msgid "Il file \"%(file)s\" non è di tipo .txt o .csv e quindi è stato ignorato"
+msgstr "The file \"%(file)s\" is not a gpx track so it has been ignored"
+
+#: tours/dbms/dbms.py:275
 #, python-format
 msgid "Il file %(m_file)s potrebbe essere corrotto"
 msgstr "The file %(m_file)s may be corrupted"
 
-#: tours/dbms/dbms.py:329
+#: tours/dbms/dbms.py:369
 #, python-format
 msgid "Un viaggio con nome %(titolo)s esiste già."
 msgstr "A trip with name %(titolo)s already exists."
 
-#: tours/dbms/dbms.py:333
+#: tours/dbms/dbms.py:373
 #, python-format
 msgid "Aggiunto viaggio \"%(titolo)s\"."
 msgstr "Added trip \"%(titolo)s\"."
 
-#: tours/dbms/dbms.py:398
+#: tours/dbms/dbms.py:438
 #, python-format
 msgid "Aggiunta tappa %(partenza)s - %(arrivo)s."
 msgstr "Added stage %(partenza)s - %(arrivo)s."
 
-#: tours/dbms/dbms.py:441 tours/dbms/dbms.py:661
+#: tours/dbms/dbms.py:481 tours/dbms/dbms.py:703
 #, python-format
 msgid "Il file \"%(file)s\" non è una immagine ed è stato ignorato"
 msgstr "The file \"%(file)s\" is not an image so it has been ignored"
 
-#: tours/dbms/dbms.py:491
+#: tours/dbms/dbms.py:531
 #, python-format
 msgid "Aggiunto albergo %(name)s a %(town)s."
 msgstr "‘Added hotel %(name)s in %(town)s."
 
-#: tours/dbms/dbms.py:602
+#: tours/dbms/dbms.py:642
 #, python-format
 msgid "Tappa %(start)s - %(destination)s aggiornata."
 msgstr "Stage %(start)s - %(destination)s updated."
 
-#: tours/dbms/dbms.py:700
+#: tours/dbms/dbms.py:742
 #, python-format
 msgid "Hotel %(hotel)s aggiornato."
 msgstr "Hotel %(hotel)s updated."
 
-#: tours/dbms/dbms.py:724
+#: tours/dbms/dbms.py:766
 #, python-format
 msgid "Cancellato viaggio %(tour)s."
 msgstr "Deleted tour %(tour)s."
 
-#: tours/dbms/dbms.py:740
+#: tours/dbms/dbms.py:782
 #, python-format
 msgid "Cancellata tappa %(start)s - %(destination)s."
 msgstr "Deleted stage %(start)s - %(destination)s."
 
-#: tours/dbms/dbms.py:773
+#: tours/dbms/dbms.py:815
 #, python-format
 msgid "Cancellato albergo %(hotel)s."
 msgstr "Deleted hotel %(hotel)s."
@@ -308,8 +313,8 @@ msgstr "OK, it's done!"
 msgid "Tipo file"
 msgstr "File type"
 
-#: tours/dbms/forms.py:34 tours/laps/templates/lap.jinja2:218
-#: tours/laps/templates/photos.jinja2:17 tours/laps/templates/s_lap.jinja2:182
+#: tours/dbms/forms.py:34 tours/laps/templates/lap.jinja2:182
+#: tours/laps/templates/photos.jinja2:17 tours/laps/templates/s_lap.jinja2:146
 msgid "Foto"
 msgstr "Pictures"
 
@@ -321,8 +326,12 @@ msgstr "Video"
 msgid "Traccia gpx"
 msgstr "Gpx track"
 
+#: tours/dbms/forms.py:34
+msgid "Text/CSV"
+msgstr ""
+
 #: tours/dbms/forms.py:36 tours/dbms/forms.py:80 tours/dbms/forms.py:88
-#: tours/dbms/templates/load_file.jinja2:99
+#: tours/dbms/templates/load_file.jinja2:102
 msgid "Didascalia"
 msgstr "Caption"
 
@@ -342,8 +351,8 @@ msgstr "City"
 
 #: tours/dbms/forms.py:44 tours/dbms/forms.py:60
 #: tours/dbms/templates/load_file.jinja2:14
-#: tours/laps/templates/hotel.jinja2:164 tours/laps/templates/photos.jinja2:42
-#: tours/laps/templates/s_hotel.jinja2:122
+#: tours/laps/templates/hotel.jinja2:168 tours/laps/templates/photos.jinja2:42
+#: tours/laps/templates/s_hotel.jinja2:126
 msgid "Tappa"
 msgstr "Stage"
 
@@ -358,8 +367,8 @@ msgid "Telefono"
 msgstr "Phone #"
 
 #: tours/dbms/forms.py:52 tours/dbms/forms.py:68
-#: tours/laps/templates/hotel.jinja2:153
-#: tours/laps/templates/s_hotel.jinja2:111
+#: tours/laps/templates/hotel.jinja2:157
+#: tours/laps/templates/s_hotel.jinja2:115
 msgid "Costo"
 msgstr "Cost"
 
@@ -368,8 +377,8 @@ msgid "Foto dell'albergo"
 msgstr "Photo of the hotel"
 
 #: tours/dbms/forms.py:54 tours/dbms/forms.py:70
-#: tours/laps/templates/hotel.jinja2:175
-#: tours/laps/templates/s_hotel.jinja2:133
+#: tours/laps/templates/hotel.jinja2:179
+#: tours/laps/templates/s_hotel.jinja2:137
 msgid "Sito web"
 msgstr "Website"
 
@@ -483,25 +492,25 @@ msgstr "Caption too long: max. 32 characters."
 msgid "Carica file"
 msgstr "File upload"
 
-#: tours/dbms/templates/load_file.jinja2:103
+#: tours/dbms/templates/load_file.jinja2:107
 msgid "Nome traccia"
 msgstr "Track title"
 
-#: tours/dbms/templates/load_file.jinja2:112
-msgid "Inserire un nome identificativo della traccia gpx"
-msgstr "Enter a descriptive name for the GPX track"
-
-#: tours/dbms/templates/load_file.jinja2:116
-msgid "Nome identificativo della traccia gpx troppo lungo (max. 32 caratteri)"
-msgstr "The descriptive name for the GPX track is too long (max. 32 characters)"
-
-#: tours/dbms/templates/load_file.jinja2:125
+#: tours/dbms/templates/load_file.jinja2:121
 msgid "Scegliere un file."
 msgstr "Choose a file."
 
-#: tours/dbms/templates/load_file.jinja2:129
+#: tours/dbms/templates/load_file.jinja2:125
 msgid "Il file selezionato non è compatibile con il tipo di file selezionato"
 msgstr "The selected file is not compatible with the selected file type"
+
+#: tours/dbms/templates/load_file.jinja2:136
+msgid "Inserire un nome identificativo della traccia gpx"
+msgstr "Enter a descriptive name for the GPX track"
+
+#: tours/dbms/templates/load_file.jinja2:140
+msgid "Nome identificativo della traccia gpx troppo lungo (max. 32 caratteri)"
+msgstr "The descriptive name for the GPX track is too long (max. 32 characters)"
 
 #: tours/dbms/templates/manage_tour.jinja2:3
 msgid "Gestione viaggio"
@@ -552,17 +561,17 @@ msgstr "Update Stage"
 msgid "Database assente! Prova più tardi"
 msgstr "Database missing! Try later"
 
-#: tours/laps/templates/hotel.jinja2:109 tours/laps/templates/s_hotel.jinja2:67
+#: tours/laps/templates/hotel.jinja2:113 tours/laps/templates/s_hotel.jinja2:71
 msgid "Prenotazione"
 msgstr "Booking"
 
-#: tours/laps/templates/hotel.jinja2:186
-#: tours/laps/templates/s_hotel.jinja2:144
+#: tours/laps/templates/hotel.jinja2:190
+#: tours/laps/templates/s_hotel.jinja2:148
 msgid "Modifica questo albergo"
 msgstr "Edit this hotel"
 
-#: tours/laps/templates/hotel.jinja2:187
-#: tours/laps/templates/s_hotel.jinja2:145
+#: tours/laps/templates/hotel.jinja2:191
+#: tours/laps/templates/s_hotel.jinja2:149
 msgid "Cancella questo albergo"
 msgstr "Delete this hote"
 
@@ -596,25 +605,25 @@ msgstr "Official Gpx track"
 msgid "Traccia"
 msgstr "Gpx track"
 
-#: tours/laps/templates/lap.jinja2:182 tours/laps/templates/photos.jinja2:24
-#: tours/laps/templates/s_lap.jinja2:146
+#: tours/laps/templates/lap.jinja2:208 tours/laps/templates/photos.jinja2:24
+#: tours/laps/templates/s_lap.jinja2:172
 msgid "Tappa precedente"
 msgstr "Previous stage"
 
-#: tours/laps/templates/lap.jinja2:193 tours/laps/templates/photos.jinja2:32
-#: tours/laps/templates/s_lap.jinja2:157
+#: tours/laps/templates/lap.jinja2:219 tours/laps/templates/photos.jinja2:32
+#: tours/laps/templates/s_lap.jinja2:183
 msgid "Tappa successiva"
 msgstr "Next stage"
 
-#: tours/laps/templates/lap.jinja2:225 tours/laps/templates/s_lap.jinja2:189
+#: tours/laps/templates/lap.jinja2:245 tours/laps/templates/s_lap.jinja2:209
 msgid "Carica tracce gpx/foto/film"
 msgstr "Upload GPX track/photo/video"
 
-#: tours/laps/templates/lap.jinja2:226 tours/laps/templates/s_lap.jinja2:190
+#: tours/laps/templates/lap.jinja2:246 tours/laps/templates/s_lap.jinja2:210
 msgid "Modifica questa tappa"
 msgstr "Edit this stage"
 
-#: tours/laps/templates/lap.jinja2:227 tours/laps/templates/s_lap.jinja2:191
+#: tours/laps/templates/lap.jinja2:247 tours/laps/templates/s_lap.jinja2:211
 msgid "Cancella questa tappa"
 msgstr "Delete this stage"
 
@@ -655,12 +664,24 @@ msgstr "Stages done"
 msgid "Chilometri percorsi"
 msgstr "Kilometres covered"
 
-#: tours/maps/maps.py:35
+#: tours/laps/templates/pois.jinja2:23
+msgid "Da visitare"
+msgstr "Point of interest"
+
+#: tours/laps/templates/pois.jinja2:24
+msgid "al Km."
+msgstr "at Km."
+
+#: tours/laps/templates/pois.jinja2:46
+msgid "Chiudi"
+msgstr "Back"
+
+#: tours/maps/maps.py:30
 #, python-brace-format
 msgid "Nel file %{gpx}s ci sono più tracce"
 msgstr "The %{gpx} file contains multiple tracks"
 
-#: tours/maps/maps.py:38
+#: tours/maps/maps.py:33
 msgid "Traccia con più segmenti"
 msgstr "Track with multiple segments"
 
