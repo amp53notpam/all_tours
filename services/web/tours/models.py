@@ -25,7 +25,7 @@ class User(UserMixin, db.Model):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(64), unique=True)
-    password: Mapped[str]
+    password: Mapped[str] = mapped_column(String(192))
     email: Mapped[str] = mapped_column(String(64), unique=True)
     is_admin: Mapped[bool | None] = mapped_column(BOOLEAN, default=False)
     tours: Mapped[List[Tour]] = relationship(back_populates="owner")
@@ -141,7 +141,7 @@ class Hotel(db.Model):
     reserved: Mapped[bool | None] = mapped_column(BOOLEAN, default=False)
     price: Mapped[int | None]
     photo: Mapped[str | None] = mapped_column(String(48))
-    link: Mapped[str | None]
+    link: Mapped[str | None] = mapped_column(String(1024))
     lat: Mapped[float | None]
     long: Mapped[float | None]
     lap_id: Mapped[int] = mapped_column(ForeignKey("lap.id"))

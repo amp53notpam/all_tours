@@ -24,7 +24,7 @@ Mako
 MarkupSafe
 msgspec
 packaging
-psycopg2-binary
+pymsql
 python-dotenv
 pytz
 SQLAlchemy
