@@ -20,6 +20,11 @@ class MediaType(str, enum.Enum):
     IMAGE = "image"
 
 
+class CheckInOutType(str, enum.Enum):
+    IN = "check_in"
+    OUT = "check_out"
+
+
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
 
@@ -136,9 +141,9 @@ class Hotel(db.Model):
     address: Mapped[str] = mapped_column(String(48))
     town: Mapped[str] = mapped_column(String(32))
     email: Mapped[str | None] = mapped_column(String(48))
-    check_in: Mapped[date | None]
-    check_out: Mapped[date | None]
     reserved: Mapped[bool | None] = mapped_column(BOOLEAN, default=False)
+    # check_in: Mapped[date | None]
+    # check_out : Mapped[date | None]
     price: Mapped[int | None]
     photo: Mapped[str | None] = mapped_column(String(48))
     link: Mapped[str | None]
@@ -150,6 +155,15 @@ class Hotel(db.Model):
 
     def __repr__(self) -> str:
         return f"{self.name} - {self.town}"
+
+
+class CheckInOut(db.Model):
+    id: Mapped[int] = mapped_column(primary_key=True)
+    type: Mapped[CheckInOutType] = mapped_column(Enum(CheckInOutType, name="checkinout_enum", native_enum=True))
+    date: Mapped[date | None]
+    after: Mapped[time | None]
+    before: Mapped[time | None]
+    hotel_id: Mapped[int] = mapped_column(ForeignKey("hotel.id"))
 
 
 class PhoneNumber(db.Model):
