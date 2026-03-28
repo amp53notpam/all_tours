@@ -152,6 +152,8 @@ class Hotel(db.Model):
     lap_id: Mapped[int] = mapped_column(ForeignKey("lap.id"))
     lap: Mapped[Lap] = relationship(back_populates="hotels")
     phones: Mapped[List[PhoneNumber]] = relationship(secondary=association_table, back_populates="hotel")
+    checks: Mapped[List[CheckInOut]] = relationship(back_populates="hotel", order_by="CheckInOut.date")
+
 
     def __repr__(self) -> str:
         return f"{self.name} - {self.town}"
@@ -159,11 +161,12 @@ class Hotel(db.Model):
 
 class CheckInOut(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
-    type: Mapped[CheckInOutType] = mapped_column(Enum(CheckInOutType, name="checkinout_enum", native_enum=True))
+    check_type: Mapped[CheckInOutType] = mapped_column(Enum(CheckInOutType, name="checkinout_enum", native_enum=True))
     date: Mapped[date | None]
     after: Mapped[time | None]
     before: Mapped[time | None]
     hotel_id: Mapped[int] = mapped_column(ForeignKey("hotel.id"))
+    hotel: Mapped[Hotel] = relationship(back_populates="checks")
 
 
 class PhoneNumber(db.Model):

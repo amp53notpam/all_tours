@@ -12,10 +12,10 @@ from flask_babel import _
 from sqlalchemy import func, desc
 from sqlalchemy.exc import IntegrityError
 from werkzeug.utils import secure_filename
-from ..models import Lap, Hotel, Tour, Media, User, PhoneNumber, Gpx, POI
+from ..models import Lap, Hotel, Tour, Media, User, PhoneNumber, Gpx, POI, CheckInOut
 from .forms import AddTourForm, AddLapForm, UpdLapForm, AddHotelForm, UpdHotelForm, LoadFileForm, TourMgmtForm
 from .. import db
-from ..utils import make_header, translations, get_trip
+from ..utils import make_header, translations, get_trip, get_check_inout
 
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'webp', 'gpx', 'mp4', 'txt', 'csv'}
 
@@ -298,6 +298,8 @@ def delete_hotel(hotel):
             pass
     for phone in hotel.phones:
         db.session.delete(phone)
+    for chk in hotel.checks:
+        db.session.delete(chk)
     db.session.delete(hotel)
     db.session.commit()
 
@@ -459,6 +461,9 @@ class AddHotel(View):
             address = request.form.get('address')
             town = request.form.get('town')
             stay = request.form.get('stay')
+            check_in_after = request.form.get('check_in_after')
+            check_in_before = request.form.get('check_in_before')
+            check_out_before = request.form.get('check_out_before')
             phones = []
             phones.append(request.form.get('phone_1'))
             phones.append(request.form.get('phone_2'))
@@ -482,19 +487,11 @@ class AddHotel(View):
                               category="warning")
 
             lap = db.session.get(Lap, lap_id)
-            # save to database
-            new_hotel = Hotel(
-                name=name,
-                address=address,
-                town=town,
-                lap=lap
-            )
-
-            new_hotel.check_in = lap.date
-            new_hotel.check_out = lap.date + timedelta(days=int(stay))
+            check_in_date = lap.date
+            check_out_date = lap.date + timedelta(days=int(stay))
 
             try:
-                check_hotel_date(new_hotel.check_in, new_hotel.check_out)
+                check_hotel_date(check_in_date, check_out_date)
             except DateOverlappingError as e:
                 flash(e.msg, category="error")
                 laps = db.session.execute(db.select(Lap).where(Lap.tour_id == tour.id).order_by(Lap.date)).scalars()
@@ -506,11 +503,34 @@ class AddHotel(View):
 
                 return render_template("add_hotel.jinja2", form=form, header=header)
 
+            # save to database
+            new_hotel = Hotel(
+                name=name,
+                address=address,
+                town=town,
+                lap=lap
+            )
+
             for phone in phones:
                 new_hotel.phones.append(PhoneNumber(phone=phone,
                                                     href_phone=sub(' ', '', phone)
                                                     )
                                         )
+
+            check_in = CheckInOut(check_type='IN',
+                                  date=check_in_date,
+                                  )
+            if check_in_after:
+                check_in.after = check_in_after
+            if check_in_before:
+                check_in.before = check_in_before
+
+            check_out = CheckInOut(check_type='OUT',
+                                   date=check_out_date)
+            if check_out_before:
+                check_out.before = check_out_before
+
+            new_hotel.checks.extend((check_in, check_out))
 
             if email:
                 new_hotel.email = email
@@ -679,6 +699,8 @@ class UpdHotel(View):
         header = make_header()
 
         tour = get_trip()
+        hotel = db.session.get(Hotel, id)
+        check_in, check_out = get_check_inout(hotel)
 
         if request.method == 'POST':
             lap_id = request.form.get('lap')
@@ -689,6 +711,9 @@ class UpdHotel(View):
             email = request.form.get('email')
             latitude = request.form.get('geo_lat')
             longitude = request.form.get('geo_long')
+            check_in_after = request.form.get('check_in_after')
+            check_in_before = request.form.get('check_in_before')
+            check_out_before = request.form.get('check_out_before')
             price = request.form.get('price')
             website = request.form.get('website')
             reserved = True if request.form.get('reserved') else False
@@ -706,10 +731,10 @@ class UpdHotel(View):
             hotel = db.session.get(Hotel, id)
             lap = db.session.get(Lap, lap_id)
 
-            hotel.check_in = lap.date
-            hotel.check_out = hotel.check_in + timedelta(days=int(stay))
+            check_in_date = lap.date
+            check_out_date = check_in_date + timedelta(days=int(stay))
             try:
-                check_hotel_date(hotel.check_in, hotel.check_out)
+                check_hotel_date(check_in_date, check_out_date)
             except DateOverlappingError as e:
                 flash(e.msg, category="error")
                 laps = db.session.execute(db.select(Lap).where(Lap.tour_id == tour.id).order_by(Lap.date)).scalars()
@@ -738,17 +763,38 @@ class UpdHotel(View):
             if photo:
                 hotel.photo = photo
 
+            if check_in_after:
+                check_in.after=check_in_after
+            else:
+                check_in.after = None
+            if check_in_before:
+                check_in.before=check_in_before
+            else:
+                check_in.before = None
+            if check_out_before:
+                check_out.before=check_out_before
+            else:
+                check_out.before = None
+
+            hotel.checks = [check_in, check_out]
+
+
             db.session.commit()
             flash(_('Hotel %(hotel)s aggiornato.', hotel=hotel.name), category="info")
             current_app.logger.info(f"Updated hotel {hotel.name}.")
             return redirect(url_for("lap_bp.hotel", id=id))
 
-        hotel = db.session.get(Hotel, id)
         form.lap.choices = [(lap.id, f"{lap.start} - {lap.destination}", dict()) for lap in tour.laps]
         form.lap.default = f"{hotel.lap_id}"
         form.process([])
 
-        return render_template("upd_hotel.jinja2", form=form, hotel=hotel, timedelta=(hotel.check_out - hotel.check_in).days, header=header)
+        return render_template("upd_hotel.jinja2",
+                               form=form,
+                               hotel=hotel,
+                               timedelta=(check_out.date - check_in.date).days,
+                               check_in=check_in,
+                               check_out=check_out,
+                               header=header)
 
 
 class DeleteTour(View):

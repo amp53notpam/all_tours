@@ -121,33 +121,46 @@
             </div>
         </div>
 
-        {% if hotel.check_in %}
+        {% if check_in %}
         <div class="row w3-row">
             <div class="w3-container w3-third 3w-mobile">
                 <p class="w3-left-align wbold">Check-in:</p>
             </div>
-            <div class="w3-container w3-twothird w3-mobile">
-                <p class="w3-left-align">{{ hotel.check_in.strftime("%A %d %b %Y") }}</p>
+            <div class="w3-container w3-third w3-mobile">
+                <p class="w3-left-align">{{ check_in.date.strftime("%A %d %b %Y") }}
             </div>
+            {% if check_in.after or check_in.before %}
+            <div class="w3-container w3-third w3-mobile">
+                <p class="w3-center">{% if check_in.after %}{{ _('Dalle ') }}{{ check_in.after.strftime("%H:%M") }} {% else %}Aperto fino {% endif %}
+                {% if check_in.before %}{{ _('alle ') }}{{ check_in.before.strftime("%H:%M") }}{% endif %}
+                </p>
+            </div>
+            {% endif %}
         </div>
         {% endif %}
 
-        {% if hotel.check_out %}
-            {% set check_out = hotel.check_out.strftime("%A %d %b %Y") %}
-        {% elif hotel.check_in %}
-            {% set check_out = (hotel.check_in + timedelta(days=1)).strftime("%A %d %b %Y") %}
+        {% if check_out %}
+            {% set chk_out = check_out.date.strftime("%A %d %b %Y") %}
+        {% elif check_in %}
+            {% set chk_out = (check_in.date + timedelta(days=1)).strftime("%A %d %b %Y") %}
         {% else %}
-            {% set check_out = None %}
+            {% set chk_out = None %}
         {% endif %}
 
-        {% if check_out %}
+        {% if chk_out %}
         <div class="row w3-row">
             <div class="w3-container w3-third 3w-mobile">
                 <p class="w3-left-align wbold">Check-out:</p>
             </div>
-            <div class="w3-container w3-twothird w3-mobile">
-                <p class="w3-left-align">{{ check_out }}</p>
+            <div class="w3-container w3-third w3-mobile">
+                <p class="w3-left-align">{{ chk_out }}</p>
             </div>
+            {% if check_out and check_out.before %}
+             <div class="w3-container w3-third w3-mobile">
+                <p class="w3-center">{{ _('Entro le ') }}{{ check_out.before.strftime("%H:%M") }}
+                </p>
+            </div>
+            {% endif %}
         </div>
         {% endif %}
 

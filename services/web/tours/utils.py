@@ -90,3 +90,16 @@ def is_displayable(tour):
 
 def get_trip():
     return db.session.execute(db.select(Tour).where(Tour.id == int(session['trip']))).scalar()
+
+
+def get_check_inout(hotel):
+    check_in = None
+    check_out = None
+    for chk in hotel.checks:
+        if chk.check_type.value == 'check_in':
+            check_in = chk
+        elif chk.check_type.value == 'check_out':
+            check_out = chk
+
+    return (check_in, check_out)
+

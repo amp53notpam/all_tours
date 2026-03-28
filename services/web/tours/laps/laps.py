@@ -6,7 +6,7 @@ from flask.views import View
 from sqlalchemy.exc import OperationalError, ProgrammingError
 from .. import db
 from ..models import Lap, Hotel, Tour, Media, User, POI
-from ..utils import make_header, make_short_template, get_trip
+from ..utils import make_header, make_short_template, get_trip, get_check_inout
 from flask_babel import _
 
 lap_bp = Blueprint('lap_bp', __name__,
@@ -107,7 +107,7 @@ class Hotels(View):
             trip_id = get_trip().id
             hotels = db.session.execute(
                 db.select(Hotel).join(Lap, Hotel.lap_id == Lap.id).where(Lap.tour_id == trip_id).order_by(
-                    Hotel.check_in)).all()
+                    Lap.date)).all()
             # hotels_unbound = None
             # if '_user_id' in session and int(session['_user_id']) == db.session.execute(db.select(Tour).where(Tour.id == trip_id)).scalar().owner.id:
             #     hotels_unbound = db.session.execute(db.select(Hotel).where(Hotel.lap_id == None).where(Hotel.tour_id == trip_id)).all()
@@ -134,10 +134,18 @@ class SingleHotel(View):
         hotel = db.session.get(Hotel, id)
         hotels = db.session.execute(
             db.select(Hotel).join(Lap, Hotel.lap_id == Lap.id).where(Lap.tour_id == hotel.lap.tour_id).order_by(
-                Hotel.check_in)).all()
+                Lap.date)).all()
         hotels_unbound = db.session.execute(db.select(Hotel).where(Hotel.lap_id == None)).all()
+        check_in, check_out = get_check_inout(hotel)
 
-        return render_template("hotel.jinja2", header=header, hotels=hotels, hotels_nb=hotels_unbound, hotel=hotel, is_editable=is_editable())
+        return render_template("hotel.jinja2",
+                               header=header,
+                               hotels=hotels,
+                               hotels_nb=hotels_unbound,
+                               hotel=hotel,
+                               check_in=check_in,
+                               check_out=check_out,
+                               is_editable=is_editable())
 
 
 class SingleLapJS(View):
@@ -157,9 +165,10 @@ class SingleLapJS(View):
 class SingleHotelJS(View):
     def dispatch_request(self, id=None):
         this_hotel = db.session.get(Hotel, id)
+        check_in, check_out = get_check_inout(this_hotel)
 
         short_html = make_short_template("hotel.jinja2")
-        return render_template(short_html, hotel=this_hotel, timedelta=timedelta, is_editable=is_editable())
+        return render_template(short_html, hotel=this_hotel, check_in=check_in,  check_out=check_out, timedelta=timedelta, is_editable=is_editable())
 
 
 class SingleLapMedia(View):

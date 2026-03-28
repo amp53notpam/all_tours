@@ -113,6 +113,32 @@
             </div>
         </div>
 
+        {# check-in #}
+        <div class="w3-container w3-row form-group" style="margin-bottom: 10px">
+            <div class="w3-col m5 w3-mobile">
+                {{ form.check_in_after.label(class="w3-theme-l4 w3-left-align wbold form_label") }}
+            </div>
+            <div class="w3-col m7 w3-mobile" style="display: flex; flex-wrap: nowrap; justify--content: space-between;">
+                {{ form.check_in_after(class="w3-left-align w3-input w3-theme-l4", style="width: 45%;") }}
+                <div style="width: 10%"></div>
+                {{ form.check_in_before(class="w3-left-align w3-input w3-theme-l4", style="width: 45%;") }}
+            </div>
+        </div>
+
+        {# check-out #}
+        <div class="w3-container w3-row form-group" style="margin-bottom: 10px">
+            <div class="w3-col m5 w3-mobile">
+                {{ form.check_out_before.label(class="w3-theme-l4 w3-left-align wbold form_label") }}
+            </div>
+            <div class="w3-col m7 w3-mobile" style="display: flex; flex-wrap: nowrap; justify--content: space-between;">
+                {{ form.check_out_before(class="w3-left-align w3-input w3-theme-l4", style="width: 45%;") }}
+                {#
+                <div style="width: 10%"></div>
+                {{ form.check_in_before(class="w3-left-align w3-input w3-theme-l4", style="width: 45%;") }}
+                #}
+            </div>
+        </div>
+
         {# costo #}
         <div class="w3-container w3-row form-group" style="margin-bottom: 10px">
             <div class="w3-col m5 w3-mobile">
