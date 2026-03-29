@@ -102,4 +102,3 @@ def get_check_inout(hotel):
             check_out = chk
 
     return (check_in, check_out)
-

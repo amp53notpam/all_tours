@@ -764,20 +764,19 @@ class UpdHotel(View):
                 hotel.photo = photo
 
             if check_in_after:
-                check_in.after=check_in_after
+                check_in.after = check_in_after
             else:
                 check_in.after = None
             if check_in_before:
-                check_in.before=check_in_before
+                check_in.before = check_in_before
             else:
                 check_in.before = None
             if check_out_before:
-                check_out.before=check_out_before
+                check_out.before = check_out_before
             else:
                 check_out.before = None
 
             hotel.checks = [check_in, check_out]
-
 
             db.session.commit()
             flash(_('Hotel %(hotel)s aggiornato.', hotel=hotel.name), category="info")

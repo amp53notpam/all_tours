@@ -76,7 +76,7 @@ def downgrade():
     for value in values:
         op.execute(hotel.update().where(hotel.c.id == value['id'])
                    .values({"check_out": value['check_out']}))
-    
+
     op.drop_table('check_in_out')
     # ### end Alembic commands ###
     conn.execute(sa.text("drop type checkinout_enum"))

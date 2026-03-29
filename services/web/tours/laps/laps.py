@@ -168,7 +168,13 @@ class SingleHotelJS(View):
         check_in, check_out = get_check_inout(this_hotel)
 
         short_html = make_short_template("hotel.jinja2")
-        return render_template(short_html, hotel=this_hotel, check_in=check_in,  check_out=check_out, timedelta=timedelta, is_editable=is_editable())
+        return render_template(short_html,
+                               hotel=this_hotel,
+                               check_in=check_in,
+                               check_out=check_out,
+                               timedelta=timedelta,
+                               is_editable=is_editable()
+                               )
 
 
 class SingleLapMedia(View):

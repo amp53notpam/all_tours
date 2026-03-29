@@ -154,7 +154,6 @@ class Hotel(db.Model):
     phones: Mapped[List[PhoneNumber]] = relationship(secondary=association_table, back_populates="hotel")
     checks: Mapped[List[CheckInOut]] = relationship(back_populates="hotel", order_by="CheckInOut.date")
 
-
     def __repr__(self) -> str:
         return f"{self.name} - {self.town}"
 
