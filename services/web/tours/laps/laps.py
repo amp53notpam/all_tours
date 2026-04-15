@@ -213,7 +213,7 @@ class SingleLapMediaJS(View):
                     "caption": media.caption,
                     "lat": media.lat,
                     "long": media.long,
-                    "map": url_for("map_bp.photo_map", lat=media.lat, long=media.long) if media.lat else None
+                    "map": url_for("map_bp.photo_map", id=media.id) if media.lat else None
                     }
             data.append(foto)
 

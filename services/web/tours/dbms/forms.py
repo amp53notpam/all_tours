@@ -64,8 +64,7 @@ class UpdHotelForm(FlaskForm):
     address = StringField(_l('Indirizzo'))
     stay = IntegerField(_l('Giorni di soggiorno'))
     email = EmailField("E-mail", validators=[Email(message=_l('E-mail non valida'))])
-    phone = TelField()
-    phone_action = RadioField(_l('Telefono'), choices=[('add', _l('Aggiungi')), ('delete', _l('Cancella'))], default='add')
+    phone = TelField(_l('Telefono'))
     geo_lat = FloatField("Lat. & Long.")
     geo_long = FloatField()
     check_in_after = TimeField(_('Orario check-in'))
@@ -74,6 +73,7 @@ class UpdHotelForm(FlaskForm):
     price = FloatField(_l('Costo'))
     photo = FileField(_l("Foto dell'albergo"), validators=[FileAllowed(['webp', 'jpg', 'jpeg'])])
     website = URLField(_l("Sito web"))
+    gpx = FileField(_l("Traccia gpx -> albergo"), validators=[FileAllowed(['gpx'])])
     reserved = BooleanField(_l('È prenotato'))
     submit = SubmitField('OK')
 

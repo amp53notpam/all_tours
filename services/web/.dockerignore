@@ -3,5 +3,5 @@
 logs
 uploaded
 .env*
-.mariadb*
-
+uv.lock
+*.toml

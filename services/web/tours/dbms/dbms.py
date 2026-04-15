@@ -169,7 +169,7 @@ def check_hotel_date(check_in, check_out):
         raise DateOverlappingError(_(f'La durata del soggiorno si sovrappone alle tappe "{laps}"'))
 
 
-def do_phone_mngmt(hotel, act, phone):
+def do_phone_mgmt(hotel, phone, act='add'):
     phones = hotel.phones
     href_phone = sub(' ', '', phone)
     phone_obj = db.session.execute(db.select(PhoneNumber).where(PhoneNumber.href_phone == href_phone)).scalar()
@@ -190,6 +190,22 @@ def do_phone_mngmt(hotel, act, phone):
             phones.remove(phone_obj)
         if not phone_obj.hotel:
             db.session.delete(phone_obj)
+
+
+def do_gpx_mgmt(hotel, gpx_file):
+    if gpx_file is None:
+        return
+
+    if hotel.gpx:
+        if hotel.gpx.gpx != gpx_file:
+            remove(join(current_app.config['UPLOAD_FOLDER'], 'tracks', hotel.gpx.gpx))
+            hotel.gpx.gpx = gpx_file
+    else:
+        hotel.gpx = Gpx(
+            gpx=gpx_file,
+            lap_id=hotel.lap_id,
+            caption=hotel.name,
+        )
 
 
 def load_gpx(request, id):
@@ -296,6 +312,8 @@ def delete_hotel(hotel):
             remove(join(current_app.config['UPLOAD_FOLDER'], 'images', hotel.photo))
         except FileNotFoundError:
             pass
+    if hotel.gpx:
+        delete_gpx(hotel.gpx)
     for phone in hotel.phones:
         db.session.delete(phone)
     for chk in hotel.checks:
@@ -512,10 +530,7 @@ class AddHotel(View):
             )
 
             for phone in phones:
-                new_hotel.phones.append(PhoneNumber(phone=phone,
-                                                    href_phone=sub(' ', '', phone)
-                                                    )
-                                        )
+                do_phone_mgmt(new_hotel, phone)
 
             check_in = CheckInOut(check_type='IN',
                                   date=check_in_date,
@@ -706,7 +721,7 @@ class UpdHotel(View):
             lap_id = request.form.get('lap')
             address = request.form.get('address')
             stay = request.form.get('stay')
-            phone_action = request.form.get('phone_action')
+            # phone_action = request.form.get('phone_action')
             phone = request.form.get('phone')
             email = request.form.get('email')
             latitude = request.form.get('geo_lat')
@@ -727,6 +742,16 @@ class UpdHotel(View):
                     else:
                         flash(_('Il file "%(file)s" non è una immagine ed è stato ignorato', file=file.filename),
                               category="warning")
+            gpx_file = None
+            if 'gpx' in request.files:
+                file = request.files['gpx']
+                if file.filename != '':
+                    if allowed_file(file.filename):
+                        gpx_file = secure_filename(file.filename)
+                        file.save(join(current_app.config['UPLOAD_FOLDER'], 'tracks', gpx_file))
+                    else:
+                        flash(_('Il file "%(file)s" non è una traccia gpx ed è stato ignorato', file=file.filename),
+                              category="warning")
 
             hotel = db.session.get(Hotel, id)
             lap = db.session.get(Lap, lap_id)
@@ -744,10 +769,12 @@ class UpdHotel(View):
 
                 return render_template("upd_hotel.jinja2", form=form, hotel=hotel, timedelta=(hotel.check_out - hotel.check_in).days, header=header)
 
+            do_gpx_mgmt(hotel, gpx_file)
+
             if address:
                 hotel.address = address
             if phone:
-                do_phone_mngmt(hotel, phone_action, phone)
+                do_phone_mgmt(hotel, phone)
             if email:
                 hotel.email = email
             if latitude and longitude:
@@ -868,7 +895,7 @@ class DeletePhone(View):
 
     def dispatch_request(self, hotel_id=None, phone=None):
         hotel = db.session.get(Hotel, hotel_id)
-        do_phone_mngmt(hotel, 'delete_phone', phone)
+        do_phone_mgmt(hotel, phone, 'delete_phone')
 
         return redirect(url_for("lap_bp.hotel", id=hotel_id))
 

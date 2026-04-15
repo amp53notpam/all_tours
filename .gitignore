@@ -34,3 +34,5 @@ s_*.jinja2
 token
 logs
 dump*
+*.toml
+uv.lock

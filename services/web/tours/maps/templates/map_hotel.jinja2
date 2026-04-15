@@ -107,24 +107,33 @@ const tileLayer = new ol.layer.Tile({
     }),
 });
 
-const style = {
-  'MultiLineString': new ol.style.Style({
-    stroke: new ol.style.Stroke({
-      color: '#00f',
-      width: 3,
-    }),
-  }),
-};
-
 {% if track %}
 const gpxLayer = new ol.layer.Vector({
     source: new ol.source.Vector({
         url: {{ url_for("download_files", filename="tracks/"+track)|tojson }},
         format: new ol.format.GPX(),
         }),
-    style: function (feature) {
-        return style[feature.getGeometry().getType()];
-    },
+    style: new ol.style.Style({
+        stroke: new ol.style.Stroke({
+            color: '#00f',
+            width: 3,
+        }),
+    }),
+});
+{% endif %}
+
+{% if track_hotel %}
+const gpxLayerHotel = new ol.layer.Vector({
+    source: new ol.source.Vector({
+        url: {{ url_for("download_files", filename="tracks/"+track_hotel)|tojson }},
+        format: new ol.format.GPX(),
+        }),
+    style: new ol.style.Style({
+        stroke: new ol.style.Stroke({
+            color: '#ff4a4d',
+            width: 3,
+        }),
+    })
 });
 {% endif %}
 
@@ -141,7 +150,10 @@ const map = new ol.Map({
   layers: [
     tileLayer,
     {% if track %}
-    gpxLayer
+    gpxLayer,
+    {% endif %}
+    {% if track_hotel %}
+    gpxLayerHotel,
     {% endif %}
   ],
   controls: ol.control.defaults.defaults({attribution: false}).extend([attribution]),

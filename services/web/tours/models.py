@@ -90,8 +90,10 @@ class Lap(db.Model):
 class Gpx(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     gpx: Mapped[str] = mapped_column(String(64))
-    caption: Mapped[str | None] = mapped_column(String(32))
-    lap_id: Mapped[int] = mapped_column(ForeignKey("lap.id"))
+    caption: Mapped[str | None] = mapped_column(String(64))
+    hotel_id: Mapped[int | None] = mapped_column(ForeignKey("hotel.id"))
+    hotel: Mapped[Hotel] = relationship(back_populates="gpx")
+    lap_id: Mapped[int | None] = mapped_column(ForeignKey("lap.id"))
     lap: Mapped[Lap] = relationship(back_populates="other_gpx")
 
     __table_args__ = (UniqueConstraint('lap_id', 'gpx', name='lap_gpx_uc'),)
@@ -150,6 +152,7 @@ class Hotel(db.Model):
     lat: Mapped[float | None]
     long: Mapped[float | None]
     lap_id: Mapped[int] = mapped_column(ForeignKey("lap.id"))
+    gpx: Mapped[Gpx] = relationship(back_populates="hotel")
     lap: Mapped[Lap] = relationship(back_populates="hotels")
     phones: Mapped[List[PhoneNumber]] = relationship(secondary=association_table, back_populates="hotel")
     checks: Mapped[List[CheckInOut]] = relationship(back_populates="hotel", order_by="CheckInOut.date")
